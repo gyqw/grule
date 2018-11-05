@@ -29,7 +29,7 @@ import java.util.TreeSet;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
-import com.bstek.urule.RuleException;
+import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.Utils;
 
 /**

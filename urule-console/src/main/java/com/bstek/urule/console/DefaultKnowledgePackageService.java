@@ -18,7 +18,7 @@ package com.bstek.urule.console;
 import java.io.IOException;
 import java.util.List;
 
-import com.bstek.urule.RuleException;
+import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.builder.KnowledgeBase;
 import com.bstek.urule.builder.KnowledgeBuilder;
 import com.bstek.urule.builder.ResourceBase;

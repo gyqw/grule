@@ -45,7 +45,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-import com.bstek.urule.RuleException;
+import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.Utils;
 import com.bstek.urule.console.EnvironmentUtils;
 import com.bstek.urule.console.User;

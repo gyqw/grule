@@ -33,7 +33,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.bstek.urule.RuleException;
+import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.Utils;
 import com.bstek.urule.console.repository.RepositoryResourceProvider;
 import com.bstek.urule.console.repository.RepositoryService;

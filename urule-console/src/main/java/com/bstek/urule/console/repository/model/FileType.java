@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.bstek.urule.console.repository.model;
 
-import com.bstek.urule.RuleException;
+import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.dsl.Constant;
 
 /**

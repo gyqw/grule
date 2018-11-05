@@ -22,11 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Jacky.gao
- * @since 2015年1月28日
+ * 2015年1月28日
  */
 public class MemoryKnowledgeCache implements KnowledgeCache {
 
-    private Map<String, KnowledgePackage> map = new ConcurrentHashMap<String, KnowledgePackage>();
+    private Map<String, KnowledgePackage> map = new ConcurrentHashMap<>();
 
     @Override
     public KnowledgePackage getKnowledge(String packageId) {

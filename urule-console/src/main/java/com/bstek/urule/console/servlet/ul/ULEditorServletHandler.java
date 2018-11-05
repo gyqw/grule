@@ -29,7 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 
-import com.bstek.urule.RuleException;
+import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.Utils;
 import com.bstek.urule.builder.ResourceLibraryBuilder;
 import com.bstek.urule.console.repository.RepositoryService;

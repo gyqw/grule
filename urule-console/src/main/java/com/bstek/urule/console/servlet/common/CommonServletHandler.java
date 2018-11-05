@@ -35,7 +35,7 @@ import org.dom4j.io.SAXReader;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
-import com.bstek.urule.RuleException;
+import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.Utils;
 import com.bstek.urule.console.EnvironmentUtils;
 import com.bstek.urule.console.User;

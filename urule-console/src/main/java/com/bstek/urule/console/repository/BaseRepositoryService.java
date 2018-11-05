@@ -43,7 +43,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.bstek.urule.RuleException;
+import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.console.DefaultRepositoryInteceptor;
 import com.bstek.urule.console.RepositoryInteceptor;
 import com.bstek.urule.console.repository.model.RepositoryFile;

@@ -41,7 +41,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.springframework.context.ApplicationContextAware;
 
-import com.bstek.urule.RuleException;
+import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.Utils;
 import com.bstek.urule.console.User;
 import com.bstek.urule.console.exception.NoPermissionException;
