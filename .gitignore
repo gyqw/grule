@@ -2,4 +2,5 @@
 *.iml
 urule-console/target/
 urule-core/target/
+urule-parent/target/
 urule-springboot/target/
