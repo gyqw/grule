@@ -140,7 +140,7 @@ urule.Rule.prototype.initRemark=function(){
 urule.Rule.prototype.initHeader=function(){
 	this.nameContainer=$("<div></div>");
 	this.ruleContainer.append(this.nameContainer);
-	this.label=$("<span style='line-height:30px'><Strong>规则 <Strong></span>");
+	this.label=$("<span style='line-height:30px'><Strong>规则编号 <Strong></span>");
 	this.nameContainer.append(this.label);
 	this.nameEditor=$(`<input type='text' class="form-control rule-text-editor">`).hide();
 	this.name="rule";
