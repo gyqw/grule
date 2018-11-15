@@ -40,7 +40,7 @@ public class KnowledgeBase {
     private KnowledgePackageImpl knowledgePackage;
 
     public KnowledgeBase(Rete rete) {
-        this(rete, (Map) null);
+        this(rete, null);
     }
 
     protected KnowledgeBase(Rete rete, Map<String, FlowDefinition> flowMap) {

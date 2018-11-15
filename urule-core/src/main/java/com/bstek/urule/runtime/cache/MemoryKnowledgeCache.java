@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Jacky.gao
+ * @author fred
  * 2015年1月28日
  */
 public class MemoryKnowledgeCache implements KnowledgeCache {
@@ -31,7 +32,7 @@ public class MemoryKnowledgeCache implements KnowledgeCache {
     @Override
     public KnowledgePackage getKnowledge(String packageId) {
         if (packageId.startsWith("/")) {
-            packageId = packageId.substring(1, packageId.length());
+            packageId = packageId.substring(1);
         }
         return map.get(packageId);
     }
@@ -39,7 +40,7 @@ public class MemoryKnowledgeCache implements KnowledgeCache {
     @Override
     public void putKnowledge(String packageId, KnowledgePackage knowledgePackage) {
         if (packageId.startsWith("/")) {
-            packageId = packageId.substring(1, packageId.length());
+            packageId = packageId.substring(1);
         }
         map.put(packageId, knowledgePackage);
     }

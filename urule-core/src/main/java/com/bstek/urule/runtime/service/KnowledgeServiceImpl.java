@@ -82,6 +82,7 @@ public class KnowledgeServiceImpl implements KnowledgeService, ApplicationContex
                 }
             }
         }
+
         return knowledgePackage;
     }
 
