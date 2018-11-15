@@ -20,12 +20,12 @@ urule.Rule=function(parent,container,data){
 urule.Rule.prototype.init=function(){
 	this.ruleContainer=$("<div class='collapse in' id='"+this.uuid+"-container'>");
 	this.container.append(this.ruleContainer);
-    this.initParent();
     this.initRemark();
 	this.initHeader();
 	this.initIf();
 	this.initThen();
 	this.initElse();
+    this.initParent();
 };
 urule.Rule.prototype.initData=function(){
 	if(!this.data){
@@ -134,7 +134,13 @@ urule.Rule.prototype.addProperty=function(property){
 	window._setDirty();
 };
 urule.Rule.prototype.initParent=function(){
-    var uruelsh= $("<div>"+this.data.remark+"</div>");
+	var message;
+	if(this.data!=null){
+		message=this.data.remark;
+	}else {
+		message=this.remark.defaultRemark;
+	}
+    var uruelsh= $("<div>"+message+"</div>");
     var uuid = this.uuid;
     uruelsh.click(function () {
         $("#"+uuid+"-container").collapse("toggle");
