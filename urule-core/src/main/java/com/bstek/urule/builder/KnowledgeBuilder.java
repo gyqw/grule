@@ -54,14 +54,14 @@ public class KnowledgeBuilder extends AbstractBuilder {
 
     public KnowledgeBase buildKnowledgeBase(ResourceBase resourceBase) throws IOException {
         KnowledgePackageService knowledgePackageService = (KnowledgePackageService) this.applicationContext.getBean("urule.knowledgePackageService");
-        List<Rule> rules = new ArrayList();
-        Map<String, Library> libMap = new HashMap();
-        Map<String, FlowDefinition> flowMap = new HashMap();
-        Iterator var6 = resourceBase.getResources().iterator();
+        List<Rule> rules = new ArrayList<>();
+        Map<String, Library> libMap = new HashMap<>();
+        Map<String, FlowDefinition> flowMap = new HashMap<>();
+        Iterator resourceIterator = resourceBase.getResources().iterator();
 
         while (true) {
-            while (var6.hasNext()) {
-                Resource resource = (Resource) var6.next();
+            while (resourceIterator.hasNext()) {
+                Resource resource = (Resource) resourceIterator.next();
                 String path = resource.getPath();
                 if (this.dslRuleSetBuilder.support(resource)) {
                     RuleSet ruleSet = this.dslRuleSetBuilder.build(resource.getContent());
@@ -127,7 +127,7 @@ public class KnowledgeBuilder extends AbstractBuilder {
                                     flowMap.put(fd.getId(), fd);
                                 } else if (type.equals(ResourceType.Scorecard)) {
                                     ScoreRule rule = (ScoreRule) object;
-                                    List<Rule> listRules = new ArrayList();
+                                    List<Rule> listRules = new ArrayList<>();
                                     listRules.add(rule);
                                     this.buildRulesPath(listRules, path);
                                     rules.add(rule);
@@ -175,7 +175,7 @@ public class KnowledgeBuilder extends AbstractBuilder {
     }
 
     private List<Rule> buildRules(LoopRule loopRule) {
-        List<Rule> rules = new ArrayList();
+        List<Rule> rules = new ArrayList<>();
         List<LoopRuleUnit> units = loopRule.getUnits();
         Iterator var4 = units.iterator();
 
@@ -190,13 +190,13 @@ public class KnowledgeBuilder extends AbstractBuilder {
             rules.add(rule);
         }
 
-        loopRule.setUnits((List) null);
+        loopRule.setUnits(null);
         return rules;
     }
 
     public KnowledgeBase buildKnowledgeBase(RuleSet ruleSet) {
-        List<Rule> rules = new ArrayList();
-        Map<String, Library> libMap = new HashMap();
+        List<Rule> rules = new ArrayList<>();
+        Map<String, Library> libMap = new HashMap<>();
         this.addToLibraryMap(libMap, ruleSet.getLibraries());
         if (ruleSet.getRules() != null) {
             rules.addAll(ruleSet.getRules());
@@ -204,7 +204,7 @@ public class KnowledgeBuilder extends AbstractBuilder {
 
         ResourceLibrary resourceLibrary = this.resourceLibraryBuilder.buildResourceLibrary(libMap.values());
         Rete rete = this.reteBuilder.buildRete(rules, resourceLibrary);
-        return new KnowledgeBase(rete, (Map) null);
+        return new KnowledgeBase(rete, null);
     }
 
     private void addToLibraryMap(Map<String, Library> map, List<Library> libraries) {

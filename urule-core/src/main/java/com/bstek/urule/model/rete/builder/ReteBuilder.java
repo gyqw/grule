@@ -39,6 +39,9 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+/**
+ * @author fred
+ */
 public class ReteBuilder implements ApplicationContextAware {
     public static final String BEAN_ID = "urule.reteBuilder";
     private static Collection<CriterionBuilder> criterionBuilders;
@@ -47,37 +50,38 @@ public class ReteBuilder implements ApplicationContextAware {
     }
 
     public Rete buildRete(List<Rule> rules, ResourceLibrary resourceLibrary) {
-        List<ObjectTypeNode> objectTypeNodes = new ArrayList();
+        List<ObjectTypeNode> objectTypeNodes = new ArrayList<>();
         Rete rete = new Rete(objectTypeNodes, resourceLibrary);
         BuildContext context = new BuildContextImpl(resourceLibrary, objectTypeNodes);
-        Map<String, List<Rule>> activationRulesMap = new HashMap();
-        Map<String, List<Rule>> agendaRulesMap = new HashMap();
-        Iterator var8 = rules.iterator();
+        Map<String, List<Rule>> activationRulesMap = new HashMap<>();
+        Map<String, List<Rule>> agendaRulesMap = new HashMap<>();
+        Iterator ruleIterator = rules.iterator();
 
-        while (var8.hasNext()) {
-            Rule rule = (Rule) var8.next();
+        while (ruleIterator.hasNext()) {
+            Rule rule = (Rule) ruleIterator.next();
             if (!this.isPass(rule)) {
                 Object agendaRules;
                 if (StringUtils.isNotBlank(rule.getActivationGroup())) {
                     agendaRules = activationRulesMap.get(rule.getActivationGroup());
                     if (agendaRules == null) {
-                        agendaRules = new ArrayList();
-                        activationRulesMap.put(rule.getActivationGroup(), new ArrayList<Rule>());
+                        ArrayList<Rule> ruleArrayList = new ArrayList<>();
+                        ruleArrayList.add(rule);
+                        activationRulesMap.put(rule.getActivationGroup(), ruleArrayList);
+                    } else {
+                        ((List) agendaRules).add(rule);
                     }
-
-                    ((List) agendaRules).add(rule);
                 } else if (StringUtils.isNotBlank(rule.getAgendaGroup())) {
-                    agendaRules = (List) agendaRulesMap.get(rule.getAgendaGroup());
+                    agendaRules = agendaRulesMap.get(rule.getAgendaGroup());
                     if (agendaRules == null) {
-                        agendaRules = new ArrayList();
-                        agendaRulesMap.put(rule.getAgendaGroup(), new ArrayList<Rule>());
+                        ArrayList<Rule> ruleArrayList = new ArrayList<>();
+                        agendaRulesMap.put(rule.getAgendaGroup(), ruleArrayList);
+                    } else {
+                        ((List) agendaRules).add(rule);
                     }
-
-                    ((List) agendaRules).add(rule);
                 } else {
                     TerminalNode terminalNode = new TerminalNode(rule, context.nextId());
                     this.buildBranch(rule, context, terminalNode);
-                    rule.setLhs((Lhs) null);
+                    rule.setLhs(null);
                 }
             }
         }
@@ -107,13 +111,13 @@ public class ReteBuilder implements ApplicationContextAware {
         if (activationRulesMap.size() == 0) {
             return null;
         } else {
-            ResourceLibrary resourceLibrary = ((BuildContext) parentContext).getResourceLibrary();
+            ResourceLibrary resourceLibrary = (parentContext).getResourceLibrary();
             Map<String, List<ReteUnit>> reteMap = new HashMap();
             Iterator var5 = activationRulesMap.keySet().iterator();
 
             while (var5.hasNext()) {
                 String groupName = (String) var5.next();
-                List<Rule> rules = (List) activationRulesMap.get(groupName);
+                List<Rule> rules = activationRulesMap.get(groupName);
                 Collections.sort(rules, new Comparator<Rule>() {
                     public int compare(Rule r1, Rule r2) {
                         Integer o1 = r1.getSalience();
@@ -138,7 +142,7 @@ public class ReteBuilder implements ApplicationContextAware {
                     }
 
                     List<ObjectTypeNode> objectTypeNodes = new ArrayList();
-                    BuildContext context = new BuildContextImpl(objectTypeNodes, (BuildContext) parentContext);
+                    BuildContext context = new BuildContextImpl(objectTypeNodes, parentContext);
                     TerminalNode terminalNode = new TerminalNode(rule, context.nextId());
                     Rete rete = new Rete(objectTypeNodes, resourceLibrary);
                     this.buildBranch(rule, context, terminalNode);
@@ -164,7 +168,7 @@ public class ReteBuilder implements ApplicationContextAware {
 
             Object prevNode;
             for (Iterator var7 = prevNodes.iterator(); var7.hasNext(); ((BaseReteNode) prevNode).addLine(terminalNode)) {
-                prevNode = (BaseReteNode) var7.next();
+                prevNode = var7.next();
                 if (prevNode instanceof JunctionNode) {
                     JunctionNode junctionNode = (JunctionNode) prevNode;
                     List<Line> toConnections = junctionNode.getToConnections();

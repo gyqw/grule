@@ -39,6 +39,7 @@ import java.util.*;
  * objectTypeActivities
  *
  * @author Jacky.gao
+ * @author fred
  * 2015年1月8日
  */
 public class KnowledgeSessionImpl implements KnowledgeSession {
@@ -62,7 +63,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
     private KnowledgeEventManager knowledgeEventManager;
 
     public KnowledgeSessionImpl(KnowledgePackage knowledgePackage) {
-        this((KnowledgePackage[]) (new KnowledgePackage[]{knowledgePackage}), (KnowledgeSession) null);
+        this((new KnowledgePackage[]{knowledgePackage}), null);
     }
 
     public KnowledgeSessionImpl(KnowledgePackage knowledgePackage, KnowledgeSession parentSession) {
@@ -135,23 +136,23 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
     }
 
     public RuleExecutionResponse fireRules() {
-        return this.execute((AgendaFilter) null, (Map) null, 2147483647);
+        return this.execute(null, null, 2147483647);
     }
 
     public RuleExecutionResponse fireRules(int max) {
-        return this.execute((AgendaFilter) null, (Map) null, max);
+        return this.execute(null, null, max);
     }
 
     public RuleExecutionResponse fireRules(AgendaFilter filter) {
-        return this.execute(filter, (Map) null, 2147483647);
+        return this.execute(filter, null, 2147483647);
     }
 
     public RuleExecutionResponse fireRules(AgendaFilter filter, int max) {
-        return this.execute(filter, (Map) null, max);
+        return this.execute(filter, null, max);
     }
 
     public RuleExecutionResponse fireRules(Map<String, Object> parameters) {
-        return this.execute((AgendaFilter) null, parameters, 2147483647);
+        return this.execute(null, parameters, 2147483647);
     }
 
     public RuleExecutionResponse fireRules(Map<String, Object> parameters, AgendaFilter filter) {
@@ -163,11 +164,11 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
     }
 
     public RuleExecutionResponse fireRules(Map<String, Object> parameters, int max) {
-        return this.execute((AgendaFilter) null, parameters, max);
+        return this.execute(null, parameters, max);
     }
 
     public FlowExecutionResponse startProcess(String processId) {
-        return this.startProcess(processId, (Map) null);
+        return this.startProcess(processId, null);
     }
 
     public FlowExecutionResponse startProcess(String processId, Map<String, Object> parameters) {
@@ -178,7 +179,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
             KnowledgePackage knowledgePackage = (KnowledgePackage) var4.next();
             Map<String, FlowDefinition> flowMap = knowledgePackage.getFlowMap();
             if (flowMap != null && flowMap.containsKey(processId)) {
-                targetFlow = (FlowDefinition) flowMap.get(processId);
+                targetFlow = flowMap.get(processId);
                 break;
             }
         }
@@ -226,7 +227,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
 
         this.addToFactsMap(this.parameterMap);
         long start = System.currentTimeMillis();
-        this.evaluationRete(this.allFactsMap.values());
+        evaluationRete(this.allFactsMap.values());
         ExecutionResponseImpl resp = (ExecutionResponseImpl) this.agenda.execute(filter, max);
         resp.setDuration(System.currentTimeMillis() - start);
         this.reset();
@@ -234,7 +235,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
     }
 
     private void clearInitParameters() {
-        List<String> stringList = new ArrayList();
+        List<String> stringList = new ArrayList<>();
         Iterator var2 = this.initParameters.keySet().iterator();
 
         String key;
@@ -340,9 +341,9 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
             reteInstance.resetForReevaluate(obj);
         }
 
-        List<Object> facts = new ArrayList();
+        List<Object> facts = new ArrayList<>();
         facts.add(obj);
-        this.evaluationRete(facts);
+        evaluationRete(facts);
     }
 
     private void evaluationRete(Collection<Object> facts) {
@@ -447,7 +448,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
         if (!this.activationReteInstancesMap.containsKey(activationGroupName)) {
             throw new RuleException("Activation group [" + activationGroupName + "] not exist!");
         } else {
-            List<ReteInstanceUnit> unitList = (List) this.activationReteInstancesMap.get(activationGroupName);
+            List<ReteInstanceUnit> unitList = this.activationReteInstancesMap.get(activationGroupName);
             Iterator var4 = unitList.iterator();
 
             label42:
@@ -486,7 +487,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
         if (!this.agendaReteInstancesMap.containsKey(groupName)) {
             throw new RuleException("Agenda group [" + groupName + "] not exist!");
         } else {
-            List<ReteInstanceUnit> unitList = (List) this.agendaReteInstancesMap.get(groupName);
+            List<ReteInstanceUnit> unitList = this.agendaReteInstancesMap.get(groupName);
             Iterator var3 = unitList.iterator();
 
             while (true) {
@@ -564,7 +565,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
     }
 
     public KnowledgeSession getKnowledgeSession(String id) {
-        return (KnowledgeSession) this.knowledgeSessionMap.get(id);
+        return this.knowledgeSessionMap.get(id);
     }
 
     public void putKnowledgeSession(String id, KnowledgeSession session) {
@@ -595,21 +596,21 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
     }
 
     private void initContext() {
-        Map<String, String> allVariableCateogoryMap = null;
+        Map<String, String> allVariableCategoryMap = null;
         Iterator var2 = this.knowledgePackageList.iterator();
 
         while (var2.hasNext()) {
             KnowledgePackage knowledgePackage = (KnowledgePackage) var2.next();
-            if (allVariableCateogoryMap == null) {
-                allVariableCateogoryMap = knowledgePackage.getVariableCateogoryMap();
+            if (allVariableCategoryMap == null) {
+                allVariableCategoryMap = knowledgePackage.getVariableCateogoryMap();
             } else {
-                allVariableCateogoryMap.putAll(knowledgePackage.getVariableCateogoryMap());
+                allVariableCategoryMap.putAll(knowledgePackage.getVariableCateogoryMap());
             }
         }
 
-        this.context = new ContextImpl(this, Utils.getApplicationContext(), allVariableCateogoryMap, this.debugMessageItems);
-        this.evaluationContext = new EvaluationContextImpl(this, Utils.getApplicationContext(), allVariableCateogoryMap, this.debugMessageItems);
-        this.flowContext = new FlowContextImpl(this, allVariableCateogoryMap, Utils.getApplicationContext(), this.debugMessageItems);
+        this.context = new ContextImpl(this, Utils.getApplicationContext(), allVariableCategoryMap, this.debugMessageItems);
+        this.evaluationContext = new EvaluationContextImpl(this, Utils.getApplicationContext(), allVariableCategoryMap, this.debugMessageItems);
+        this.flowContext = new FlowContextImpl(this, allVariableCategoryMap, Utils.getApplicationContext(), this.debugMessageItems);
     }
 
     public Context getContext() {
