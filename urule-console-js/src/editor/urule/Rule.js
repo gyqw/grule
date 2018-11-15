@@ -18,8 +18,9 @@ urule.Rule=function(parent,container,data){
 	this.initData();
 };
 urule.Rule.prototype.init=function(){
-	this.ruleContainer=$("<div>");
+	this.ruleContainer=$("<div class='collapse in' id='"+this.uuid+"-container'>");
 	this.container.append(this.ruleContainer);
+    this.initParent();
     this.initRemark();
 	this.initHeader();
 	this.initIf();
@@ -131,6 +132,14 @@ urule.Rule.prototype.addProperty=function(property){
 	this.propertyContainer.append(property.getContainer());
 	this.properties.push(property);
 	window._setDirty();
+};
+urule.Rule.prototype.initParent=function(){
+    var uruelsh= $("<div>"+this.data.remark+"</div>");
+    var uuid = this.uuid;
+    uruelsh.click(function () {
+        $("#"+uuid+"-container").collapse("toggle");
+    });
+    this.container.prepend(uruelsh);
 };
 urule.Rule.prototype.initRemark=function(){
 	var remarkContainer=$("<div></div>");
