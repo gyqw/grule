@@ -18,7 +18,7 @@ urule.Rule=function(parent,container,data){
 	this.initData();
 };
 urule.Rule.prototype.init=function(){
-	this.ruleContainer=$("<div class='collapse in' id='"+this.uuid+"-container'>");
+	this.ruleContainer=$("<div class='collapse' id='"+this.uuid+"-container'>");
 	this.container.append(this.ruleContainer);
     this.initRemark();
 	this.initHeader();
