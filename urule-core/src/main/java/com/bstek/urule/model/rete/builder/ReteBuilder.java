@@ -135,13 +135,13 @@ public class ReteBuilder implements ApplicationContextAware {
 
                 while (var8.hasNext()) {
                     Rule rule = (Rule) var8.next();
-                    List<ReteUnit> retes = (List) reteMap.get(groupName);
+                    List<ReteUnit> retes = reteMap.get(groupName);
                     if (retes == null) {
-                        retes = new ArrayList();
+                        retes = new ArrayList<>();
                         reteMap.put(groupName, retes);
                     }
 
-                    List<ObjectTypeNode> objectTypeNodes = new ArrayList();
+                    List<ObjectTypeNode> objectTypeNodes = new ArrayList<>();
                     BuildContext context = new BuildContextImpl(objectTypeNodes, parentContext);
                     TerminalNode terminalNode = new TerminalNode(rule, context.nextId());
                     Rete rete = new Rete(objectTypeNodes, resourceLibrary);
@@ -149,9 +149,9 @@ public class ReteBuilder implements ApplicationContextAware {
                     ReteUnit reteUnit = new ReteUnit(rete, rule.getName());
                     reteUnit.setEffectiveDate(rule.getEffectiveDate());
                     reteUnit.setExpiresDate(rule.getExpiresDate());
-                    ((List) retes).add(reteUnit);
+                    retes.add(reteUnit);
                     parentContext = context;
-                    rule.setLhs((Lhs) null);
+                    rule.setLhs(null);
                 }
             }
 
@@ -173,7 +173,7 @@ public class ReteBuilder implements ApplicationContextAware {
                     JunctionNode junctionNode = (JunctionNode) prevNode;
                     List<Line> toConnections = junctionNode.getToConnections();
                     if (toConnections.size() == 1) {
-                        Line conn = (Line) toConnections.get(0);
+                        Line conn = toConnections.get(0);
                         Node fromNode = conn.getFrom();
                         if (fromNode instanceof CriteriaNode) {
                             CriteriaNode cnode = (CriteriaNode) fromNode;

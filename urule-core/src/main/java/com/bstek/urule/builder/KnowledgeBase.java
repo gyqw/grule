@@ -56,10 +56,10 @@ public class KnowledgeBase {
             this.knowledgePackage = new KnowledgePackageImpl();
             this.knowledgePackage.setRete(this.rete);
             this.knowledgePackage.setFlowMap(this.flowMap);
-            Map<String, String> variableCategoryMap = new HashMap();
+            Map<String, String> variableCategoryMap = new HashMap<>();
             this.knowledgePackage.setVariableCategoryMap(variableCategoryMap);
             List<VariableCategory> variableCategories = this.resourceLibrary.getVariableCategories();
-            Map<String, String> parameters = new HashMap();
+            Map<String, String> parameters = new HashMap<>();
             this.knowledgePackage.setParameters(parameters);
             Iterator var4 = variableCategories.iterator();
 

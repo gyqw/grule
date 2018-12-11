@@ -21,7 +21,7 @@ import com.bstek.urule.runtime.KnowledgePackage;
 
 /**
  * @author Jacky.gao
- * @since 2015年1月28日
+ * 2015年1月28日
  */
 public interface KnowledgeService {
     String BEAN_ID = "urule.knowledgeService";

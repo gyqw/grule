@@ -27,7 +27,7 @@ import com.bstek.urule.exception.RuleException;
 
 /**
  * @author Jacky.gao
- * @since 2016年6月3日
+ * 2016年6月3日
  */
 public abstract class BaseServletHandler implements ServletHandler {
 
