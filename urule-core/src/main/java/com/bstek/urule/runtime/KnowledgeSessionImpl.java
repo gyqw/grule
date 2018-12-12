@@ -71,24 +71,23 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
     }
 
     public KnowledgeSessionImpl(KnowledgePackage[] knowledgePackages, KnowledgeSession parentSession) {
-        this.activedActivationGroup = new ArrayList();
-        this.sessionValueMap = new HashMap();
-        this.debugMessageItems = new ArrayList();
-        this.initParameters = new HashMap();
-        this.allFactsMap = new HashMap();
-        this.knowledgePackageList = new ArrayList();
-        this.reteInstanceList = new ArrayList();
-        this.parameterMap = new HashMap();
-        this.factMaps = new ArrayList();
-        this.knowledgeSessionMap = new HashMap();
-        this.activationReteInstancesMap = new HashMap();
-        this.agendaReteInstancesMap = new HashMap();
+        this.activedActivationGroup = new ArrayList<>();
+        this.sessionValueMap = new HashMap<>();
+        this.debugMessageItems = new ArrayList<>();
+        this.initParameters = new HashMap<>();
+        this.allFactsMap = new HashMap<>();
+        this.knowledgePackageList = new ArrayList<>();
+        this.reteInstanceList = new ArrayList<>();
+        this.parameterMap = new HashMap<>();
+        this.factMaps = new ArrayList<>();
+        this.knowledgeSessionMap = new HashMap<>();
+        this.activationReteInstancesMap = new HashMap<>();
+        this.agendaReteInstancesMap = new HashMap<>();
         this.knowledgeEventManager = new KnowledgeEventManagerImpl();
-        KnowledgePackage[] var3 = knowledgePackages;
         int var4 = knowledgePackages.length;
 
         for (int var5 = 0; var5 < var4; ++var5) {
-            KnowledgePackage knowledgePackage = var3[var5];
+            KnowledgePackage knowledgePackage = knowledgePackages[var5];
             this.knowledgePackageList.add(knowledgePackage);
             this.reteInstanceList.add(knowledgePackage.newReteInstance());
             Map<String, String> p = knowledgePackage.getParameters();
@@ -97,7 +96,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
 
                 while (var8.hasNext()) {
                     String key = (String) var8.next();
-                    Datatype type = Datatype.valueOf((String) p.get(key));
+                    Datatype type = Datatype.valueOf(p.get(key));
                     if (type.equals(Datatype.Integer)) {
                         this.initParameters.put(key, 0);
                     } else if (type.equals(Datatype.Long)) {
