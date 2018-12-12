@@ -54,6 +54,7 @@ import com.bstek.urule.console.repository.model.VersionFile;
 
 /**
  * @author Jacky.gao
+ * @author fred
  * 2017年12月15日
  */
 public abstract class BaseRepositoryService implements RepositoryReader, ApplicationContextAware {
@@ -150,23 +151,24 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
         if (StringUtils.isNotBlank(version)) {
             repositoryInteceptor.readFile(path + ":" + version);
             return readVersionFile(path, version);
+        } else {
+            repositoryInteceptor.readFile(path);
+            Node rootNode = getRootNode();
+            int colonPos = path.lastIndexOf(":");
+            if (colonPos > -1) {
+                version = path.substring(colonPos + 1);
+                path = path.substring(0, colonPos);
+                return readFile(path, version);
+            }
+            path = processPath(path);
+            if (!rootNode.hasNode(path)) {
+                throw new RuleException("File [" + path + "] not exist.");
+            }
+            Node fileNode = rootNode.getNode(path);
+            Property property = fileNode.getProperty(DATA);
+            Binary fileBinary = property.getBinary();
+            return fileBinary.getStream();
         }
-        repositoryInteceptor.readFile(path);
-        Node rootNode = getRootNode();
-        int colonPos = path.lastIndexOf(":");
-        if (colonPos > -1) {
-            version = path.substring(colonPos + 1);
-            path = path.substring(0, colonPos);
-            return readFile(path, version);
-        }
-        path = processPath(path);
-        if (!rootNode.hasNode(path)) {
-            throw new RuleException("File [" + path + "] not exist.");
-        }
-        Node fileNode = rootNode.getNode(path);
-        Property property = fileNode.getProperty(DATA);
-        Binary fileBinary = property.getBinary();
-        return fileBinary.getStream();
     }
 
 
