@@ -70,7 +70,7 @@ public class ActivationImpl implements Activation {
                     if (expiresDate != null && expiresDate.getTime() < now.getTime()) {
                         return null;
                     } else {
-                        List<Object> matchedObjects = new ArrayList();
+                        List<Object> matchedObjects = new ArrayList<>();
                         matchedObjects.addAll(this.objectCriteriaMap.keySet());
                         List actions;
                         if (this.rule instanceof LoopRule) {

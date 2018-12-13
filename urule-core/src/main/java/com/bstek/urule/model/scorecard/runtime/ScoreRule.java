@@ -38,6 +38,7 @@ import com.bstek.urule.runtime.rete.ValueCompute;
 
 /**
  * @author Jacky.gao
+ * @author fred
  * 2016年9月26日
  */
 public class ScoreRule extends Rule {
@@ -82,7 +83,7 @@ public class ScoreRule extends Rule {
                 rowItem = null;
                 RowItemImpl rowItemImpl;
                 if (rowMap.containsKey(rowNumber)) {
-                    rowItemImpl = (RowItemImpl) rowMap.get(rowNumber);
+                    rowItemImpl = rowMap.get(rowNumber);
                 } else {
                     rowItemImpl = new RowItemImpl();
                     rowItemImpl.setRowNumber(rowNumber);
