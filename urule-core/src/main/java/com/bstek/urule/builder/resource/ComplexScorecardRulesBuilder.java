@@ -61,7 +61,7 @@ public class ComplexScorecardRulesBuilder implements ResourceBuilder<ScoreRule> 
         scoreRule.setVariableName(scorecard.getVariableName());
         scoreRule.setVariableLabel(scorecard.getVariableLabel());
         scoreRule.setLibraries(scorecard.getLibraries());
-        List<Rule> rules = new ArrayList();
+        List<Rule> rules = new ArrayList<>();
         List<Row> rows = scorecard.getRows();
         List<ComplexColumn> columns = scorecard.getColumns();
         Iterator var7 = rows.iterator();
@@ -82,11 +82,11 @@ public class ComplexScorecardRulesBuilder implements ResourceBuilder<ScoreRule> 
             rule.setRhs(rhs);
             rules.add(rule);
             Value value = null;
-            Iterator var14 = columns.iterator();
+            Iterator columnIterator = columns.iterator();
 
-            while (var14.hasNext()) {
-                ComplexColumn col = (ComplexColumn) var14.next();
-                Cell cell = this.getCell(scorecard, row.getNum(), col.getNum());
+            while (columnIterator.hasNext()) {
+                ComplexColumn col = (ComplexColumn) columnIterator.next();
+                Cell cell = getCell(scorecard, row.getNum(), col.getNum());
                 ComplexColumnType type = col.getType();
                 ScoringAction action;
                 switch (type) {

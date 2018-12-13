@@ -16,8 +16,7 @@ public class ComplexScorecardDeserializer implements Deserializer<ComplexScoreca
     }
 
     public ComplexScorecardDefinition deserialize(Element root) {
-        ComplexScorecardDefinition card = this.complexScorecardParser.parse(root);
-        return card;
+        return this.complexScorecardParser.parse(root);
     }
 
     public void setComplexScorecardParser(ComplexScorecardParser complexScorecardParser) {

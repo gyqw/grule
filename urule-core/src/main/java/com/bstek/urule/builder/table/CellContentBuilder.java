@@ -76,7 +76,7 @@ public class CellContentBuilder {
             } else {
                 Junction topJunction = null;
                 if (conditions.size() == 1) {
-                    return this.newCriteria(cell, col, (Condition) conditions.get(0));
+                    return this.newCriteria(cell, col, conditions.get(0));
                 } else {
                     if (joint.getType().equals(JointType.and)) {
                         topJunction = new And();
@@ -84,8 +84,8 @@ public class CellContentBuilder {
                         topJunction = new Or();
                     }
 
-                    this.buildConditionsCriterion(cell, conditions, (Junction) topJunction, col);
-                    this.buildJointsCriterion(cell, joints, col, (Junction) topJunction);
+                    this.buildConditionsCriterion(cell, conditions, topJunction, col);
+                    this.buildJointsCriterion(cell, joints, col, topJunction);
                     return topJunction;
                 }
             }

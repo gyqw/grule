@@ -91,10 +91,10 @@ public class ComplexScorecardParser implements Parser<ComplexScorecardDefinition
             card.setDebug(Boolean.valueOf(debug));
         }
 
-        Iterator var10 = element.elements().iterator();
+        Iterator elementsIterator = element.elements().iterator();
 
-        while (var10.hasNext()) {
-            Object obj = var10.next();
+        while (elementsIterator.hasNext()) {
+            Object obj = elementsIterator.next();
             if (obj != null && obj instanceof Element) {
                 Element ele = (Element) obj;
                 String name = ele.getName();
@@ -127,7 +127,7 @@ public class ComplexScorecardParser implements Parser<ComplexScorecardDefinition
     private void rebuildComplexCard(ComplexScorecardDefinition table) {
         List<Library> libraries = table.getLibraries();
         ResourceLibrary resLibraries = this.rulesRebuilder.getResourceLibraryBuilder().buildResourceLibrary(libraries);
-        Map<String, String> namedMap = new HashMap();
+        Map<String, String> namedMap = new HashMap<>();
         Iterator var5 = table.getCellMap().values().iterator();
 
         while (true) {
