@@ -44,7 +44,7 @@ public class CriteriaActivity extends AbstractActivity {
         } else if (this.joinNodeIsPassed()) {
             return null;
         } else {
-            List<Object> allMatchedObjects = new ArrayList();
+            List<Object> allMatchedObjects = new ArrayList<>();
             EvaluateResponse response = null;
             String criteriaId = this.criteria.getId();
             Object storeValue = context.getCriteriaValue(criteriaId);

@@ -125,13 +125,24 @@ public class KnowledgeBuilder extends AbstractBuilder {
                                     fd = fd.newFlowDefinitionForSerialize(this, knowledgePackageService, this.dslRuleSetBuilder);
                                     this.addToLibraryMap(libMap, fd.getLibraries());
                                     flowMap.put(fd.getId(), fd);
-                                } else if (type.equals(ResourceType.Scorecard)) {
-                                    ScoreRule rule = (ScoreRule) object;
-                                    List<Rule> listRules = new ArrayList<>();
-                                    listRules.add(rule);
-                                    this.buildRulesPath(listRules, path);
-                                    rules.add(rule);
-                                    this.addToLibraryMap(libMap, rule.getLibraries());
+                                } else {
+                                    ScoreRule rule;
+                                    ArrayList listRules;
+                                    if (type.equals(ResourceType.Scorecard)) {
+                                        rule = (ScoreRule) object;
+                                        listRules = new ArrayList<>();
+                                        listRules.add(rule);
+                                        this.buildRulesPath(listRules, path);
+                                        rules.add(rule);
+                                        this.addToLibraryMap(libMap, rule.getLibraries());
+                                    } else if (type.equals(ResourceType.ComplexScorecard)) {
+                                        rule = (ScoreRule) object;
+                                        listRules = new ArrayList();
+                                        listRules.add(rule);
+                                        this.buildRulesPath(listRules, path);
+                                        rules.add(rule);
+                                        this.addToLibraryMap(libMap, rule.getLibraries());
+                                    }
                                 }
                             }
                             break;

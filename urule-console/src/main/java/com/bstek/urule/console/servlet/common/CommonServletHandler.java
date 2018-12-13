@@ -203,7 +203,7 @@ public class CommonServletHandler extends RenderPageServletHandler {
                 types[i] = FileType.valueOf(fileTypes[i]);
             }
         } else {
-            types = new FileType[]{FileType.UL, FileType.Ruleset, FileType.RuleFlow, FileType.DecisionTable, FileType.ScriptDecisionTable, FileType.DecisionTree, FileType.Scorecard};
+            types = new FileType[]{FileType.UL, FileType.Ruleset, FileType.RuleFlow, FileType.DecisionTable, FileType.ScriptDecisionTable, FileType.DecisionTree, FileType.Scorecard, FileType.ComplexScorecard};
         }
         try {
             Repository repo = repositoryService.loadRepository(project, user, false, types, searchFileName);
