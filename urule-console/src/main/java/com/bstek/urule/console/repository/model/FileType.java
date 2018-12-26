@@ -89,7 +89,12 @@ public enum FileType {
         public String toString() {
             return "DIR";
         }
-    };
+    },Crosstab {
+        @Override
+        public String toString() {
+            return "ct.xml";
+        }
+    },;
 
     public static FileType parse(String type) {
         if (type.equals("rs.xml")) {
@@ -118,6 +123,8 @@ public enum FileType {
             return ComplexScorecard;
         } else if (type.equals("DIR")) {
             return FileType.DIR;
+        } else if (type.equals("ct.xml")) {
+            return FileType.Crosstab;
         } else {
             throw new RuleException("Unknow type:" + type);
         }
