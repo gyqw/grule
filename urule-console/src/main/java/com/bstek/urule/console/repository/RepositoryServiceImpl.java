@@ -53,7 +53,6 @@ import com.bstek.urule.console.repository.permission.PermissionService;
 import com.bstek.urule.console.repository.refactor.RefactorService;
 import com.bstek.urule.console.servlet.permission.ProjectConfig;
 import com.bstek.urule.console.servlet.permission.UserPermission;
-import org.springframework.stereotype.Service;
 
 /**
  * @author Jacky.gao

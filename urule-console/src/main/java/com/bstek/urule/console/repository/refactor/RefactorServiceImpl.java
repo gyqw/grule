@@ -18,7 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
 
 public class RefactorServiceImpl implements RefactorService {
     private RepositoryService repositoryService;
