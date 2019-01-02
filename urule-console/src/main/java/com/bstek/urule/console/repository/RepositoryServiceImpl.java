@@ -1031,6 +1031,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         this.permissionService = permissionService;
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         super.setApplicationContext(applicationContext);
         this.refactorService = new RefactorServiceImpl(this, applicationContext);
