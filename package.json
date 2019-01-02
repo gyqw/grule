@@ -1,0 +1,24 @@
+{
+  "name": "urule",
+  "version": "1.0.0",
+  "description": "URule是一款纯Java规则引擎，它以RETE算法为基础，提供了向导式规则集、脚本式规则集、决策表、交叉决策表(PRO版提供)、决策树、评分卡及决策流共六种类型的规则定义方式，配合基于WEB的设计器，可快速实现规则的定义、维护与发布。",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "cz-conventional-changelog": "^2.1.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://192.168.7.197:8083/Architecture/urule.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}

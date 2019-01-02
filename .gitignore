@@ -1,7 +1,4 @@
 .idea/
 *.iml
 node_modules/
-urule-console/target/
-urule-core/target/
-urule-parent/target/
-urule-springboot/target/
+target/

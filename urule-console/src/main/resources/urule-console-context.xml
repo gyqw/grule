@@ -140,7 +140,7 @@
 
     <bean id="urule.repositoryService" class="com.bstek.urule.console.repository.RepositoryServiceImpl">
         <property name="repositoryBuilder" ref="urule.repositoryBuilder"/>
-        <property name="permissionService" ref="urule.permissionService"/>
+        <!--<property name="permissionService" ref="urule.permissionService"/>-->
     </bean>
 
 </beans>

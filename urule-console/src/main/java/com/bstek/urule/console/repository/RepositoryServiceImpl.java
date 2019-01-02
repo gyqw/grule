@@ -15,33 +15,6 @@
  ******************************************************************************/
 package com.bstek.urule.console.repository;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import javax.jcr.Binary;
-import javax.jcr.ImportUUIDBehavior;
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.Property;
-import javax.jcr.RepositoryException;
-import javax.jcr.lock.Lock;
-import javax.jcr.nodetype.NodeType;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.jackrabbit.value.BinaryImpl;
-import org.apache.jackrabbit.value.DateValue;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.springframework.context.ApplicationContextAware;
-
-import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.Utils;
 import com.bstek.urule.console.User;
 import com.bstek.urule.console.exception.NoPermissionException;
@@ -51,12 +24,36 @@ import com.bstek.urule.console.repository.model.RepositoryFile;
 import com.bstek.urule.console.repository.model.Type;
 import com.bstek.urule.console.repository.permission.PermissionService;
 import com.bstek.urule.console.repository.refactor.RefactorService;
+import com.bstek.urule.console.repository.refactor.RefactorServiceImpl;
 import com.bstek.urule.console.servlet.permission.ProjectConfig;
 import com.bstek.urule.console.servlet.permission.UserPermission;
+import com.bstek.urule.exception.RuleException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.jackrabbit.value.BinaryImpl;
+import org.apache.jackrabbit.value.DateValue;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+import javax.jcr.*;
+import javax.jcr.lock.Lock;
+import javax.jcr.nodetype.NodeType;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Jacky.gao
- * @since 2016年5月24日
+ * 2016年5月24日
  */
 public class RepositoryServiceImpl extends BaseRepositoryService implements RepositoryService, ApplicationContextAware {
     protected RefactorService refactorService;
@@ -64,7 +61,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
 
     @Override
     public List<UserPermission> loadResourceSecurityConfigs(String companyId) throws Exception {
-        List<UserPermission> configs = new ArrayList<UserPermission>();
+        List<UserPermission> configs = new ArrayList<>();
         String filePath = RESOURCE_SECURITY_CONFIG_FILE + (companyId == null ? "" : companyId);
         Node rootNode = getRootNode();
         Node fileNode = rootNode.getNode(filePath);
@@ -191,7 +188,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         List<RepositoryFile> files = new ArrayList();
         NodeIterator nodeIterator = fileNode.getNodes();
 
-        while(nodeIterator.hasNext()) {
+        while (nodeIterator.hasNext()) {
             Node categoryNode = nodeIterator.nextNode();
             if (categoryNode.hasProperty("_template_category")) {
                 RepositoryFile categoryFile = new RepositoryFile();
@@ -209,7 +206,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         List<RepositoryFile> list = new ArrayList();
         NodeIterator nodeIterator = categoryNode.getNodes();
 
-        while(nodeIterator.hasNext()) {
+        while (nodeIterator.hasNext()) {
             Node fileNode = nodeIterator.nextNode();
             if (fileNode.hasProperty("_file")) {
                 RepositoryFile file = new RepositoryFile();
@@ -1029,7 +1026,13 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         }
     }
 
+    @Autowired
     public void setPermissionService(PermissionService permissionService) {
         this.permissionService = permissionService;
+    }
+
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        super.setApplicationContext(applicationContext);
+        this.refactorService = new RefactorServiceImpl(this, applicationContext);
     }
 }
