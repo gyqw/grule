@@ -28,6 +28,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 public class RepositoryFile {
 	private String id;
 	private String name;
+	private String comment;
 	private String fullPath;
 	private Type type;
 	private Type folderType;
@@ -131,5 +132,13 @@ public class RepositoryFile {
 
 	public void setLockInfo(String lockInfo) {
 		this.lockInfo = lockInfo;
+	}
+
+	public String getComment() {
+		return this.comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 }

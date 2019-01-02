@@ -44,5 +44,6 @@ public enum Type {
     decisionTree,
     flow,
     all,
+    crosstab,
     folder;
 }

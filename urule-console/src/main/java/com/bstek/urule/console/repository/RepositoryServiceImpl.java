@@ -15,33 +15,6 @@
  ******************************************************************************/
 package com.bstek.urule.console.repository;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import javax.jcr.Binary;
-import javax.jcr.ImportUUIDBehavior;
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.Property;
-import javax.jcr.RepositoryException;
-import javax.jcr.lock.Lock;
-import javax.jcr.nodetype.NodeType;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.jackrabbit.value.BinaryImpl;
-import org.apache.jackrabbit.value.DateValue;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.springframework.context.ApplicationContextAware;
-
-import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.Utils;
 import com.bstek.urule.console.User;
 import com.bstek.urule.console.exception.NoPermissionException;
@@ -50,19 +23,45 @@ import com.bstek.urule.console.repository.model.LibType;
 import com.bstek.urule.console.repository.model.RepositoryFile;
 import com.bstek.urule.console.repository.model.Type;
 import com.bstek.urule.console.repository.permission.PermissionService;
+import com.bstek.urule.console.repository.refactor.RefactorService;
+import com.bstek.urule.console.repository.refactor.RefactorServiceImpl;
 import com.bstek.urule.console.servlet.permission.ProjectConfig;
 import com.bstek.urule.console.servlet.permission.UserPermission;
+import com.bstek.urule.exception.RuleException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.jackrabbit.value.BinaryImpl;
+import org.apache.jackrabbit.value.DateValue;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+import javax.jcr.*;
+import javax.jcr.lock.Lock;
+import javax.jcr.nodetype.NodeType;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Jacky.gao
- * @since 2016年5月24日
+ * 2016年5月24日
  */
 public class RepositoryServiceImpl extends BaseRepositoryService implements RepositoryService, ApplicationContextAware {
+    protected RefactorService refactorService;
     private PermissionService permissionService;
 
     @Override
     public List<UserPermission> loadResourceSecurityConfigs(String companyId) throws Exception {
-        List<UserPermission> configs = new ArrayList<UserPermission>();
+        List<UserPermission> configs = new ArrayList<>();
         String filePath = RESOURCE_SECURITY_CONFIG_FILE + (companyId == null ? "" : companyId);
         Node rootNode = getRootNode();
         Node fileNode = rootNode.getNode(filePath);
@@ -143,6 +142,88 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         }
         return false;
     }
+
+    @Override
+    public String saveTemplateFile(String path, String content) throws Exception {
+        path = this.processPath(path);
+        Node rootNode = this.getRootNode();
+        if (!rootNode.hasNode(path)) {
+            throw new RuleException("File [" + path + "] not exist.");
+        } else {
+            Node fileNode = rootNode.getNode(path);
+            Binary fileBinary = new BinaryImpl(content.getBytes("utf-8"));
+            fileNode.setProperty("_data", fileBinary);
+            fileNode.setProperty("_file", true);
+            this.session.save();
+            return path;
+        }
+    }
+
+    @Override
+    public String getProject(String path) {
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+
+        int pos = path.indexOf("/");
+        if (pos == -1) {
+            pos = path.length();
+        }
+
+        return path.substring(0, pos);
+    }
+
+    @Override
+    public List<RepositoryFile> loadTemplates(String project) throws Exception {
+        String path = project + "/" + "__rules_templates__";
+        path = this.processPath(path);
+        Node rootNode = this.getRootNode();
+        Node fileNode = null;
+        if (!rootNode.hasNode(path)) {
+            fileNode = rootNode.addNode(path);
+        } else {
+            fileNode = rootNode.getNode(path);
+        }
+
+        List<RepositoryFile> files = new ArrayList();
+        NodeIterator nodeIterator = fileNode.getNodes();
+
+        while (nodeIterator.hasNext()) {
+            Node categoryNode = nodeIterator.nextNode();
+            if (categoryNode.hasProperty("_template_category")) {
+                RepositoryFile categoryFile = new RepositoryFile();
+                categoryFile.setName(categoryNode.getName());
+                categoryFile.setFullPath(categoryNode.getPath());
+                categoryFile.setChildren(this.loadTemplateFiles(categoryNode));
+                files.add(categoryFile);
+            }
+        }
+
+        return files;
+    }
+
+    private List<RepositoryFile> loadTemplateFiles(Node categoryNode) throws Exception {
+        List<RepositoryFile> list = new ArrayList();
+        NodeIterator nodeIterator = categoryNode.getNodes();
+
+        while (nodeIterator.hasNext()) {
+            Node fileNode = nodeIterator.nextNode();
+            if (fileNode.hasProperty("_file")) {
+                RepositoryFile file = new RepositoryFile();
+                file.setType(Type.rule);
+                file.setFullPath(fileNode.getPath());
+                file.setName(fileNode.getName());
+                if (fileNode.hasProperty("__rules_template_comment__")) {
+                    file.setComment(fileNode.getProperty("__rules_template_comment__").getString());
+                }
+
+                list.add(file);
+            }
+        }
+
+        return list;
+    }
+
 
     @Override
     public List<ClientConfig> loadClientConfigs(String project) throws Exception {
@@ -600,6 +681,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         lockManager.unlock(lock.getNode().getPath());
     }
 
+    @Override
     public void deleteFile(String path, User user) throws Exception {
         if (!permissionService.fileHasWritePermission(path)) {
             throw new NoPermissionException();
@@ -705,7 +787,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
     }
 
     private List<String> getFiles(Node rootNode, String path) throws Exception {
-        String project = getProject(path);
+        String project = getProjects(path);
         List<String> list = new ArrayList<String>();
         Node projectNode = rootNode.getNode(project);
         buildPath(list, projectNode);
@@ -734,7 +816,8 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         }
     }
 
-    private String getProject(String path) {
+
+    private String getProjects(String path) {
         if (path.startsWith("/")) {
             path = path.substring(1);
         }
@@ -781,6 +864,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         return projectFileInfo;
     }
 
+    @Override
     public void createDir(String path, User user) throws Exception {
         if (!permissionService.isAdmin()) {
             throw new NoPermissionException();
@@ -833,6 +917,13 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         createFileNode(path, content, user, true);
     }
 
+    @Override
+    public boolean fileExist(String path) throws Exception {
+        Node rootNode = this.getRootNode();
+        return rootNode.hasNode(path);
+    }
+
+    @Override
     public void fileRename(String path, String newPath) throws Exception {
         if (!permissionService.isAdmin()) {
             throw new NoPermissionException();
@@ -845,10 +936,12 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         if (!rootNode.hasNode(path)) {
             throw new RuleException("File [" + path + "] not exist.");
         }
+        this.refactorService.refactorFile("/" + path, "/" + newPath);
         session.getWorkspace().move("/" + path, "/" + newPath);
         session.save();
     }
 
+    @Override
     public void exportXml(String projectPath, OutputStream outputStream) throws Exception {
         if (!permissionService.isAdmin()) {
             throw new NoPermissionException();
@@ -856,6 +949,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         session.exportSystemView(projectPath, outputStream, false, false);
     }
 
+    @Override
     public void importXml(InputStream inputStream, boolean overwrite) throws Exception {
         if (!permissionService.isAdmin()) {
             throw new NoPermissionException();
@@ -932,7 +1026,14 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         }
     }
 
+    @Autowired
     public void setPermissionService(PermissionService permissionService) {
         this.permissionService = permissionService;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        super.setApplicationContext(applicationContext);
+        this.refactorService = new RefactorServiceImpl(this, applicationContext);
     }
 }
