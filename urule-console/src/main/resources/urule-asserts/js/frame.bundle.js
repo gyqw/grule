@@ -11157,11 +11157,13 @@
                                 }
                             })
                         }
-                    }, {
+                    },
+                       /* {
                         name: "修改项目名称", icon: "rf rf-rename", click: function (t) {
                             i.eventEmitter.emit(i.OPEN_UPDATE_PROJECT_DIALOG, t)
                         }
-                    }, {
+                    }, */
+                        {
                         name: "删除项目", icon: "rf rf-remove", click: function (t, e) {
                             bootbox.confirm("此操作将删除" + t.name + "项目及其下所有文件，你确定要这样做吗？", function (n) {
                                 n && w(t, e)

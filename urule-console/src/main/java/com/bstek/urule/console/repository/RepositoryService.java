@@ -67,4 +67,12 @@ public interface RepositoryService extends RepositoryReader {
     List<ClientConfig> loadClientConfigs(String project) throws Exception;
 
     List<UserPermission> loadResourceSecurityConfigs(String companyId) throws Exception;
+
+    boolean fileExist(String var1) throws Exception;
+
+    String getProject(String var1);
+
+    List<RepositoryFile> loadTemplates(String var1) throws Exception;
+
+    String saveTemplateFile(String var1, String var2) throws Exception;
 }

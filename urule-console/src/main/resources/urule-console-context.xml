@@ -41,6 +41,24 @@
     <bean id="urule.complexScorecardEditorServletHandler"
           class="com.bstek.urule.console.servlet.complexscorecard.ComplexScorecardEditorServletHandler"/>
 
+    <bean id="urule.decisionTableFileRefactor" class="com.bstek.urule.console.repository.refactor.file.DecisionTableFileRefactor"></bean>
+    <bean id="urule.decisionTreeFileRefactor" class="com.bstek.urule.console.repository.refactor.file.DecisionTreeFileRefactor"></bean>
+    <bean id="urule.flowFileRefactor" class="com.bstek.urule.console.repository.refactor.file.FlowFileRefactor"></bean>
+    <bean id="urule.knowledgePackageFileRefactor" class="com.bstek.urule.console.repository.refactor.file.KnowledgePackageFileRefactor"></bean>
+    <bean id="urule.rulesetFileRefactor" class="com.bstek.urule.console.repository.refactor.file.RulesetFileRefactor"></bean>
+    <bean id="urule.scorecardFileRefactor" class="com.bstek.urule.console.repository.refactor.file.ScorecardFileRefactor"></bean>
+    <bean id="urule.complexScorecardFileRefactor" class="com.bstek.urule.console.repository.refactor.file.ComplexScorecardFileRefactor"></bean>
+    <bean id="urule.crossTableFileRefactor" class="com.bstek.urule.console.repository.refactor.file.CrossTableFileRefactor"></bean>
+
+    <bean id="urule.decisionTableContentRefactor" class="com.bstek.urule.console.repository.refactor.field.DecisionTableContentRefactor"></bean>
+    <bean id="urule.decisionTreeContentRefactor" class="com.bstek.urule.console.repository.refactor.field.DecisionTreeContentRefactor"></bean>
+    <bean id="urule.flowContentRefactor" class="com.bstek.urule.console.repository.refactor.field.FlowContentRefactor"></bean>
+    <bean id="urule.rulesetContentRefactor" class="com.bstek.urule.console.repository.refactor.field.RulesetContentRefactor"></bean>
+    <bean id="urule.scorecardContentRefactor" class="com.bstek.urule.console.repository.refactor.field.ScorecardContentRefactor"></bean>
+    <bean id="urule.complexScorecardContentRefactor" class="com.bstek.urule.console.repository.refactor.field.ComplexScorecardContentRefactor"></bean>
+    <bean id="urule.scriptRulesetContentRefactor" class="com.bstek.urule.console.repository.refactor.field.ScriptRulesetContentRefactor"></bean>
+    <bean id="urule.crossTableContentRefactor" class="com.bstek.urule.console.repository.refactor.field.CrossTableContentRefactor"></bean>
+
     <bean id="urule.resourceLoaderServletHandler" class="com.bstek.urule.console.servlet.ResourceLoaderServletHandler"/>
 
     <bean id="urule.loadKnowledgeServletHandler"
@@ -122,7 +140,7 @@
 
     <bean id="urule.repositoryService" class="com.bstek.urule.console.repository.RepositoryServiceImpl">
         <property name="repositoryBuilder" ref="urule.repositoryBuilder"/>
-        <property name="permissionService" ref="urule.permissionService"/>
+        <!--<property name="permissionService" ref="urule.permissionService"/>-->
     </bean>
 
 </beans>
