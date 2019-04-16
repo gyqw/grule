@@ -28,7 +28,6 @@ import './ActionType.js';
 import './SimpleArithmetic.js';
 import './PrintAction.js';
 import './AssignmentAction.js';
-import './ActionType.js';
 import './Join.js';
 import './NamedJoin.js';
 import './NamedCondition.js';
@@ -54,9 +53,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 $(document).ready(function () {
-    const container=$('#container');
+    const container = $('#container');
     container.urule();
-    const dialogContainer=$('<div>');
+    const dialogContainer = $('<div>');
     container.append(dialogContainer);
     ReactDOM.render(
         <KnowledgeTreeDialog/>,
