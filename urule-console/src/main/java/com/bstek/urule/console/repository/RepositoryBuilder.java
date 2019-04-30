@@ -1,45 +1,10 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.repository;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.Properties;
-import java.util.logging.Logger;
-
-import javax.jcr.RepositoryException;
-import javax.servlet.ServletContext;
-import javax.sql.DataSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import com.bstek.urule.exception.RuleException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.core.RepositoryImpl;
-import org.apache.jackrabbit.core.config.AccessManagerConfig;
-import org.apache.jackrabbit.core.config.BeanConfig;
-import org.apache.jackrabbit.core.config.ClusterConfig;
-import org.apache.jackrabbit.core.config.DataSourceConfig;
-import org.apache.jackrabbit.core.config.LoginModuleConfig;
-import org.apache.jackrabbit.core.config.PersistenceManagerConfig;
-import org.apache.jackrabbit.core.config.RepositoryConfig;
-import org.apache.jackrabbit.core.config.RepositoryConfigurationParser;
-import org.apache.jackrabbit.core.config.SecurityConfig;
-import org.apache.jackrabbit.core.config.SecurityManagerConfig;
-import org.apache.jackrabbit.core.config.VersioningConfig;
+import org.apache.jackrabbit.core.config.*;
 import org.apache.jackrabbit.core.data.DataStore;
 import org.apache.jackrabbit.core.data.DataStoreFactory;
 import org.apache.jackrabbit.core.data.FileDataStore;
@@ -55,6 +20,8 @@ import org.apache.jackrabbit.core.util.CooperativeFileLock;
 import org.apache.jackrabbit.core.util.RepositoryLockMechanism;
 import org.apache.jackrabbit.core.util.RepositoryLockMechanismFactory;
 import org.apache.jackrabbit.core.util.db.ConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -63,13 +30,18 @@ import org.springframework.web.context.WebApplicationContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.bstek.urule.exception.RuleException;
+import javax.jcr.RepositoryException;
+import javax.servlet.ServletContext;
+import javax.sql.DataSource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
+import java.io.InputStream;
+import java.util.Properties;
 
-/**
- * @author Jacky.gao
- * 2016年5月24日
- */
 public class RepositoryBuilder implements InitializingBean, ApplicationContextAware {
+    private Logger logger = LoggerFactory.getLogger(RepositoryBuilder.class.getName());
+
     private String repoHomeDir;
     private Element workspaceTemplate;
     private RepositoryImpl repository;
@@ -78,7 +50,6 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
     private String repositoryDatasourceName;
     public static String databaseType;
     public static DataSource datasource;
-    private Logger log = Logger.getLogger(RepositoryBuilder.class.getName());
 
     public RepositoryImpl getRepository() {
         return repository;
@@ -171,7 +142,7 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
     }
 
     private void initRepositoryByXml(String xml) throws Exception {
-        log.info("Build repository from user custom xml file...");
+        logger.info("Build repository from user custom xml file...");
         InputStream inputStream = null;
         try {
             inputStream = this.applicationContext.getResource(xml).getInputStream();
@@ -264,9 +235,9 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
                 throw new RuleException("Repository root dir " + repoHomeDir + " is not exist.");
             }
         } else {
-            log.info("Current is not a standard web container,so can't resolve real path for repo home dir.");
+            logger.info("Current is not a standard web container,so can't resolve real path for repo home dir.");
         }
-        log.info("Use \"" + repoHomeDir + "\" as urule repository home directory.");
+        logger.info("Use \"" + repoHomeDir + "\" as urule repository home directory.");
     }
 
     public void afterPropertiesSet() throws Exception {
