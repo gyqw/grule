@@ -1,52 +1,30 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.runtime.service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import org.apache.commons.lang.StringUtils;
-
-import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.Utils;
+import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.model.flow.FlowDefinition;
 import com.bstek.urule.model.rete.JsonUtils;
 import com.bstek.urule.runtime.KnowledgePackage;
 import com.bstek.urule.runtime.KnowledgePackageWrapper;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * @author Jacky.gao
- * 2015年1月28日
- */
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Map;
+
 public class RemoteServiceImpl implements RemoteService {
+    private Logger logger = LoggerFactory.getLogger(RemoteServiceImpl.class.getName());
+
     private String resporityServerUrl;
-    private Logger log = Logger.getLogger(RemoteServiceImpl.class.getName());
 
     public KnowledgePackage getKnowledge(String packageId, String timestamp) {
         if (StringUtils.isEmpty(resporityServerUrl)) {
             return null;
         }
-        log.info("Load knowledgepackage from remote...");
+        logger.info("Load knowledge package from remote...");
         String content = sendRequest(packageId, timestamp);
         if (StringUtils.isEmpty(content)) {
             return null;

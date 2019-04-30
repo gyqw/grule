@@ -1,32 +1,9 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.bstek.urule.debug.DebugWriter;
 import com.bstek.urule.exception.RuleException;
+import com.bstek.urule.model.function.FunctionDescriptor;
+import com.bstek.urule.model.library.Datatype;
 import com.bstek.urule.model.rule.Other;
 import com.bstek.urule.model.rule.Rhs;
 import com.bstek.urule.model.rule.Rule;
@@ -37,21 +14,19 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.bstek.urule.debug.DebugWriter;
-import com.bstek.urule.model.function.FunctionDescriptor;
-import com.bstek.urule.model.library.Datatype;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.*;
 
-/**
- * @author Jacky.gao
- * 2015年1月8日
- */
 public class Utils implements ApplicationContextAware {
     private static boolean debug;
     private static boolean debugToFile;
     private static ApplicationContext applicationContext;
     private static Collection<DebugWriter> debugWriters;
-    private static Map<String, FunctionDescriptor> functionDescriptorMap = new HashMap<String, FunctionDescriptor>();
-    private static Map<String, FunctionDescriptor> functionDescriptorLabelMap = new HashMap<String, FunctionDescriptor>();
+    private static Map<String, FunctionDescriptor> functionDescriptorMap = new HashMap<>();
+    private static Map<String, FunctionDescriptor> functionDescriptorLabelMap = new HashMap<>();
 
     public static ApplicationContext getApplicationContext() {
         return applicationContext;

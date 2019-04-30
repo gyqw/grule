@@ -5,19 +5,19 @@
     <parent>
         <groupId>geex-architecture</groupId>
         <artifactId>urule-parent</artifactId>
-        <version>2.1.7-SNAPSHOT</version>
+        <version>${revision}</version>
+        <relativePath>../urule-parent</relativePath>
     </parent>
 
-    <name>URule Console Project</name>
+    <name>Geex Rule Console Project</name>
     <artifactId>urule-console</artifactId>
-    <version>2.1.7-SNAPSHOT</version>
-    <url>https://github.com/youseries/urule/tree/master/urule-console</url>
+    <version>${revision}</version>
 
     <dependencies>
         <dependency>
             <groupId>geex-architecture</groupId>
             <artifactId>urule-core</artifactId>
-            <version>2.1.7-SNAPSHOT</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.jackrabbit</groupId>
@@ -65,23 +65,4 @@
         </license>
     </licenses>
 
-    <developers>
-        <developer>
-            <name>Gaojie</name>
-            <email>jacky.gao@bstek.com</email>
-            <organization>Bstek</organization>
-            <organizationUrl>http://www.bstek.com</organizationUrl>
-        </developer>
-    </developers>
-
-    <scm>
-        <connection>https://github.com/youseries/urule.git</connection>
-        <developerConnection>https://github.com/youseries/urule.git</developerConnection>
-        <url>https://github.com/youseries/urule</url>
-    </scm>
-
-    <organization>
-        <name>Bstek</name>
-        <url>http://www.bstek.com</url>
-    </organization>
 </project>

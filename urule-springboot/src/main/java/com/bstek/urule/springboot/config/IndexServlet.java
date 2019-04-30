@@ -7,10 +7,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * @author Jacky.gao
- * 2016年10月12日
- */
 public class IndexServlet extends HttpServlet {
     private static final long serialVersionUID = 9155627652423910928L;
 

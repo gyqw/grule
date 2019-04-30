@@ -172,10 +172,8 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
 
     public FlowExecutionResponse startProcess(String processId, Map<String, Object> parameters) {
         FlowDefinition targetFlow = null;
-        Iterator var4 = this.knowledgePackageList.iterator();
 
-        while (var4.hasNext()) {
-            KnowledgePackage knowledgePackage = (KnowledgePackage) var4.next();
+        for (KnowledgePackage knowledgePackage : this.knowledgePackageList) {
             Map<String, FlowDefinition> flowMap = knowledgePackage.getFlowMap();
             if (flowMap != null && flowMap.containsKey(processId)) {
                 targetFlow = flowMap.get(processId);
@@ -199,37 +197,30 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
             targetFlow.newInstance(this.flowContext);
             ExecutionResponseImpl response = (ExecutionResponseImpl) this.flowContext.getResponse();
             response.setDuration(System.currentTimeMillis() - start);
-            this.reset();
+            reset();
             return response;
         }
     }
 
     private RuleExecutionResponse execute(AgendaFilter filter, Map<String, Object> params, int max) {
         this.parameterMap.clear();
-        this.clearInitParameters();
+        clearInitParameters();
         this.parameterMap.putAll(this.initParameters);
-        Iterator var4 = this.factMaps.iterator();
-
-        while (var4.hasNext()) {
-            Map<?, ?> map = (Map) var4.next();
-            Iterator var6 = map.keySet().iterator();
-
-            while (var6.hasNext()) {
-                Object key = var6.next();
-                this.parameterMap.put(key.toString(), map.get(key));
+        for (Map<?, ?> factMap : this.factMaps) {
+            for (Object key : factMap.keySet()) {
+                this.parameterMap.put(key.toString(), factMap.get(key));
             }
         }
-
         if (params != null) {
             this.parameterMap.putAll(params);
         }
+        addToFactsMap(this.parameterMap);
 
-        this.addToFactsMap(this.parameterMap);
         long start = System.currentTimeMillis();
         evaluationRete(this.allFactsMap.values());
         ExecutionResponseImpl resp = (ExecutionResponseImpl) this.agenda.execute(filter, max);
         resp.setDuration(System.currentTimeMillis() - start);
-        this.reset();
+        reset();
         return resp;
     }
 

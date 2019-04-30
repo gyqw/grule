@@ -1,42 +1,24 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.runtime.service;
 
-
-import java.io.IOException;
-import java.util.logging.Logger;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.runtime.KnowledgePackage;
 import com.bstek.urule.runtime.cache.CacheUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
-/**
- * @author Jacky.gao
- * 2015年1月28日
- */
+import java.io.IOException;
+
 public class KnowledgeServiceImpl implements KnowledgeService, ApplicationContextAware {
+    private Logger logger = LoggerFactory.getLogger(KnowledgeServiceImpl.class.getName());
+
     private long knowledgeUpdateCycle;
     private RemoteService remoteService;
     private KnowledgePackageService knowledgePackageService;
-    private Logger log = Logger.getLogger(KnowledgeServiceImpl.class.getName());
 
     @Override
     public KnowledgePackage[] getKnowledges(String[] packageIds) throws IOException {
@@ -71,12 +53,12 @@ public class KnowledgeServiceImpl implements KnowledgeService, ApplicationContex
             if (mm >= knowledgeUpdateCycle) {
                 KnowledgePackage remoteKnowledgePackage = remoteService.getKnowledge(packageId, String.valueOf(knowledgePackage.getTimestamp()));
                 if (remoteKnowledgePackage == null) {
-                    // 表示repository中knowledgepackage与本地的比较无更新
-                    log.info("Not need update remote knowledgepackage.");
+                    // 表示repository中knowledge package与本地的比较无更新
+                    logger.info("Not need update remote knowledge package.");
                     knowledgePackage.resetTimestamp();
                     CacheUtils.getKnowledgeCache().putKnowledge(packageId, knowledgePackage);
                 } else {
-                    log.info("Need update remote knowledgepackage.");
+                    logger.info("Need update remote knowledge package.");
                     remoteKnowledgePackage.resetTimestamp();
                     CacheUtils.getKnowledgeCache().putKnowledge(packageId, remoteKnowledgePackage);
                 }

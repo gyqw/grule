@@ -1,42 +1,20 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.runtime.agenda;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 import com.bstek.urule.Utils;
 import com.bstek.urule.action.ActionValue;
 import com.bstek.urule.model.rule.Rule;
 import com.bstek.urule.model.rule.RuleInfo;
 import com.bstek.urule.runtime.KnowledgeSession;
-import com.bstek.urule.runtime.KnowledgeSessionImpl;
-import com.bstek.urule.runtime.WorkingMemory;
 import com.bstek.urule.runtime.response.ExecutionResponseImpl;
 import com.bstek.urule.runtime.response.RuleExecutionResponse;
 import com.bstek.urule.runtime.rete.Context;
 import com.bstek.urule.runtime.rete.FactTracker;
 import com.bstek.urule.runtime.rete.ReteInstance;
 
-/**
- * @author Jacky.gao
- * 2015年1月2日
- */
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public class Agenda {
     private Context context;
     private RuleBox ruleBox;
@@ -51,15 +29,11 @@ public class Agenda {
         ExecutionResponseImpl response = new ExecutionResponseImpl();
         List<ActionValue> actionValues = new ArrayList<>();
         response.setActionValues(actionValues);
-        List<RuleInfo> firedRules = new ArrayList<>();
         List<RuleInfo> ruleInfoResult = this.ruleBox.execute(filter, max, actionValues);
-        firedRules.addAll(ruleInfoResult);
+        List<RuleInfo> firedRules = new ArrayList<>(ruleInfoResult);
         KnowledgeSession session = (KnowledgeSession) this.context.getWorkingMemory();
         List<ReteInstance> reteInstanceList = session.getReteInstanceList();
-        Iterator var9 = reteInstanceList.iterator();
-
-        while (var9.hasNext()) {
-            ReteInstance reteInstance = (ReteInstance) var9.next();
+        for (ReteInstance reteInstance : reteInstanceList) {
             reteInstance.reset();
         }
 
@@ -69,25 +43,19 @@ public class Agenda {
     }
 
     public void addTrackers(Collection<FactTracker> list, boolean noCondition) {
-        Iterator var3 = list.iterator();
+        for (FactTracker tracker : list) {
+            Activation activation = tracker.getActivation();
 
-        while (true) {
-            while (var3.hasNext()) {
-                FactTracker tracker = (FactTracker) var3.next();
-                Activation activation = tracker.getActivation();
-                Rule rule = activation.getRule();
-                if (noCondition && rule.isWithElse()) {
-                    if (!this.ruleBox.getRules().contains(rule)) {
-                        Rule elseRule = Utils.buildElseRule(rule);
-                        ActivationImpl ac = new ActivationImpl(elseRule);
-                        this.ruleBox.add(ac);
-                    }
-                } else {
-                    this.ruleBox.add(activation);
+            Rule rule = activation.getRule();
+            if (noCondition && rule.isWithElse()) {
+                if (!this.ruleBox.getRules().contains(rule)) {
+                    Rule elseRule = Utils.buildElseRule(rule);
+                    ActivationImpl ac = new ActivationImpl(elseRule);
+                    this.ruleBox.add(ac);
                 }
+            } else {
+                this.ruleBox.add(activation);
             }
-
-            return;
         }
     }
 

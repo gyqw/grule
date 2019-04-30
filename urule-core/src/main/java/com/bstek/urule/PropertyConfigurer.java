@@ -10,10 +10,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
 
-/**
- * @author fred
- * 2018-11-05 5:27 PM
- */
 public class PropertyConfigurer implements ApplicationContextAware {
     private static Properties props = new Properties();
 

@@ -6,10 +6,6 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-/**
- * @author Jacky.gao
- * 2016年10月12日
- */
 @Component
 public class URuleServletRegistration {
 
