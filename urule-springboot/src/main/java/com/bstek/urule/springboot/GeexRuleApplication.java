@@ -1,11 +1,11 @@
 package com.bstek.urule.springboot;
 
 import com.bstek.urule.Utils;
+import com.bstek.urule.debug.MessageItem;
 import com.bstek.urule.runtime.KnowledgePackage;
 import com.bstek.urule.runtime.KnowledgeSession;
 import com.bstek.urule.runtime.KnowledgeSessionFactory;
 import com.bstek.urule.runtime.response.FlowExecutionResponse;
-import com.bstek.urule.runtime.response.RuleExecutionResponse;
 import com.bstek.urule.runtime.service.KnowledgeService;
 import com.bstek.urule.springboot.model.OrderModel;
 import com.bstek.urule.springboot.model.OutputModel;
@@ -42,8 +42,11 @@ public class GeexRuleApplication implements CommandLineRunner {
 
             // 执行所有满足条件的规则
             FlowExecutionResponse flowExecutionResponse = session.startProcess("jueceliu01");
-
             logger.info("orderModel: {}, outputModel: {}", orderModel, outputModel);
+
+            for (MessageItem messageItem : session.getDebugMessageItems()) {
+                logger.info(messageItem.getMsg());
+            }
         } catch (Exception e) {
             logger.error("test error", e);
         }

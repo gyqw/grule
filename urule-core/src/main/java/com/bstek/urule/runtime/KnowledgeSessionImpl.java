@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.runtime;
 
 import com.bstek.urule.Utils;
@@ -35,13 +20,6 @@ import com.bstek.urule.runtime.rete.*;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * objectTypeActivities
- *
- * @author Jacky.gao
- * @author fred
- * 2015年1月8日
- */
 public class KnowledgeSessionImpl implements KnowledgeSession {
     private Context context;
     private EvaluationContextImpl evaluationContext;
@@ -84,18 +62,13 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
         this.activationReteInstancesMap = new HashMap<>();
         this.agendaReteInstancesMap = new HashMap<>();
         this.knowledgeEventManager = new KnowledgeEventManagerImpl();
-        int var4 = knowledgePackages.length;
 
-        for (int var5 = 0; var5 < var4; ++var5) {
-            KnowledgePackage knowledgePackage = knowledgePackages[var5];
+        for (KnowledgePackage knowledgePackage : knowledgePackages) {
             this.knowledgePackageList.add(knowledgePackage);
             this.reteInstanceList.add(knowledgePackage.newReteInstance());
             Map<String, String> p = knowledgePackage.getParameters();
             if (p != null) {
-                Iterator var8 = p.keySet().iterator();
-
-                while (var8.hasNext()) {
-                    String key = (String) var8.next();
+                for (String key : p.keySet()) {
                     Datatype type = Datatype.valueOf(p.get(key));
                     if (type.equals(Datatype.Integer)) {
                         this.initParameters.put(key, 0);
@@ -324,10 +297,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
     }
 
     private void reevaluate(Object obj) {
-        Iterator var2 = this.reteInstanceList.iterator();
-
-        while (var2.hasNext()) {
-            ReteInstance reteInstance = (ReteInstance) var2.next();
+        for (ReteInstance reteInstance : this.reteInstanceList) {
             reteInstance.resetForReevaluate(obj);
         }
 
@@ -337,25 +307,21 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
     }
 
     private void evaluationRete(Collection<Object> facts) {
-        Iterator var2 = this.reteInstanceList.iterator();
+        Iterator reteInstanceIterator = this.reteInstanceList.iterator();
 
         label84:
         while (true) {
             ReteInstance reteInstance;
-            Collection trackers;
+            Collection trackers = null;
             Map reteInstanceMap;
             do {
-                if (!var2.hasNext()) {
+                if (!reteInstanceIterator.hasNext()) {
                     this.evaluationContext.clean();
                     return;
                 }
 
-                reteInstance = (ReteInstance) var2.next();
-                trackers = null;
-                Iterator var5 = facts.iterator();
-
-                while (var5.hasNext()) {
-                    Object fact = var5.next();
+                reteInstance = (ReteInstance) reteInstanceIterator.next();
+                for (Object fact : facts) {
                     this.doRete(reteInstance, fact, false);
                 }
 
@@ -368,7 +334,6 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
                 reteInstanceMap = reteInstance.getActivationGroupReteInstancesMap();
             } while (reteInstanceMap == null);
 
-            trackers = null;
             this.activationReteInstancesMap.putAll(reteInstanceMap);
             Iterator var7 = reteInstanceMap.keySet().iterator();
 
@@ -385,7 +350,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
                     id = reteInstance.getId() + key;
                 } while (this.activedActivationGroup.contains(id));
 
-                List<ReteInstanceUnit> insList = (List) reteInstanceMap.get(key);
+                List<ReteInstanceUnit> insList = (List<ReteInstanceUnit>) reteInstanceMap.get(key);
                 Iterator var11 = insList.iterator();
 
                 while (true) {
@@ -406,10 +371,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
                     } while (expiresDate != null && expiresDate.getTime() < (new Date()).getTime());
 
                     ReteInstance ri = insUnit.getReteInstance();
-                    Iterator var16 = facts.iterator();
-
-                    while (var16.hasNext()) {
-                        Object fact = var16.next();
+                    for (Object fact : facts) {
                         trackers = ri.enter(this.evaluationContext, fact);
                         if (trackers != null) {
                             this.activedActivationGroup.add(id);
@@ -431,7 +393,6 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
         if (trackers != null) {
             this.agenda.addTrackers(trackers, noneCondition);
         }
-
     }
 
     public void activeRule(String activationGroupName, String ruleName) {
@@ -519,10 +480,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
 
     public void writeLogFile() throws IOException {
         if (this.debugMessageItems.size() != 0) {
-            Iterator var1 = Utils.getDebugWriters().iterator();
-
-            while (var1.hasNext()) {
-                DebugWriter writer = (DebugWriter) var1.next();
+            for (DebugWriter writer : Utils.getDebugWriters()) {
                 writer.write(this.debugMessageItems);
             }
 
@@ -587,10 +545,8 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
 
     private void initContext() {
         Map<String, String> allVariableCategoryMap = null;
-        Iterator var2 = this.knowledgePackageList.iterator();
 
-        while (var2.hasNext()) {
-            KnowledgePackage knowledgePackage = (KnowledgePackage) var2.next();
+        for (KnowledgePackage knowledgePackage : this.knowledgePackageList) {
             if (allVariableCategoryMap == null) {
                 allVariableCategoryMap = knowledgePackage.getVariableCateogoryMap();
             } else {

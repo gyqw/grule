@@ -29,6 +29,7 @@ public class Rule implements RuleInfo {
     private Rule elseRule;
 
     public Rule() {
+        this.debug = true;
     }
 
     public String getId() {
@@ -189,5 +190,31 @@ public class Rule implements RuleInfo {
 
     public void setElseRule(Rule elseRule) {
         this.elseRule = elseRule;
+    }
+
+    @Override
+    public String toString() {
+        return "Rule{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", file='" + file + '\'' +
+                ", salience=" + salience +
+                ", effectiveDate=" + effectiveDate +
+                ", expiresDate=" + expiresDate +
+                ", enabled=" + enabled +
+                ", debug=" + debug +
+                ", activationGroup='" + activationGroup + '\'' +
+                ", agendaGroup='" + agendaGroup + '\'' +
+                ", autoFocus=" + autoFocus +
+                ", ruleflowGroup='" + ruleflowGroup + '\'' +
+                ", lhs=" + lhs +
+                ", rhs=" + rhs +
+                ", other=" + other +
+                ", loop=" + loop +
+                ", loopRule=" + loopRule +
+                ", remark='" + remark + '\'' +
+                ", withElse=" + withElse +
+                ", elseRule=" + elseRule +
+                '}';
     }
 }

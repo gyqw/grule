@@ -32,10 +32,8 @@ public abstract class AbstractActivity implements Activity {
         if (this.paths != null && this.paths.size() != 0) {
             List<FactTracker> trackers = null;
             int size = this.paths.size();
-            Iterator var6 = this.paths.iterator();
 
-            while (var6.hasNext()) {
-                Path path = (Path) var6.next();
+            for (Path path : this.paths) {
                 Collection<FactTracker> results = null;
                 Activity activity = path.getTo();
                 path.setPassed(true);
@@ -47,7 +45,7 @@ public abstract class AbstractActivity implements Activity {
 
                 if (results != null) {
                     if (trackers == null) {
-                        trackers = new ArrayList();
+                        trackers = new ArrayList<>();
                     }
 
                     trackers.addAll(results);

@@ -13,7 +13,7 @@ public class ExecutionResponseImpl implements RuleExecutionResponse, FlowExecuti
     private List<RuleExecutionResponse> ruleExecutionResponses = new ArrayList<>();
     private List<FlowExecutionResponse> flowExecutionResponses = new ArrayList<>();
     private List<RuleInfo> rulesFired;
-    private List<RuleInfo> matchedRules = new ArrayList<RuleInfo>();
+    private List<RuleInfo> matchedRules = new ArrayList<>();
     private List<ActionValue> actionValues;
 
     @Override

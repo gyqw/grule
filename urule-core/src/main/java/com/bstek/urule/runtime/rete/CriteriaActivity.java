@@ -6,7 +6,6 @@ import com.bstek.urule.model.rule.lhs.Criteria;
 import com.bstek.urule.model.rule.lhs.EvaluateResponse;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class CriteriaActivity extends AbstractActivity {
@@ -44,10 +43,8 @@ public class CriteriaActivity extends AbstractActivity {
             } else {
                 this.passed = true;
                 tracker.addObjectCriteria(obj, this.criteria);
-                Iterator var9 = allMatchedObjects.iterator();
 
-                while (var9.hasNext()) {
-                    Object object = var9.next();
+                for (Object object : allMatchedObjects) {
                     tracker.addObjectCriteria(object, this.criteria);
                 }
 
