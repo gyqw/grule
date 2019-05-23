@@ -16,7 +16,6 @@ public class ConsoleDebugWriter implements DebugWriter {
             sb.append(item.toHtml());
         }
         String key = debugMessageHolder.generateKey();
-        System.out.println("Console key : " + key);
         debugMessageHolder.putDebugMessage(key, sb.toString());
     }
 

@@ -1,6 +1,5 @@
 package com.bstek.urule.runtime.rete;
 
-import com.bstek.urule.Utils;
 import com.bstek.urule.debug.MsgType;
 import com.bstek.urule.model.rule.lhs.Criteria;
 import com.bstek.urule.model.rule.lhs.EvaluateResponse;
@@ -36,7 +35,7 @@ public class CriteriaActivity extends AbstractActivity {
             }
 
             boolean result = response.getResult();
-            this.doDebug(response, context);
+            logMessage(response, context);
             if (!result) {
                 this.passAndNode();
                 return null;
@@ -57,17 +56,13 @@ public class CriteriaActivity extends AbstractActivity {
         this.doPassAndNode();
     }
 
-    private void doDebug(EvaluateResponse response, Context context) {
-        if (this.debug && Utils.isDebug()) {
-            String id = this.criteria.getId();
-            StringBuffer sb = new StringBuffer();
-            sb.append("^^^条件：" + id);
-            String result = response.getResult() ? "满足" : "不满足";
-            sb.append(" =>" + result);
-            sb.append(", 左值：" + (response.getLeftResult() == null ? "null" : response.getLeftResult()));
-            sb.append(", 右值：" + (response.getRightResult() == null ? "null" : response.getRightResult()));
-            context.debugMsg(sb.toString(), MsgType.Condition, this.debug);
-        }
+    private void logMessage(EvaluateResponse response, Context context) {
+        String id = this.criteria.getId();
+        String msg = String.format("^^^ 条件： %s => %s, 左值： %s, 右值： %s",
+                id, response.getResult() ? "满足" : "不满足",
+                response.getLeftResult() == null ? "null" : response.getLeftResult(),
+                response.getRightResult() == null ? "null" : response.getRightResult());
+        context.logMsg(msg, MsgType.Condition);
     }
 
     public boolean joinNodeIsPassed() {

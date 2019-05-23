@@ -29,9 +29,9 @@ public interface Context {
 
     Object parseExpression(String var1);
 
-    List<MessageItem> getDebugMessageItems();
+    List<MessageItem> getExecuteMessageItems();
 
-    void debugMsg(String var1, MsgType var2, boolean var3);
+    void logMsg(String var1, MsgType var2);
 
     RuleInfo getCurrentRule();
 }

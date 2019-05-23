@@ -60,14 +60,15 @@ public class VariableAssignAction extends AbstractAction {
                 String propertyName = this.variableName;
                 label = this.variableCategory + "." + (this.variableLabel == null ? this.variableName : this.variableLabel);
                 Utils.setObjectProperty(targetFact, propertyName, obj);
-                if (this.debug && Utils.isDebug()) {
-                    String msg = "###变量赋值：" + label + "=" + obj;
-                    context.debugMsg(msg, MsgType.VarAssign, this.debug);
-                }
+
+                // 执行信息
+                String msg = "### 变量赋值：" + label + "=" + obj;
+                context.logMsg(msg, MsgType.VarAssign);
 
                 return null;
             }
         }
+
     }
 
     public LeftType getType() {

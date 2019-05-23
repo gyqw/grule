@@ -1,6 +1,5 @@
 package com.bstek.urule.runtime.rete;
 
-import com.bstek.urule.Utils;
 import com.bstek.urule.debug.MessageItem;
 import com.bstek.urule.debug.MsgType;
 import com.bstek.urule.model.rule.Rule;
@@ -21,16 +20,16 @@ public class ContextImpl implements Context {
     private Map<String, String> variableCategoryMap;
     private ValueCompute valueCompute;
     private WorkingMemory workingMemory;
-    private List<MessageItem> debugMessageItems;
+    private List<MessageItem> executeMessageItems;
     private Rule currentRule;
     private StringBuilder tipMsgBuilder = new StringBuilder();
 
-    public ContextImpl(WorkingMemory workingMemory, ApplicationContext applicationContext, Map<String, String> variableCategoryMap, List<MessageItem> debugMessageItems) {
+    public ContextImpl(WorkingMemory workingMemory, ApplicationContext applicationContext, Map<String, String> variableCategoryMap, List<MessageItem> executeMessageItems) {
         this.workingMemory = workingMemory;
         this.applicationContext = applicationContext;
         this.assertorEvaluator = (AssertorEvaluator) applicationContext.getBean("urule.assertorEvaluator");
         this.variableCategoryMap = variableCategoryMap;
-        this.debugMessageItems = debugMessageItems;
+        this.executeMessageItems = executeMessageItems;
         this.valueCompute = (ValueCompute) applicationContext.getBean("urule.valueCompute");
     }
 
@@ -66,23 +65,17 @@ public class ContextImpl implements Context {
         return (new ElCompute()).doCompute(expression);
     }
 
-    public void debugMsg(String msg, MsgType type, boolean enableDebug) {
-        if (Utils.isDebug() && enableDebug) {
-            if (!Utils.isDebugToFile()) {
-                System.out.println(msg);
-            } else {
-                MessageItem item = new MessageItem(msg, type);
-                this.debugMessageItems.add(item);
-            }
-        }
+    public void logMsg(String msg, MsgType type) {
+        MessageItem item = new MessageItem(msg, type);
+        this.executeMessageItems.add(item);
     }
 
-    public List<MessageItem> getDebugMessageItems() {
-        return this.debugMessageItems;
+    public List<MessageItem> getExecuteMessageItems() {
+        return executeMessageItems;
     }
 
     public String getVariableCategoryClass(String variableCategory) {
-        String clazz = (String) this.variableCategoryMap.get(variableCategory);
+        String clazz = this.variableCategoryMap.get(variableCategory);
         if (StringUtils.isEmpty(clazz)) {
             clazz = HashMap.class.getName();
         }

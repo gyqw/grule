@@ -1,6 +1,5 @@
 package com.bstek.urule.action;
 
-import com.bstek.urule.Utils;
 import com.bstek.urule.debug.MsgType;
 import com.bstek.urule.model.rule.Value;
 import com.bstek.urule.runtime.rete.Context;
@@ -14,20 +13,17 @@ public class ConsolePrintAction extends AbstractAction {
     private ActionType actionType = ActionType.ConsolePrint;
 
     public ActionValue execute(Context context, Object matchedObject, List<Object> allMatchedObjects) {
-        if (!Utils.isDebug()) {
-            return null;
-        }
         ValueCompute valueCompute = (ValueCompute) context.getApplicationContext().getBean(ValueCompute.BEAN_ID);
         Object content = valueCompute.complexValueCompute(value, matchedObject, context, allMatchedObjects);
         if (content instanceof BigDecimal) {
             BigDecimal b = (BigDecimal) content;
-            context.debugMsg("☢☢☢控制台输出：" + b.toPlainString(), MsgType.ConsoleOutput, true);
+            context.logMsg("☢☢☢ 控制台输出：" + b.toPlainString(), MsgType.ConsoleOutput);
         } else if (content instanceof Double) {
             Double d = (Double) content;
-            context.debugMsg("☢☢☢控制台输出：" + d.toString(), MsgType.ConsoleOutput, true);
+            context.logMsg("☢☢☢ 控制台输出：" + d.toString(), MsgType.ConsoleOutput);
         } else {
             String msg = (content == null ? "null" : content.toString());
-            context.debugMsg("☢☢☢控制台输出：" + msg, MsgType.ConsoleOutput, true);
+            context.logMsg("☢☢☢ 控制台输出：" + msg, MsgType.ConsoleOutput);
         }
         return null;
     }

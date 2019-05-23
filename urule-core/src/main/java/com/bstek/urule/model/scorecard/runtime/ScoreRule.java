@@ -18,7 +18,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ScoreRule extends Rule {
     private ScoringType scoringType;
@@ -45,21 +48,16 @@ public class ScoreRule extends Rule {
         }
 
         List<ActionValue> values = session.fireRules(parentSession.getParameters()).getActionValues();
-        Map<Integer, RowItemImpl> rowMap = new HashMap();
-        Iterator var9 = values.iterator();
+        Map<Integer, RowItemImpl> rowMap = new HashMap<>();
 
-        while (var9.hasNext()) {
-            ActionValue value = (ActionValue) var9.next();
+        for (ActionValue value : values) {
             if (value.getValue() instanceof ScoreRuntimeValue) {
                 ScoreRuntimeValue scoreValue = (ScoreRuntimeValue) value.getValue();
                 int rowNumber = scoreValue.getRowNumber();
                 String rowItem;
-                if (isdebug && Utils.isDebug()) {
-                    rowItem = "---行" + rowNumber + ",得分：" + scoreValue.getValue();
-                    context.debugMsg(rowItem, MsgType.ScoreCard, isdebug);
-                }
+                rowItem = "--- 行" + rowNumber + ",得分：" + scoreValue.getValue();
+                context.logMsg(rowItem, MsgType.ScoreCard);
 
-                rowItem = null;
                 RowItemImpl rowItemImpl;
                 if (rowMap.containsKey(rowNumber)) {
                     rowItemImpl = rowMap.get(rowNumber);
@@ -77,9 +75,10 @@ public class ScoreRule extends Rule {
                     rowItemImpl.addCellItem(cellItem);
                 }
             }
+
         }
 
-        List<RowItem> items = new ArrayList();
+        List<RowItem> items = new ArrayList<>(rowMap.values().size());
         items.addAll(rowMap.values());
         ScorecardImpl card = new ScorecardImpl(this.getName(), items, isdebug);
         Object actualScore = null;
@@ -89,10 +88,8 @@ public class ScoreRule extends Rule {
         } else if (this.scoringType.equals(ScoringType.weightsum)) {
             actualScore = card.executeWeightSum(context);
         } else if (this.scoringType.equals(ScoringType.custom)) {
-            if (isdebug && Utils.isDebug()) {
-                msg = "---执行自定义评分卡得分计算Bean:" + this.scoringBean;
-                context.debugMsg(msg, MsgType.ScoreCard, isdebug);
-            }
+            msg = "--- 执行自定义评分卡得分计算Bean:" + this.scoringBean;
+            context.logMsg(msg, MsgType.ScoreCard);
 
             ScoringStrategy scoringStrategy = (ScoringStrategy) context.getApplicationContext().getBean(this.scoringBean);
             actualScore = scoringStrategy.calculate(card, context);
@@ -101,7 +98,6 @@ public class ScoreRule extends Rule {
         if (this.assignTargetType.equals(AssignTargetType.none)) {
             this.log.warn("Scorecard [" + card.getName() + "] not setting assignment object for score value, score value is :" + actualScore);
         } else {
-            msg = null;
             ValueCompute valueCompute = context.getValueCompute();
             String className = context.getVariableCategoryClass(this.variableCategory);
             Object targetFact;
