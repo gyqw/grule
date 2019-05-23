@@ -1,5 +1,6 @@
 .idea/
 *.iml
-urule-console/target/
-urule-core/target/
-urule-springboot/target/
+target/
+dist/
+.flattened-pom.xml
+node_modules/
