@@ -20,7 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <urule.version>2.2.0-SNAPSHOT</urule.version>
-        <urule-pro.version>2.0.9</urule-pro.version>
+        <urule-pro.version>2.1.6</urule-pro.version>
     </properties>
 
     <dependencies>
