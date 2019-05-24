@@ -37,7 +37,11 @@ export default class QuickStart extends Component{
                     </tr>
                     <tr>
                         <td>交叉决策表</td>
-                        <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
+                        <td><i className="glyphicon glyphicon-ok" style={{fontSize:'20px',color:'green'}}></i></td>
+                    </tr>
+                    <tr>
+                        <td>复杂评分卡</td>
+                        <td><i className="glyphicon glyphicon-ok" style={{fontSize:'20px',color:'green'}}></i></td>
                     </tr>
                     <tr>
                         <td>文件名、项目名重构</td>
@@ -56,7 +60,35 @@ export default class QuickStart extends Component{
                         <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
                     </tr>
                     <tr>
+                        <td>中文项目名和文件名支持</td>
+                        <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
+                    </tr>
+                    <tr>
+                        <td>服务器推送知识包到客户端功能的支持</td>
+                        <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
+                    </tr>
+                    <tr>
+                        <td>知识包优化与压缩的支持</td>
+                        <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
+                    </tr>
+                    <tr>
+                        <td>客户端服务器模式下大知识包的推拉支持</td>
+                        <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
+                    </tr>
+                    <tr>
+                        <td>规则集中执行组的支持</td>
+                        <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
+                    </tr>
+                    <tr>
+                        <td>规则流中所有节点向导式条件与动作配置的支持</td>
+                        <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
+                    </tr>
+                    <tr>
                         <td>循环规则多循环单元支持</td>
+                        <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
+                    </tr>
+                    <tr>
+                        <td>循环规则中无条件执行的支持</td>
                         <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
                     </tr>
                     <tr>
@@ -64,7 +96,19 @@ export default class QuickStart extends Component{
                         <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
                     </tr>
                     <tr>
-                        <td>性能调优</td>
+                        <td>规则树构建优化</td>
+                        <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
+                    </tr>
+                    <tr>
+                        <td>对象查找索引支持</td>
+                        <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
+                    </tr>
+                    <tr>
+                        <td>规则树中短路计算的支持</td>
+                        <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
+                    </tr>
+                    <tr>
+                        <td>规则条件冗余计算缓存支持</td>
                         <td><i className="glyphicon glyphicon-remove" style={{fontSize:'20px',color:'red'}}></i></td>
                     </tr>
                     <tr>
