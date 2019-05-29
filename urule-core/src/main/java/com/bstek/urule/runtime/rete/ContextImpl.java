@@ -70,6 +70,11 @@ public class ContextImpl implements Context {
         this.executeMessageItems.add(item);
     }
 
+    public void logMsg(String msg, MsgType type, String leftVariable, String leftVariableValue, String rightVariable, String rightVariableValue) {
+        MessageItem item = new MessageItem(msg, type, leftVariable, leftVariableValue, rightVariable, rightVariableValue);
+        this.executeMessageItems.add(item);
+    }
+
     public List<MessageItem> getExecuteMessageItems() {
         return executeMessageItems;
     }

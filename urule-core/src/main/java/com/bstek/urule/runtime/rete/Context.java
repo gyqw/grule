@@ -31,7 +31,9 @@ public interface Context {
 
     List<MessageItem> getExecuteMessageItems();
 
-    void logMsg(String var1, MsgType var2);
+    void logMsg(String msg, MsgType msgType);
+
+    void logMsg(String msg, MsgType msgType, String leftVariable, String leftVariableValue, String rightVariable, String rightVariableValue);
 
     RuleInfo getCurrentRule();
 }

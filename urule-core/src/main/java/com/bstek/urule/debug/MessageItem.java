@@ -3,10 +3,23 @@ package com.bstek.urule.debug;
 public class MessageItem {
     private String msg;
     private MsgType type;
+    private String leftVariable;
+    private String leftVariableValue;
+    private String rightVariable;
+    private String rightVariableValue;
 
     public MessageItem(String msg, MsgType type) {
         this.msg = msg;
         this.type = type;
+    }
+
+    public MessageItem(String msg, MsgType type, String leftVariable, String leftVariableValue, String rightVariable, String rightVariableValue) {
+        this.msg = msg;
+        this.type = type;
+        this.leftVariable = leftVariable;
+        this.leftVariableValue = leftVariableValue;
+        this.rightVariable = rightVariable;
+        this.rightVariableValue = rightVariableValue;
     }
 
     public String toHtml() {
@@ -46,5 +59,33 @@ public class MessageItem {
 
     public MsgType getType() {
         return type;
+    }
+
+    public String getLeftVariable() {
+        return leftVariable;
+    }
+
+    public String getLeftVariableValue() {
+        return leftVariableValue;
+    }
+
+    public String getRightVariable() {
+        return rightVariable;
+    }
+
+    public String getRightVariableValue() {
+        return rightVariableValue;
+    }
+
+    @Override
+    public String toString() {
+        return "MessageItem{" +
+                "msg='" + msg + '\'' +
+                ", type=" + type +
+                ", leftVariable='" + leftVariable + '\'' +
+                ", leftVariableValue='" + leftVariableValue + '\'' +
+                ", rightVariable='" + rightVariable + '\'' +
+                ", rightVariableValue='" + rightVariableValue + '\'' +
+                '}';
     }
 }

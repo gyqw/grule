@@ -1,8 +1,11 @@
 package com.bstek.urule.runtime.rete;
 
 import com.bstek.urule.debug.MsgType;
+import com.bstek.urule.model.rule.ValueType;
+import com.bstek.urule.model.rule.VariableValue;
 import com.bstek.urule.model.rule.lhs.Criteria;
 import com.bstek.urule.model.rule.lhs.EvaluateResponse;
+import com.bstek.urule.model.rule.lhs.VariableLeftPart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,11 +61,21 @@ public class CriteriaActivity extends AbstractActivity {
 
     private void logMessage(EvaluateResponse response, Context context) {
         String id = this.criteria.getId();
+        String leftVariable = ((VariableLeftPart) this.criteria.getLeft().getLeftPart()).getVariableLabel();
+        String leftVariableValue = response.getLeftResult() == null ? "null" : response.getLeftResult().toString();
+        String rightVariable = "";
+        if (this.criteria.getValue().getValueType() == ValueType.Variable) {
+            rightVariable = ((VariableValue) this.criteria.getValue()).getVariableLabel();
+        } else {
+            rightVariable = this.criteria.getValue().getValueType().name();
+        }
+        String rightVariableValue = response.getRightResult() == null ? "null" : response.getRightResult().toString();
+
         String msg = String.format("^^^ 条件： %s => %s, 左值： %s, 右值： %s",
                 id, response.getResult() ? "满足" : "不满足",
-                response.getLeftResult() == null ? "null" : response.getLeftResult(),
-                response.getRightResult() == null ? "null" : response.getRightResult());
-        context.logMsg(msg, MsgType.Condition);
+                leftVariableValue, rightVariableValue);
+
+        context.logMsg(msg, MsgType.Condition, leftVariable, leftVariableValue, rightVariable, rightVariableValue);
     }
 
     public boolean joinNodeIsPassed() {
