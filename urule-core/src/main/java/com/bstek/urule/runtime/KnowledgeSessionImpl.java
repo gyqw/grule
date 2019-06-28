@@ -373,14 +373,14 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
                     ReteInstance ri = insUnit.getReteInstance();
                     for (Object fact : facts) {
                         trackers = ri.enter(this.evaluationContext, fact);
-                        if (trackers != null) {
+                        if (trackers != null && trackers.size() > 0) {
                             this.activedActivationGroup.add(id);
                             this.agenda.addTrackers(trackers, false);
                             break;
                         }
                     }
 
-                    if (trackers != null) {
+                    if (trackers != null && trackers.size() > 0) {
                         break;
                     }
                 }

@@ -22,7 +22,7 @@ public abstract class AbstractActivity implements Activity {
 
     public void addPath(Path path) {
         if (this.paths == null) {
-            this.paths = new ArrayList();
+            this.paths = new ArrayList<>();
         }
 
         this.paths.add(path);

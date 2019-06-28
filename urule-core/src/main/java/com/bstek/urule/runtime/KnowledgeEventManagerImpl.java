@@ -3,7 +3,6 @@ package com.bstek.urule.runtime;
 import com.bstek.urule.runtime.event.*;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -11,10 +10,7 @@ import java.util.List;
  * 2018-11-05 5:43 PM
  */
 public class KnowledgeEventManagerImpl implements KnowledgeEventManager {
-    private List<KnowledgeEventListener> listeners = new ArrayList();
-
-    public KnowledgeEventManagerImpl() {
-    }
+    private List<KnowledgeEventListener> listeners = new ArrayList<>();
 
     public void addEventListener(KnowledgeEventListener listener) {
         this.listeners.add(listener);
@@ -29,13 +25,8 @@ public class KnowledgeEventManagerImpl implements KnowledgeEventManager {
     }
 
     public void fireEvent(KnowledgeEvent event) {
-        Iterator var2;
-        KnowledgeEventListener listener;
         if (event instanceof ActivationEvent) {
-            var2 = this.listeners.iterator();
-
-            while (var2.hasNext()) {
-                listener = (KnowledgeEventListener) var2.next();
+            for (KnowledgeEventListener listener : this.listeners) {
                 if (listener instanceof AgendaEventListener) {
                     AgendaEventListener lis = (AgendaEventListener) listener;
                     if (event instanceof ActivationCancelledEvent) {
@@ -54,10 +45,7 @@ public class KnowledgeEventManagerImpl implements KnowledgeEventManager {
                 }
             }
         } else if (event instanceof ProcessEvent) {
-            var2 = this.listeners.iterator();
-
-            while (var2.hasNext()) {
-                listener = (KnowledgeEventListener) var2.next();
+            for (KnowledgeEventListener listener : this.listeners) {
                 if (listener instanceof ProcessEventListener) {
                     ProcessEventListener lis = (ProcessEventListener) listener;
                     if (event instanceof ProcessAfterCompletedEvent) {
@@ -82,7 +70,5 @@ public class KnowledgeEventManagerImpl implements KnowledgeEventManager {
                 }
             }
         }
-
     }
-
 }

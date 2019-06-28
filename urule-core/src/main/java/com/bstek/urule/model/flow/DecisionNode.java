@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.bstek.urule.model.flow;
 
 import com.bstek.urule.action.Action;
@@ -10,14 +5,10 @@ import com.bstek.urule.action.VariableAssignAction;
 import com.bstek.urule.model.flow.ins.FlowContext;
 import com.bstek.urule.model.flow.ins.FlowInstance;
 import com.bstek.urule.model.library.Datatype;
-import com.bstek.urule.model.rule.Library;
-import com.bstek.urule.model.rule.LibraryType;
-import com.bstek.urule.model.rule.Rhs;
-import com.bstek.urule.model.rule.Rule;
-import com.bstek.urule.model.rule.RuleSet;
-import com.bstek.urule.model.rule.SimpleValue;
+import com.bstek.urule.model.rule.*;
 import com.bstek.urule.model.rule.lhs.LeftType;
 import com.bstek.urule.runtime.KnowledgeSession;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -55,14 +46,14 @@ public class DecisionNode extends BindingNode {
     private void doPercent(FlowContext context, FlowInstance instance) {
         String nodeKey = instance.getProcessDefinition().getId() + "_" + this.getName();
         long total = this.getAmount(nodeKey, context) + 1L;
-        List<PercentItem> percentItems = new ArrayList();
+        List<PercentItem> percentItems = new ArrayList<>();
         Iterator var7 = this.items.iterator();
 
-        while(var7.hasNext()) {
-            DecisionItem item = (DecisionItem)var7.next();
+        while (var7.hasNext()) {
+            DecisionItem item = (DecisionItem) var7.next();
             PercentItem percent = new PercentItem();
             percent.setName(item.getTo());
-            percent.setPercent((long)item.getPercent());
+            percent.setPercent((long) item.getPercent());
             String itemKey = nodeKey + "." + item.getTo();
             long itemTotal = this.getAmount(itemKey, context);
             percent.setTotal(itemTotal);
@@ -78,7 +69,7 @@ public class DecisionNode extends BindingNode {
 
     private long getAmount(String key, FlowContext context) {
         Object value = context.getWorkingMemory().getSessionValue(key);
-        return value == null ? 0L : (Long)value;
+        return value == null ? 0L : (Long) value;
     }
 
     private void setAmount(String key, long value, FlowContext context) {
@@ -105,17 +96,17 @@ public class DecisionNode extends BindingNode {
         int result;
         do {
             if (!var5.hasNext()) {
-                return (PercentItem)items.get(0);
+                return (PercentItem) items.get(0);
             }
 
-            item = (PercentItem)var5.next();
+            item = (PercentItem) var5.next();
             long itemTotal = item.getTotal();
             BigDecimal left = new BigDecimal(itemTotal);
             BigDecimal newPercent = left.divide(totalValue, 20, 6);
             BigDecimal defaultPercent = new BigDecimal(item.getPercent());
             defaultPercent = defaultPercent.divide(new BigDecimal(100), 2, 6);
             result = newPercent.compareTo(defaultPercent);
-        } while(result != -1);
+        } while (result != -1);
 
         return item;
     }
@@ -140,8 +131,8 @@ public class DecisionNode extends BindingNode {
         int i = 0;
         Iterator var7 = this.items.iterator();
 
-        while(var7.hasNext()) {
-            DecisionItem item = (DecisionItem)var7.next();
+        while (var7.hasNext()) {
+            DecisionItem item = (DecisionItem) var7.next();
             ++i;
             if (item.getConditionType() != null && !item.getConditionType().equals("script")) {
                 Rule rule = new Rule();
@@ -175,15 +166,15 @@ public class DecisionNode extends BindingNode {
         if (libraries != null) {
             Iterator var5 = libraries.iterator();
 
-            while(var5.hasNext()) {
-                Library lib = (Library)var5.next();
+            while (var5.hasNext()) {
+                Library lib = (Library) var5.next();
                 String path = lib.getPath();
                 if (lib.getVersion() != null) {
                     path = path + ":" + lib.getVersion();
                 }
 
                 LibraryType type = lib.getType();
-                switch(type) {
+                switch (type) {
                     case Action:
                         sb.append("importActionLibrary \"" + path + "\"");
                         sb.append("\r\n");
@@ -205,8 +196,8 @@ public class DecisionNode extends BindingNode {
 
         boolean exist = false;
 
-        for(int i = 0; i < this.items.size(); ++i) {
-            DecisionItem item = (DecisionItem)this.items.get(i);
+        for (int i = 0; i < this.items.size(); ++i) {
+            DecisionItem item = (DecisionItem) this.items.get(i);
             if (item.getConditionType() == null || !item.getConditionType().equals("config")) {
                 exist = true;
                 sb.append(item.buildDSLScript(i, debug, flowId, this.getName()));
