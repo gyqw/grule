@@ -15,28 +15,6 @@
  ******************************************************************************/
 package com.bstek.urule.console.servlet.common;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.bstek.urule.parse.deserializer.*;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.apache.commons.lang.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-
-import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.Utils;
 import com.bstek.urule.console.EnvironmentUtils;
 import com.bstek.urule.console.User;
@@ -48,10 +26,32 @@ import com.bstek.urule.console.servlet.RenderPageServletHandler;
 import com.bstek.urule.console.servlet.RequestContext;
 import com.bstek.urule.dsl.RuleParserLexer;
 import com.bstek.urule.dsl.RuleParserParser;
+import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.model.function.FunctionDescriptor;
 import com.bstek.urule.model.library.action.ActionLibrary;
 import com.bstek.urule.model.library.action.SpringBean;
+import com.bstek.urule.parse.deserializer.*;
 import com.bstek.urule.runtime.BuiltInActionLibraryBuilder;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.apache.commons.lang.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Jacky.gao
@@ -79,8 +79,24 @@ public class CommonServletHandler extends RenderPageServletHandler {
         String content = req.getParameter("content");
         content = Utils.decodeContent(content);
         String versionComment = req.getParameter("versionComment");
-        Boolean newVersion = Boolean.valueOf(req.getParameter("newVersion"));
+        boolean newVersion = Boolean.valueOf(req.getParameter("newVersion"));
         User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
+
+        // 检验文件合规性
+        try {
+            InputStream inputStream = new ByteArrayInputStream(content.getBytes(Charset.forName("UTF-8")));
+            Element element = parseXml(inputStream);
+            for (Deserializer<?> des : deserializers) {
+                if (des.support(element)) {
+                    des.deserialize(element);
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            throw new RuleException(e);
+        }
+
+        // 保存文件
         try {
             repositoryService.saveFile(file, content, newVersion, versionComment, user);
         } catch (Exception ex) {
@@ -304,8 +320,7 @@ public class CommonServletHandler extends RenderPageServletHandler {
         Document document;
         try {
             document = reader.read(stream);
-            Element root = document.getRootElement();
-            return root;
+            return document.getRootElement();
         } catch (DocumentException e) {
             throw new RuleException(e);
         }

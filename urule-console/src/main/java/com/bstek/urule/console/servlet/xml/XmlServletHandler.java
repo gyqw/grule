@@ -1,29 +1,14 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.servlet.xml;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.bstek.urule.Utils;
+import com.bstek.urule.console.repository.RepositoryResourceProvider;
+import com.bstek.urule.console.repository.RepositoryService;
+import com.bstek.urule.console.servlet.WriteJsonServletHandler;
+import com.bstek.urule.exception.RuleException;
+import com.bstek.urule.model.library.action.ActionLibrary;
+import com.bstek.urule.model.library.action.SpringBean;
+import com.bstek.urule.parse.deserializer.*;
+import com.bstek.urule.runtime.BuiltInActionLibraryBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -33,33 +18,23 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.bstek.urule.exception.RuleException;
-import com.bstek.urule.Utils;
-import com.bstek.urule.console.repository.RepositoryResourceProvider;
-import com.bstek.urule.console.repository.RepositoryService;
-import com.bstek.urule.console.servlet.WriteJsonServletHandler;
-import com.bstek.urule.model.library.action.ActionLibrary;
-import com.bstek.urule.model.library.action.SpringBean;
-import com.bstek.urule.parse.deserializer.ActionLibraryDeserializer;
-import com.bstek.urule.parse.deserializer.ConstantLibraryDeserializer;
-import com.bstek.urule.parse.deserializer.DecisionTableDeserializer;
-import com.bstek.urule.parse.deserializer.DecisionTreeDeserializer;
-import com.bstek.urule.parse.deserializer.Deserializer;
-import com.bstek.urule.parse.deserializer.ParameterLibraryDeserializer;
-import com.bstek.urule.parse.deserializer.RuleSetDeserializer;
-import com.bstek.urule.parse.deserializer.ScriptDecisionTableDeserializer;
-import com.bstek.urule.parse.deserializer.VariableLibraryDeserializer;
-import com.bstek.urule.runtime.BuiltInActionLibraryBuilder;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Jacky.gao
  * @author fred
- * 2016年6月3日
+ * @since 2016年6月3日
  */
 public class XmlServletHandler extends WriteJsonServletHandler implements ApplicationContextAware {
     private RepositoryService repositoryService;
     private BuiltInActionLibraryBuilder builtInActionLibraryBuilder;
-    protected List<Deserializer<?>> deserializers = new ArrayList<Deserializer<?>>();
+    protected List<Deserializer<?>> deserializers = new ArrayList<>();
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -136,8 +111,7 @@ public class XmlServletHandler extends WriteJsonServletHandler implements Applic
         Document document;
         try {
             document = reader.read(stream);
-            Element root = document.getRootElement();
-            return root;
+            return document.getRootElement();
         } catch (DocumentException e) {
             throw new RuleException(e);
         }
