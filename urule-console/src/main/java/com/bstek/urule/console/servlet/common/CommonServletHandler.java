@@ -115,7 +115,7 @@ public class CommonServletHandler extends RenderPageServletHandler {
             if (scriptFiles.size() > 0) {
                 files.addAll(scriptFiles);
             }
-            List<RefFile> refFiles = new ArrayList<RefFile>();
+            List<RefFile> refFiles = new ArrayList<>();
             for (String file : files) {
                 RefFile ref = new RefFile();
                 refFiles.add(ref);
@@ -142,7 +142,7 @@ public class CommonServletHandler extends RenderPageServletHandler {
                 int pos = file.lastIndexOf("/");
                 String name = file;
                 if (pos > -1) {
-                    name = file.substring(pos + 1, file.length());
+                    name = file.substring(pos + 1);
                 }
                 ref.setName(name);
             }
