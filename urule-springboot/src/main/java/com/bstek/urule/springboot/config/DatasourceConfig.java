@@ -15,7 +15,7 @@ public class DatasourceConfig {
     public BasicDataSource uruleDataSource() {
         BasicDataSource basicDataSource = new BasicDataSource();
         basicDataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        basicDataSource.setUrl("jdbc:mysql://127.0.0.1:3306/urule?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true");
+        basicDataSource.setUrl("jdbc:mysql://192.168.8.232:3306/urule?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true");
         basicDataSource.setUsername("root");
         basicDataSource.setPassword("123");
         return basicDataSource;
