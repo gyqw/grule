@@ -4,12 +4,15 @@ import com.bstek.urule.action.ActionValue;
 import com.bstek.urule.model.rule.RuleInfo;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ExecutionResponseImpl implements RuleExecutionResponse, FlowExecutionResponse {
     private long duration;
     private String flowId;
+    private List<String> arrowList = new LinkedList<>();
     private List<String> nodeNames = new ArrayList<>();
+    private List<NodeExecutionResponse> nodeExecutionResponseList = new LinkedList<>();
     private List<RuleExecutionResponse> ruleExecutionResponses = new ArrayList<>();
     private List<FlowExecutionResponse> flowExecutionResponses = new ArrayList<>();
     private List<RuleInfo> rulesFired;
@@ -21,8 +24,25 @@ public class ExecutionResponseImpl implements RuleExecutionResponse, FlowExecuti
         return flowId;
     }
 
+    @Override
+    public List<String> getArrowList() {
+        return this.arrowList;
+    }
+
     public void setFlowId(String flowId) {
         this.flowId = flowId;
+    }
+
+    public void addArrowList(String arrow) {
+        this.arrowList.add(arrow);
+    }
+
+    public void addNodeExecutionResponse(NodeExecutionResponse nodeExecutionResponse) {
+        this.nodeExecutionResponseList.add(nodeExecutionResponse);
+    }
+
+    public List<NodeExecutionResponse> getNodeExecutionResponseList() {
+        return nodeExecutionResponseList;
     }
 
     public void addFlowExecutionResponse(FlowExecutionResponse response) {
@@ -83,5 +103,20 @@ public class ExecutionResponseImpl implements RuleExecutionResponse, FlowExecuti
 
     public void setFiredRules(List<RuleInfo> rulesFired) {
         this.rulesFired = rulesFired;
+    }
+
+    @Override
+    public String toString() {
+        return "ExecutionResponseImpl{" +
+                "duration=" + duration +
+                ", flowId='" + flowId + '\'' +
+                ", arrowList=" + arrowList +
+                ", nodeNames=" + nodeNames +
+                ", ruleExecutionResponses=" + ruleExecutionResponses +
+                ", flowExecutionResponses=" + flowExecutionResponses +
+                ", rulesFired=" + rulesFired +
+                ", matchedRules=" + matchedRules +
+                ", actionValues=" + actionValues +
+                '}';
     }
 }

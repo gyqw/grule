@@ -8,6 +8,8 @@ import com.bstek.urule.model.library.Datatype;
 import com.bstek.urule.model.rule.*;
 import com.bstek.urule.model.rule.lhs.LeftType;
 import com.bstek.urule.runtime.KnowledgeSession;
+import com.bstek.urule.runtime.response.ExecutionResponseImpl;
+import com.bstek.urule.runtime.response.NodeExecutionResponseImpl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -53,7 +55,7 @@ public class DecisionNode extends BindingNode {
             DecisionItem item = (DecisionItem) var7.next();
             PercentItem percent = new PercentItem();
             percent.setName(item.getTo());
-            percent.setPercent((long) item.getPercent());
+            percent.setPercent(item.getPercent());
             String itemKey = nodeKey + "." + item.getTo();
             long itemTotal = this.getAmount(itemKey, context);
             percent.setTotal(itemTotal);
@@ -80,9 +82,21 @@ public class DecisionNode extends BindingNode {
         KnowledgeSession session = this.executeKnowledgePackage(context, instance);
         this.executeNodeEvent(EventType.leave, context, instance);
         Object to = session.getParameter("return_to__");
+
+        ExecutionResponseImpl executionResponse = (ExecutionResponseImpl) context.getResponse();
+
+        NodeExecutionResponseImpl nodeExecutionResponse = new NodeExecutionResponseImpl();
+        nodeExecutionResponse.setSort(executionResponse.getNodeExecutionResponseList().size() + 1);
+        nodeExecutionResponse.setDecisionNodeName(this.name);
+        nodeExecutionResponse.setDecisionNodeResult(to);
+        executionResponse.addNodeExecutionResponse(nodeExecutionResponse);
+
         if (to == null) {
             this.log.info("Decision node [" + this.getName() + "] no matching conditions.");
         } else {
+            // 记录分流流向
+            executionResponse.addArrowList(to.toString());
+
             session.getParameters().remove("return_to__");
             this.leave(to.toString(), context, instance);
         }
@@ -126,7 +140,7 @@ public class DecisionNode extends BindingNode {
     public RuleSet buildRuleSet(List<Library> libraries, boolean debug, String flowId) {
         RuleSet rs = new RuleSet();
         rs.setLibraries(libraries);
-        List<Rule> rules = new ArrayList();
+        List<Rule> rules = new ArrayList<>();
         rs.setRules(rules);
         int i = 0;
         Iterator var7 = this.items.iterator();
@@ -137,12 +151,13 @@ public class DecisionNode extends BindingNode {
             if (item.getConditionType() != null && !item.getConditionType().equals("script")) {
                 Rule rule = new Rule();
                 rules.add(rule);
+                rule.setRuleType(RuleType.DECISION_RULE);
                 rule.setLhs(item.getLhs());
                 rule.setDebug(debug);
                 rule.setName(flowId + "-" + this.getName() + "-decision" + i);
                 Rhs rhs = new Rhs();
                 rule.setRhs(rhs);
-                List<Action> actions = new ArrayList();
+                List<Action> actions = new ArrayList<>();
                 rhs.setActions(actions);
                 VariableAssignAction action = new VariableAssignAction();
                 actions.add(action);

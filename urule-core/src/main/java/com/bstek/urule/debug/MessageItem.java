@@ -1,5 +1,7 @@
 package com.bstek.urule.debug;
 
+import java.util.Date;
+
 public class MessageItem {
     private String msg;
     private MsgType type;
@@ -7,10 +9,15 @@ public class MessageItem {
     private String leftVariableValue;
     private String rightVariable;
     private String rightVariableValue;
+    /**
+     * 执行时间
+     */
+    private Date execTime;
 
     public MessageItem(String msg, MsgType type) {
         this.msg = msg;
         this.type = type;
+        this.execTime = new Date();
     }
 
     public MessageItem(String msg, MsgType type, String leftVariable, String leftVariableValue, String rightVariable, String rightVariableValue) {
@@ -20,6 +27,7 @@ public class MessageItem {
         this.leftVariableValue = leftVariableValue;
         this.rightVariable = rightVariable;
         this.rightVariableValue = rightVariableValue;
+        this.execTime = new Date();
     }
 
     public String toHtml() {
@@ -77,6 +85,10 @@ public class MessageItem {
         return rightVariableValue;
     }
 
+    public Date getExecTime() {
+        return execTime;
+    }
+
     @Override
     public String toString() {
         return "MessageItem{" +
@@ -86,6 +98,7 @@ public class MessageItem {
                 ", leftVariableValue='" + leftVariableValue + '\'' +
                 ", rightVariable='" + rightVariable + '\'' +
                 ", rightVariableValue='" + rightVariableValue + '\'' +
+                ", execTime=" + execTime +
                 '}';
     }
 }

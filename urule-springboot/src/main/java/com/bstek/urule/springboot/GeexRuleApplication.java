@@ -1,7 +1,6 @@
 package com.bstek.urule.springboot;
 
 import com.bstek.urule.Utils;
-import com.bstek.urule.debug.MessageItem;
 import com.bstek.urule.runtime.KnowledgePackage;
 import com.bstek.urule.runtime.KnowledgeSession;
 import com.bstek.urule.runtime.KnowledgeSessionFactory;
@@ -30,23 +29,25 @@ public class GeexRuleApplication implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         try {
             KnowledgeService service = (KnowledgeService) Utils.getApplicationContext().getBean(KnowledgeService.BEAN_ID);
-            KnowledgePackage knowledgePackage = service.getKnowledge("test/test01");
+            KnowledgePackage knowledgePackage = service.getKnowledge("geexRule/highPass");
             KnowledgeSession session = KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
 
             OrderModel orderModel = new OrderModel();
             orderModel.setAppStatus(1);
             orderModel.setDdgStatus(1);
+            orderModel.setStoreTag("fhp");
             session.insert(orderModel);
             OutputModel outputModel = new OutputModel();
             session.insert(outputModel);
 
             // 执行所有满足条件的规则
-            FlowExecutionResponse flowExecutionResponse = session.startProcess("jueceliu01");
+            FlowExecutionResponse flowExecutionResponse = session.startProcess("gaotong");
             logger.info("orderModel: {}, outputModel: {}", orderModel, outputModel);
+            logger.info("flow execution response: {}", flowExecutionResponse);
 
-            for (MessageItem messageItem : session.getDebugMessageItems()) {
-                logger.info(messageItem.getMsg());
-            }
+//            for (MessageItem messageItem : session.getExecMessageItems()) {
+//                logger.info(messageItem.toString());
+//            }
         } catch (Exception e) {
             logger.error("test error", e);
         }

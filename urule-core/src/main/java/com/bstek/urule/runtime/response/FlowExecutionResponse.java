@@ -9,9 +9,16 @@ public interface FlowExecutionResponse extends ExecutionResponse {
     String getFlowId();
 
     /**
+     * @return 所有分流信息
+     */
+    List<String> getArrowList();
+
+    /**
      * @return 返回当前决策流经过的节点名称列表
      */
     List<String> getNodeNames();
+
+    List<NodeExecutionResponse> getNodeExecutionResponseList();
 
     /**
      * @return 返回规则集执行信息
