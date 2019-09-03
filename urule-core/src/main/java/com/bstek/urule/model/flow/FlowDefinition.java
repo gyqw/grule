@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.bstek.urule.model.flow;
 
 import com.bstek.urule.builder.KnowledgeBase;
@@ -23,23 +18,20 @@ import com.bstek.urule.runtime.event.impl.ProcessAfterCompletedEventImpl;
 import com.bstek.urule.runtime.event.impl.ProcessBeforeStartedEventImpl;
 import com.bstek.urule.runtime.response.ExecutionResponseImpl;
 import com.bstek.urule.runtime.service.KnowledgePackageService;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-
 public class FlowDefinition implements ProcessDefinition {
     private String id;
     private boolean debug;
     @JsonIgnore
     private List<Library> libraries;
-    @JsonDeserialize(
-            using = FlowNodeJsonDeserializer.class
-    )
+    @JsonDeserialize(using = FlowNodeJsonDeserializer.class)
     private List<FlowNode> nodes;
 
     public FlowDefinition() {
@@ -49,10 +41,8 @@ public class FlowDefinition implements ProcessDefinition {
         ExecutionResponseImpl response = (ExecutionResponseImpl) context.getResponse();
         response.setFlowId(this.id);
         StartNode startNode = null;
-        Iterator var4 = this.nodes.iterator();
 
-        while (var4.hasNext()) {
-            FlowNode node = (FlowNode) var4.next();
+        for (FlowNode node : this.nodes) {
             if (node instanceof StartNode) {
                 startNode = (StartNode) node;
                 break;
@@ -226,7 +216,7 @@ public class FlowDefinition implements ProcessDefinition {
 
     public void addLibrary(Library lib) {
         if (this.libraries == null) {
-            this.libraries = new ArrayList();
+            this.libraries = new ArrayList<>();
         }
 
         this.libraries.add(lib);

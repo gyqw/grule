@@ -1,6 +1,5 @@
 package com.bstek.urule.action;
 
-import com.bstek.urule.Utils;
 import com.bstek.urule.debug.MsgType;
 import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.model.library.Datatype;
@@ -26,7 +25,7 @@ public class ExecuteMethodAction extends AbstractAction {
 
     public ActionValue execute(Context context, Object matchedObject, List<Object> allMatchedObjects) {
         String info = (beanLabel == null ? beanId : beanLabel) + (methodLabel == null ? methodName : methodLabel);
-        info = "$$$执行动作：" + info;
+        info = "$$$ 执行动作：" + info;
         try {
             Object obj = context.getApplicationContext().getBean(beanId);
             java.lang.reflect.Method method = null;
@@ -66,10 +65,11 @@ public class ExecuteMethodAction extends AbstractAction {
                     valueKey = actionId.value();
                 }
                 Object value = method.invoke(obj, wrap.getValues());
-                if (debug && Utils.isDebug()) {
-                    String msg = info + "(" + wrap.valuesToString() + ")";
-                    context.debugMsg(msg, MsgType.ExecuteBeanMethod, debug);
-                }
+
+                // 执行信息
+                String msg = info + "(" + wrap.valuesToString() + ")";
+                context.logMsg(msg, MsgType.ExecuteBeanMethod);
+
                 if (value != null) {
                     return new ActionValueImpl(valueKey, value);
                 } else {
@@ -83,10 +83,11 @@ public class ExecuteMethodAction extends AbstractAction {
                     valueKey = actionId.value();
                 }
                 Object value = method.invoke(obj);
-                if (debug && Utils.isDebug()) {
-                    String msg = info + "()";
-                    context.debugMsg(msg, MsgType.ExecuteBeanMethod, debug);
-                }
+
+                // 执行信息
+                String msg = info + "()";
+                context.logMsg(msg, MsgType.ExecuteBeanMethod);
+
                 if (value != null) {
                     return new ActionValueImpl(valueKey, value);
                 } else {
@@ -104,92 +105,66 @@ public class ExecuteMethodAction extends AbstractAction {
             case String:
                 if (clazz.equals(String.class)) {
                     match = true;
-                } else {
-                    match = false;
                 }
                 break;
             case BigDecimal:
                 if (clazz.equals(BigDecimal.class)) {
                     match = true;
-                } else {
-                    match = false;
                 }
                 break;
             case Boolean:
                 if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
                     match = true;
-                } else {
-                    match = false;
                 }
                 break;
             case Date:
                 if (clazz.equals(Date.class)) {
                     match = true;
-                } else {
-                    match = false;
                 }
                 break;
             case Double:
                 if (clazz.equals(Double.class) || clazz.equals(double.class)) {
                     match = true;
-                } else {
-                    match = false;
                 }
                 break;
             case Enum:
                 if (Enum.class.isAssignableFrom(clazz)) {
                     match = true;
-                } else {
-                    match = false;
                 }
                 break;
             case Float:
                 if (clazz.equals(Float.class) || clazz.equals(float.class)) {
                     match = true;
-                } else {
-                    match = false;
                 }
                 break;
             case Integer:
                 if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
                     match = true;
-                } else {
-                    match = false;
                 }
                 break;
             case Char:
                 if (clazz.equals(Character.class) || clazz.equals(char.class)) {
                     match = true;
-                } else {
-                    match = false;
                 }
                 break;
             case List:
                 if (List.class.isAssignableFrom(clazz)) {
                     match = true;
-                } else {
-                    match = false;
                 }
                 break;
             case Long:
                 if (clazz.equals(Long.class) || clazz.equals(long.class)) {
                     match = true;
-                } else {
-                    match = false;
                 }
                 break;
             case Map:
                 if (Map.class.isAssignableFrom(clazz)) {
                     match = true;
-                } else {
-                    match = false;
                 }
                 break;
             case Set:
                 if (Set.class.isAssignableFrom(clazz)) {
                     match = true;
-                } else {
-                    match = false;
                 }
                 break;
             case Object:

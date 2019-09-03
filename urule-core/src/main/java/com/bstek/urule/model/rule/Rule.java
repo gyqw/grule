@@ -8,6 +8,7 @@ import java.util.Date;
 public class Rule implements RuleInfo {
     private String id;
     private String name;
+    private RuleType ruleType;
     private String file;
     private Integer salience;
     private Date effectiveDate;
@@ -29,6 +30,7 @@ public class Rule implements RuleInfo {
     private Rule elseRule;
 
     public Rule() {
+        this.debug = true;
     }
 
     public String getId() {
@@ -189,5 +191,40 @@ public class Rule implements RuleInfo {
 
     public void setElseRule(Rule elseRule) {
         this.elseRule = elseRule;
+    }
+
+    public RuleType getRuleType() {
+        return ruleType;
+    }
+
+    public void setRuleType(RuleType ruleType) {
+        this.ruleType = ruleType;
+    }
+
+    @Override
+    public String toString() {
+        return "Rule{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", ruleType=" + ruleType +
+                ", file='" + file + '\'' +
+                ", salience=" + salience +
+                ", effectiveDate=" + effectiveDate +
+                ", expiresDate=" + expiresDate +
+                ", enabled=" + enabled +
+                ", debug=" + debug +
+                ", activationGroup='" + activationGroup + '\'' +
+                ", agendaGroup='" + agendaGroup + '\'' +
+                ", autoFocus=" + autoFocus +
+                ", ruleflowGroup='" + ruleflowGroup + '\'' +
+                ", lhs=" + lhs +
+                ", rhs=" + rhs +
+                ", other=" + other +
+                ", loop=" + loop +
+                ", loopRule=" + loopRule +
+                ", remark='" + remark + '\'' +
+                ", withElse=" + withElse +
+                ", elseRule=" + elseRule +
+                '}';
     }
 }

@@ -12,15 +12,15 @@
     <name>Sample :: Geex Rule Springboot Project</name>
     <groupId>geex-architecture</groupId>
     <artifactId>urule-springboot</artifactId>
-    <version>${grule.version}</version>
+    <version>1.0.0</version>
 
     <properties>
         <java.version>1.7</java.version>
         <tomcat.version>8.5.5</tomcat.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <grule.version>2.2.0-SNAPSHOT</grule.version>
-        <urule-pro.version>2.0.9</urule-pro.version>
+        <urule.version>2.2.3-SNAPSHOT</urule.version>
+        <urule-pro.version>2.1.6</urule-pro.version>
     </properties>
 
     <dependencies>
@@ -35,16 +35,22 @@
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.38</version>
+        </dependency>
     </dependencies>
 
     <profiles>
         <profile>
-            <id>grule</id>
+            <id>urule</id>
             <dependencies>
                 <dependency>
                     <groupId>geex-architecture</groupId>
                     <artifactId>urule-console</artifactId>
-                    <version>${grule.version}</version>
+                    <version>${urule.version}</version>
                     <exclusions>
                         <exclusion>
                             <groupId>org.slf4j</groupId>

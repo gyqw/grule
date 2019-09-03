@@ -1,34 +1,14 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.runtime.rete;
-
-import java.util.List;
-
-import com.bstek.urule.model.rule.RuleInfo;
-import org.springframework.context.ApplicationContext;
 
 import com.bstek.urule.debug.MessageItem;
 import com.bstek.urule.debug.MsgType;
+import com.bstek.urule.model.rule.RuleInfo;
 import com.bstek.urule.runtime.WorkingMemory;
 import com.bstek.urule.runtime.assertor.AssertorEvaluator;
+import org.springframework.context.ApplicationContext;
 
-/**
- * @author Jacky.gao
- * 2015年1月8日
- */
+import java.util.List;
+
 public interface Context {
 
     void addTipMsg(String var1);
@@ -49,9 +29,11 @@ public interface Context {
 
     Object parseExpression(String var1);
 
-    List<MessageItem> getDebugMessageItems();
+    List<MessageItem> getExecuteMessageItems();
 
-    void debugMsg(String var1, MsgType var2, boolean var3);
+    void logMsg(String msg, MsgType msgType);
+
+    void logMsg(String msg, MsgType msgType, String leftVariable, String leftVariableValue, String rightVariable, String rightVariableValue);
 
     RuleInfo getCurrentRule();
 }

@@ -57,7 +57,7 @@ public class BuildRulesVisitor extends RuleParserBaseVisitor<Object> {
         RuleSetBodyContext ruleSetBodyContext = ctx.ruleSetBody();
         List<RulesContext> rulesContextList = ruleSetBodyContext.rules();
         if (rulesContextList != null) {
-            List<Rule> rules = new ArrayList<Rule>();
+            List<Rule> rules = new ArrayList<>();
             ruleSet.setRules(rules);
             for (RulesContext ruleContext : rulesContextList) {
                 RuleDefContext ruleDefContext = ruleContext.ruleDef();
@@ -249,6 +249,7 @@ public class BuildRulesVisitor extends RuleParserBaseVisitor<Object> {
                 }
             }
         }
+
         LeftContext leftContext = ctx.left();
         ParseTree parseTree = leftContext.getChild(1);
         Lhs lhs = new Lhs();

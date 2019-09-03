@@ -749,7 +749,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
     @Override
     public List<String> getReferenceFiles(String path, String searchText) throws Exception {
         Node rootNode = getRootNode();
-        List<String> referenceFiles = new ArrayList<String>();
+        List<String> referenceFiles = new ArrayList<>();
         List<String> files = getFiles(rootNode, path);
         for (String nodePath : files) {
             InputStream inputStream = readFile(nodePath, null);

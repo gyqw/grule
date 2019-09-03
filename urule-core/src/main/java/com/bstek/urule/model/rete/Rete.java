@@ -15,14 +15,14 @@
  ******************************************************************************/
 package com.bstek.urule.model.rete;
 
-import java.util.*;
-
 import com.bstek.urule.model.Node;
 import com.bstek.urule.model.library.ResourceLibrary;
 import com.bstek.urule.runtime.rete.ObjectTypeActivity;
 import com.bstek.urule.runtime.rete.ReteInstance;
 import com.bstek.urule.runtime.rete.ReteInstanceUnit;
 import org.codehaus.jackson.annotate.JsonIgnore;
+
+import java.util.*;
 
 /**
  * @author Jacky.gao
@@ -68,12 +68,10 @@ public class Rete implements Node {
     }
 
     public ReteInstance newReteInstance() {
-        List<ObjectTypeActivity> objectTypeActivities = new ArrayList();
-        Map<Object, Object> contextMap = new HashMap();
-        Iterator var3 = this.objectTypeNodes.iterator();
+        List<ObjectTypeActivity> objectTypeActivities = new ArrayList<>();
+        Map<Object, Object> contextMap = new HashMap<>();
 
-        while (var3.hasNext()) {
-            ObjectTypeNode node = (ObjectTypeNode) var3.next();
+        for (ObjectTypeNode node : this.objectTypeNodes) {
             objectTypeActivities.add((ObjectTypeActivity) node.newActivity(contextMap));
         }
 

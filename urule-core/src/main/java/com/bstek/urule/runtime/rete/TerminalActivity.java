@@ -24,10 +24,10 @@ public class TerminalActivity extends AbstractActivity {
         result.add(tracker);
         KnowledgeSession session = (KnowledgeSession) context.getWorkingMemory();
         session.fireEvent(new ActivationCreatedEventImpl(ac, session));
-        if (this.rule.getDebug() != null) {
-            String msg = "√√√规则【" + this.rule.getName() + "】成功匹配";
-            context.debugMsg(msg, MsgType.RuleMatch, this.rule.getDebug());
-        }
+
+        // 执行信息
+        String msg = "√√√ 规则【" + this.rule.getName() + "】成功匹配";
+        context.logMsg(msg, MsgType.RuleMatch);
 
         return result;
     }

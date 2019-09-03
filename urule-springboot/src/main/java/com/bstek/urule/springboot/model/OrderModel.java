@@ -15,6 +15,25 @@ public class OrderModel implements Serializable {
     private String appId;
     private Integer appStatus;
     private Integer ddgStatus;
+    private String storeTag;
+    private Integer customAge;
+    private Integer loanPeriods;
+
+    public Integer getLoanPeriods() {
+        return loanPeriods;
+    }
+
+    public void setLoanPeriods(Integer loanPeriods) {
+        this.loanPeriods = loanPeriods;
+    }
+
+    public Integer getCustomAge() {
+        return customAge;
+    }
+
+    public void setCustomAge(Integer customAge) {
+        this.customAge = customAge;
+    }
 
     public String getAppId() {
         return appId;
@@ -42,12 +61,23 @@ public class OrderModel implements Serializable {
         this.ddgStatus = ddgStatus;
     }
 
+    public String getStoreTag() {
+        return storeTag;
+    }
+
+    public void setStoreTag(String storeTag) {
+        this.storeTag = storeTag;
+    }
+
     @Override
     public String toString() {
         return "OrderModel{" +
                 "appId='" + appId + '\'' +
                 ", appStatus=" + appStatus +
                 ", ddgStatus=" + ddgStatus +
+                ", storeTag='" + storeTag + '\'' +
+                ", customAge=" + customAge +
+                ", loanPeriods=" + loanPeriods +
                 '}';
     }
 }

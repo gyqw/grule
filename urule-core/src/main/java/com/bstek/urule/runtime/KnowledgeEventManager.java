@@ -5,10 +5,6 @@ import com.bstek.urule.runtime.event.KnowledgeEventListener;
 
 import java.util.List;
 
-/**
- * @author fred
- * 2018-11-05 5:43 PM
- */
 public interface KnowledgeEventManager {
     void addEventListener(KnowledgeEventListener var1);
 
