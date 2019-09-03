@@ -31,6 +31,7 @@ import javax.jcr.nodetype.NodeType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -53,7 +54,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         Property property = fileNode.getProperty(DATA);
         Binary fileBinary = property.getBinary();
         InputStream inputStream = fileBinary.getStream();
-        String content = IOUtils.toString(inputStream, "utf-8");
+        String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         inputStream.close();
         Document document = DocumentHelper.parseText(content);
         Element rootElement = document.getRootElement();
@@ -170,7 +171,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
             fileNode = rootNode.getNode(path);
         }
 
-        List<RepositoryFile> files = new ArrayList();
+        List<RepositoryFile> files = new ArrayList<>();
         NodeIterator nodeIterator = fileNode.getNodes();
 
         while (nodeIterator.hasNext()) {
@@ -188,7 +189,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
     }
 
     private List<RepositoryFile> loadTemplateFiles(Node categoryNode) throws Exception {
-        List<RepositoryFile> list = new ArrayList();
+        List<RepositoryFile> list = new ArrayList<>();
         NodeIterator nodeIterator = categoryNode.getNodes();
 
         while (nodeIterator.hasNext()) {
@@ -215,14 +216,14 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         if (!permissionService.isAdmin()) {
             throw new NoPermissionException();
         }
-        List<ClientConfig> clients = new ArrayList<ClientConfig>();
+        List<ClientConfig> clients = new ArrayList<>();
         Node rootNode = getRootNode();
         String filePath = processPath(project) + "/" + CLIENT_CONFIG_FILE;
         Node fileNode = rootNode.getNode(filePath);
         Property property = fileNode.getProperty(DATA);
         Binary fileBinary = property.getBinary();
         InputStream inputStream = fileBinary.getStream();
-        String content = IOUtils.toString(inputStream, "utf-8");
+        String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         inputStream.close();
         Document document = DocumentHelper.parseText(content);
         Element rootElement = document.getRootElement();
@@ -332,7 +333,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
                 }
             }
             String projectName = projectNode.getName();
-            if (projectName.indexOf(RESOURCE_SECURITY_CONFIG_FILE) > -1) {
+            if (projectName.contains(RESOURCE_SECURITY_CONFIG_FILE)) {
                 continue;
             }
             if (StringUtils.isNotBlank(project) && !project.equals(projectName)) {
@@ -845,8 +846,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         session.save();
         createResourcePackageFile(projectName, user);
         createClientConfigFile(projectName, user);
-        RepositoryFile projectFileInfo = buildProjectFile(projectNode, null, classify, null);
-        return projectFileInfo;
+        return buildProjectFile(projectNode, null, classify, null);
     }
 
     @Override
