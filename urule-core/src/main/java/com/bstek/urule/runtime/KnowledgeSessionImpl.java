@@ -28,7 +28,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
     private KnowledgeSession parentSession;
     private List<String> activedActivationGroup;
     private Map<String, Object> sessionValueMap;
-    private List<MessageItem> debugMessageItems;
+    private List<MessageItem> execMessageItems;
     private Map<String, Object> initParameters;
     private Map<String, Object> allFactsMap;
     private List<KnowledgePackage> knowledgePackageList;
@@ -51,7 +51,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
     public KnowledgeSessionImpl(KnowledgePackage[] knowledgePackages, KnowledgeSession parentSession) {
         this.activedActivationGroup = new ArrayList<>();
         this.sessionValueMap = new HashMap<>();
-        this.debugMessageItems = new ArrayList<>();
+        this.execMessageItems = new ArrayList<>();
         this.initParameters = new HashMap<>();
         this.allFactsMap = new HashMap<>();
         this.knowledgePackageList = new ArrayList<>();
@@ -100,7 +100,7 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
         if (parentSession != null) {
             this.parentSession = parentSession;
             this.knowledgeEventManager.getKnowledgeEventListeners().addAll(parentSession.getKnowledgeEventListeners());
-            this.debugMessageItems = parentSession.getDebugMessageItems();
+            this.execMessageItems = parentSession.getExecMessageItems();
             this.knowledgeSessionMap = parentSession.getKnowledgeSessionMap();
             this.allFactsMap.putAll(parentSession.getAllFactsMap());
             this.sessionValueMap.putAll(parentSession.getSessionValueMap());
@@ -373,14 +373,14 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
                     ReteInstance ri = insUnit.getReteInstance();
                     for (Object fact : facts) {
                         trackers = ri.enter(this.evaluationContext, fact);
-                        if (trackers != null) {
+                        if (trackers != null && trackers.size() > 0) {
                             this.activedActivationGroup.add(id);
                             this.agenda.addTrackers(trackers, false);
                             break;
                         }
                     }
 
-                    if (trackers != null) {
+                    if (trackers != null && trackers.size() > 0) {
                         break;
                     }
                 }
@@ -479,17 +479,17 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
     }
 
     public void writeLogFile() throws IOException {
-        if (this.debugMessageItems.size() != 0) {
+        if (this.execMessageItems.size() != 0) {
             for (DebugWriter writer : Utils.getDebugWriters()) {
-                writer.write(this.debugMessageItems);
+                writer.write(this.execMessageItems);
             }
 
-            this.debugMessageItems.clear();
+            this.execMessageItems.clear();
         }
     }
 
-    public List<MessageItem> getDebugMessageItems() {
-        return this.debugMessageItems;
+    public List<MessageItem> getExecMessageItems() {
+        return this.execMessageItems;
     }
 
     public Map<String, Object> getAllFactsMap() {
@@ -554,9 +554,9 @@ public class KnowledgeSessionImpl implements KnowledgeSession {
             }
         }
 
-        this.context = new ContextImpl(this, Utils.getApplicationContext(), allVariableCategoryMap, this.debugMessageItems);
-        this.evaluationContext = new EvaluationContextImpl(this, Utils.getApplicationContext(), allVariableCategoryMap, this.debugMessageItems);
-        this.flowContext = new FlowContextImpl(this, allVariableCategoryMap, Utils.getApplicationContext(), this.debugMessageItems);
+        this.context = new ContextImpl(this, Utils.getApplicationContext(), allVariableCategoryMap, this.execMessageItems);
+        this.evaluationContext = new EvaluationContextImpl(this, Utils.getApplicationContext(), allVariableCategoryMap, this.execMessageItems);
+        this.flowContext = new FlowContextImpl(this, allVariableCategoryMap, Utils.getApplicationContext(), this.execMessageItems);
     }
 
     public Context getContext() {

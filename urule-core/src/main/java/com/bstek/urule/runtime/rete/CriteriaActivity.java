@@ -63,11 +63,13 @@ public class CriteriaActivity extends AbstractActivity {
         String id = this.criteria.getId();
         String leftVariable = ((VariableLeftPart) this.criteria.getLeft().getLeftPart()).getVariableLabel();
         String leftVariableValue = response.getLeftResult() == null ? "null" : response.getLeftResult().toString();
-        String rightVariable = "";
-        if (this.criteria.getValue().getValueType() == ValueType.Variable) {
-            rightVariable = ((VariableValue) this.criteria.getValue()).getVariableLabel();
-        } else {
-            rightVariable = this.criteria.getValue().getValueType().name();
+        String rightVariable = "system";
+        if(this.criteria.getValue() != null ) {
+            if (this.criteria.getValue().getValueType() == ValueType.Variable) {
+                rightVariable = ((VariableValue) this.criteria.getValue()).getVariableLabel();
+            } else {
+                rightVariable = this.criteria.getValue().getValueType().name();
+            }
         }
         String rightVariableValue = response.getRightResult() == null ? "null" : response.getRightResult().toString();
 

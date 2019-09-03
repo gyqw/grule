@@ -5,5 +5,5 @@ import java.util.List;
 
 
 public interface DebugWriter {
-	void write(List<MessageItem> items) throws IOException;
+    void write(List<MessageItem> items) throws IOException;
 }

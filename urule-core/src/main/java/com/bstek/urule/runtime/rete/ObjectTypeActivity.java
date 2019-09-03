@@ -20,9 +20,9 @@ public class ObjectTypeActivity extends AbstractActivity {
     public Collection<FactTracker> enter(EvaluationContext context, Object obj, FactTracker tracker) {
         try {
             return this.visitPaths(context, obj, tracker);
-        } catch (Exception var6) {
+        } catch (Exception e) {
             String tipMsg = context.getTipMsg();
-            throw new RuleAssertException(tipMsg, var6);
+            throw new RuleAssertException(tipMsg, e);
         }
     }
 

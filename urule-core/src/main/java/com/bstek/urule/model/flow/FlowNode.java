@@ -38,7 +38,9 @@ public abstract class FlowNode implements Node {
     public final void enter(FlowContext context, FlowInstance instance) {
         String msg = ">>> 进入决策流节点：" + name;
         context.logMsg(msg, MsgType.RuleFlow);
-        ((ExecutionResponseImpl) context.getResponse()).addNodeName(name);
+        ExecutionResponseImpl executionResponse = (ExecutionResponseImpl) context.getResponse();
+        executionResponse.addNodeName(name);
+
         KnowledgeSession session = (KnowledgeSession) context.getWorkingMemory();
         session.fireEvent(new ProcessBeforeNodeTriggeredEventImpl(this, instance, session));
         enterNode(context, instance);

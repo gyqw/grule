@@ -33,7 +33,7 @@ public interface KnowledgeSession extends WorkingMemory {
 
     void writeLogFile() throws IOException;
 
-    List<MessageItem> getDebugMessageItems();
+    List<MessageItem> getExecMessageItems();
 
     List<KnowledgePackage> getKnowledgePackageList();
 

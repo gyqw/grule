@@ -8,6 +8,7 @@ import java.util.Date;
 public class Rule implements RuleInfo {
     private String id;
     private String name;
+    private RuleType ruleType;
     private String file;
     private Integer salience;
     private Date effectiveDate;
@@ -192,11 +193,20 @@ public class Rule implements RuleInfo {
         this.elseRule = elseRule;
     }
 
+    public RuleType getRuleType() {
+        return ruleType;
+    }
+
+    public void setRuleType(RuleType ruleType) {
+        this.ruleType = ruleType;
+    }
+
     @Override
     public String toString() {
         return "Rule{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
+                ", ruleType=" + ruleType +
                 ", file='" + file + '\'' +
                 ", salience=" + salience +
                 ", effectiveDate=" + effectiveDate +
