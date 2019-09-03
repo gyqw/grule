@@ -1,20 +1,6 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.servlet;
 
+import com.bstek.urule.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
@@ -23,8 +9,6 @@ import org.apache.velocity.runtime.log.NullLogChute;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
-import com.bstek.urule.Utils;
 
 
 /**
@@ -40,7 +24,7 @@ public abstract class RenderPageServletHandler extends WriteJsonServletHandler i
         if (StringUtils.isNotBlank(file)) {
             file = Utils.decodeURL(file);
             if (file.startsWith("/")) {
-                file = file.substring(1, file.length());
+                file = file.substring(1);
                 int pos = file.indexOf("/");
                 project = file.substring(0, pos);
             }
