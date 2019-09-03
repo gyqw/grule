@@ -1,38 +1,9 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.repository;
 
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.jcr.Binary;
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.Property;
-import javax.jcr.Session;
-import javax.jcr.SimpleCredentials;
-import javax.jcr.lock.LockManager;
-import javax.jcr.version.Version;
-import javax.jcr.version.VersionHistory;
-import javax.jcr.version.VersionIterator;
-import javax.jcr.version.VersionManager;
-
+import com.bstek.urule.console.DefaultRepositoryInteceptor;
+import com.bstek.urule.console.RepositoryInteceptor;
+import com.bstek.urule.console.repository.model.*;
+import com.bstek.urule.exception.RuleException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.core.RepositoryImpl;
@@ -43,20 +14,18 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.bstek.urule.exception.RuleException;
-import com.bstek.urule.console.DefaultRepositoryInteceptor;
-import com.bstek.urule.console.RepositoryInteceptor;
-import com.bstek.urule.console.repository.model.RepositoryFile;
-import com.bstek.urule.console.repository.model.ResourceItem;
-import com.bstek.urule.console.repository.model.ResourcePackage;
-import com.bstek.urule.console.repository.model.Type;
-import com.bstek.urule.console.repository.model.VersionFile;
+import javax.jcr.*;
+import javax.jcr.lock.LockManager;
+import javax.jcr.version.Version;
+import javax.jcr.version.VersionHistory;
+import javax.jcr.version.VersionIterator;
+import javax.jcr.version.VersionManager;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-/**
- * @author Jacky.gao
- * @author fred
- * 2017年12月15日
- */
 public abstract class BaseRepositoryService implements RepositoryReader, ApplicationContextAware {
     public static final String RES_PACKGE_FILE = "___res__package__file__";
     public static final String CLIENT_CONFIG_FILE = "___client_config__file__";
