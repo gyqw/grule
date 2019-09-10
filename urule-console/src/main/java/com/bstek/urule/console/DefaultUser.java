@@ -2,7 +2,7 @@ package com.bstek.urule.console;
 
 /**
  * @author Jacky.gao
- * @since 2016年5月25日
+ * 2016年5月25日
  */
 public class DefaultUser implements User {
     private String username;

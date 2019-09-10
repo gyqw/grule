@@ -1,7 +1,7 @@
 package com.bstek.urule.console.servlet;
 
 import com.bstek.urule.console.exception.NoPermissionException;
-import com.bstek.urule.console.repository.NodeLockException;
+import com.bstek.urule.console.exception.NodeLockException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;

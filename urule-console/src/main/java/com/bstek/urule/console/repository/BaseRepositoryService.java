@@ -1,23 +1,9 @@
 package com.bstek.urule.console.repository;
 
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.jcr.Binary;
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.Property;
-import javax.jcr.Session;
-import javax.jcr.SimpleCredentials;
-import javax.jcr.lock.LockManager;
-import javax.jcr.version.Version;
-import javax.jcr.version.VersionHistory;
-import javax.jcr.version.VersionIterator;
-import javax.jcr.version.VersionManager;
-
+import com.bstek.urule.console.DefaultRepositoryInteceptor;
+import com.bstek.urule.console.RepositoryInteceptor;
+import com.bstek.urule.console.repository.model.*;
+import com.bstek.urule.exception.RuleException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.core.RepositoryImpl;
@@ -28,14 +14,18 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.bstek.urule.exception.RuleException;
-import com.bstek.urule.console.DefaultRepositoryInteceptor;
-import com.bstek.urule.console.RepositoryInteceptor;
-import com.bstek.urule.console.repository.model.RepositoryFile;
-import com.bstek.urule.console.repository.model.ResourceItem;
-import com.bstek.urule.console.repository.model.ResourcePackage;
-import com.bstek.urule.console.repository.model.Type;
-import com.bstek.urule.console.repository.model.VersionFile;
+import javax.jcr.*;
+import javax.jcr.lock.LockManager;
+import javax.jcr.version.Version;
+import javax.jcr.version.VersionHistory;
+import javax.jcr.version.VersionIterator;
+import javax.jcr.version.VersionManager;
+import java.io.File;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Jacky.gao
@@ -80,7 +70,7 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
                     }
                 }
             }
-            if (projectNode.getName().indexOf(RESOURCE_SECURITY_CONFIG_FILE) > -1) {
+            if (projectNode.getName().contains(RESOURCE_SECURITY_CONFIG_FILE)) {
                 continue;
             }
             RepositoryFile projectFile = new RepositoryFile();
@@ -107,7 +97,8 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
             Version version = iterator.nextVersion();
             String versionName = version.getName();
             if (versionName.startsWith("jcr:")) {
-                continue; // skip root version
+                // skip root version
+                continue;
             }
             Node fnode = version.getFrozenNode();
             VersionFile file = new VersionFile();
@@ -233,6 +224,11 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
 
     protected Node getRootNode() throws Exception {
         return session.getRootNode();
+    }
+
+    protected File getRootDir() throws Exception {
+        // TODO: 9/4/19
+        return new File("/home/fred/Documents/2.rmd/6.决策引擎/repo");
     }
 
     public void setRepositoryBuilder(RepositoryBuilder repositoryBuilder) {

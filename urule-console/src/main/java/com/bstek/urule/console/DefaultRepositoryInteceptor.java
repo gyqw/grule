@@ -3,7 +3,7 @@ package com.bstek.urule.console;
 
 /**
  * @author Jacky.gao
- * @since 2016年8月30日
+ * 2016年8月30日
  */
 public class DefaultRepositoryInteceptor implements RepositoryInteceptor {
 
