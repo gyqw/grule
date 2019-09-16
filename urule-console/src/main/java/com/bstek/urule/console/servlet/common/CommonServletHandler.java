@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.servlet.common;
 
 import com.bstek.urule.Utils;
@@ -27,10 +12,12 @@ import com.bstek.urule.console.servlet.RequestContext;
 import com.bstek.urule.dsl.RuleParserLexer;
 import com.bstek.urule.dsl.RuleParserParser;
 import com.bstek.urule.exception.RuleException;
+import com.bstek.urule.model.flow.*;
 import com.bstek.urule.model.function.FunctionDescriptor;
 import com.bstek.urule.model.library.action.ActionLibrary;
 import com.bstek.urule.model.library.action.SpringBean;
 import com.bstek.urule.parse.deserializer.*;
+import com.bstek.urule.parse.flow.FlowDefinitionParser;
 import com.bstek.urule.runtime.BuiltInActionLibraryBuilder;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -90,6 +77,28 @@ public class CommonServletHandler extends RenderPageServletHandler {
                 if (des.support(element)) {
                     des.deserialize(element);
                     break;
+                }
+            }
+
+            // 决策流节点语法校验
+            FlowDefinitionParser flowDefinitionParser = applicationContext.getBean(FlowDefinitionParser.class);
+            if (flowDefinitionParser.support(element.getName())) {
+                FlowDefinition flowDefinition = flowDefinitionParser.parse(element);
+                for (FlowNode flowNode : flowDefinition.getNodes()) {
+                    if (flowNode instanceof DecisionNode) {
+                        DecisionNode decisionNode = (DecisionNode) flowNode;
+                        if (DecisionType.Criteria == decisionNode.getDecisionType()) {
+                            for (DecisionItem decisionItem : decisionNode.getItems()) {
+                                if ("script".equals(decisionItem.getConditionType())) {
+                                    List<ErrorInfo> errorInfoList = scriptValidationText(decisionItem.getScript(), "DecisionNode");
+                                    if (errorInfoList != null && errorInfoList.size() > 0) {
+                                        throw new RuleException(String.format("[%s]决策节点的[%s]流向有语法错误",
+                                                decisionNode.getName(), decisionItem.getTo()));
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         } catch (Exception e) {
@@ -235,8 +244,13 @@ public class CommonServletHandler extends RenderPageServletHandler {
 
     public void scriptValidation(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String content = req.getParameter("content");
+        String type = req.getParameter("type");
+        writeObjectToJson(resp, scriptValidationText(content, type));
+    }
+
+    private List<ErrorInfo> scriptValidationText(String content, String type) {
         if (StringUtils.isNotBlank(content)) {
-            ScriptType type = ScriptType.valueOf(req.getParameter("type"));
+            ScriptType scriptType = ScriptType.valueOf(type);
             ANTLRInputStream antlrInputStream = new ANTLRInputStream(content);
             RuleParserLexer lexer = new RuleParserLexer(antlrInputStream);
             CommonTokenStream steam = new CommonTokenStream(lexer);
@@ -244,7 +258,7 @@ public class CommonServletHandler extends RenderPageServletHandler {
             parser.removeErrorListeners();
             ScriptErrorListener errorListener = new ScriptErrorListener();
             parser.addErrorListener(errorListener);
-            switch (type) {
+            switch (scriptType) {
                 case Script:
                     parser.ruleSet();
                     break;
@@ -253,11 +267,11 @@ public class CommonServletHandler extends RenderPageServletHandler {
                     break;
                 case ScriptNode:
                     parser.actions();
-
             }
-            List<ErrorInfo> infos = errorListener.getInfos();
-            writeObjectToJson(resp, infos);
+            return errorListener.getInfos();
         }
+
+        return new ArrayList<>();
     }
 
     public void loadXml(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

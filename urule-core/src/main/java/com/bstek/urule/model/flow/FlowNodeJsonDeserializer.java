@@ -71,7 +71,7 @@ public class FlowNodeJsonDeserializer extends JsonDeserializer<List<FlowNode>> {
         		decisionNode.setDecisionType(decisionType);
         		JsonNode itemsNode=childNode.get("items");
         		Iterator<JsonNode> iter=itemsNode.getElements();
-        		List<DecisionItem> items=new ArrayList<DecisionItem>();
+        		List<DecisionItem> items=new ArrayList<>();
         		while(iter.hasNext()){
         			JsonNode itemNode=iter.next();
         			DecisionItem item=new DecisionItem();
