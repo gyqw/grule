@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.servlet.common;
 
 import com.bstek.urule.Utils;
@@ -48,7 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -79,12 +64,12 @@ public class CommonServletHandler extends RenderPageServletHandler {
         String content = req.getParameter("content");
         content = Utils.decodeContent(content);
         String versionComment = req.getParameter("versionComment");
-        boolean newVersion = Boolean.valueOf(req.getParameter("newVersion"));
+        boolean newVersion = Boolean.parseBoolean(req.getParameter("newVersion"));
         User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
 
         // 检验文件合规性
         try {
-            InputStream inputStream = new ByteArrayInputStream(content.getBytes(Charset.forName("UTF-8")));
+            InputStream inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
             Element element = parseXml(inputStream);
             for (Deserializer<?> des : deserializers) {
                 if (des.support(element)) {
@@ -204,12 +189,13 @@ public class CommonServletHandler extends RenderPageServletHandler {
     public void loadResourceTreeData(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String project = req.getParameter("project");
         project = Utils.decodeURL(project);
+        project = buildProjectNameFromFile(project);
         String forLib = req.getParameter("forLib");
         String fileType = req.getParameter("fileType");
         String searchFileName = req.getParameter("searchFileName");
 
         User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
-        FileType[] types = null;
+        FileType[] types;
         if (StringUtils.isNotBlank(forLib) && forLib.equals("true")) {
             types = new FileType[]{FileType.ActionLibrary, FileType.ConstantLibrary, FileType.VariableLibrary, FileType.ParameterLibrary};
         } else if (StringUtils.isNotBlank(fileType)) {

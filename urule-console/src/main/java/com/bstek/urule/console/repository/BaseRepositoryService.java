@@ -161,7 +161,7 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
     public List<ResourcePackage> loadProjectResourcePackages(String project) throws Exception {
         List<ResourcePackage> packages = new ArrayList<>();
 
-        String filePath = getAbsPath(PROJECT_DATA_DIR + "/" + project) + "/" + RES_PACKGE_FILE;
+        String filePath = getAbsPath(project) + "/" + RES_PACKGE_FILE;
         SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String content = FileOperator.readFileContent(filePath);
 

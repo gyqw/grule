@@ -413,8 +413,8 @@ public class FrameServletHandler extends RenderPageServletHandler {
         User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
         boolean classify = getClassify(req, resp);
         String projectName = req.getParameter("projectName");
-        String searchFileName = req.getParameter("searchFileName");
         projectName = Utils.decodeURL(projectName);
+        String searchFileName = req.getParameter("searchFileName");
         String typesStr = req.getParameter("types");
         FileType[] types = null;
         if (StringUtils.isNotBlank(typesStr) && !typesStr.equals("all")) {
