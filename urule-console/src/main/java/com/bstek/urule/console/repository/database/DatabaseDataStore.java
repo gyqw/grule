@@ -1,33 +1,13 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.repository.database;
+
+import com.bstek.urule.console.repository.RepositoryBuilder;
+import org.apache.jackrabbit.core.data.DataStoreException;
+import org.apache.jackrabbit.core.data.db.DbDataStore;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.jackrabbit.core.data.DataStoreException;
-import org.apache.jackrabbit.core.data.db.DbDataStore;
-
-import com.bstek.urule.console.repository.RepositoryBuilder;
-
-/**
- * @author Jacky.gao
- * 2017年12月7日
- */
 public class DatabaseDataStore extends DbDataStore {
     @Override
     public synchronized void init(String homeDir) throws DataStoreException {
@@ -49,10 +29,9 @@ public class DatabaseDataStore extends DbDataStore {
         InputStream in =
                 DbDataStore.class.getResourceAsStream(databaseType + ".properties");
         if (in == null) {
-            String msg =
-                    "Configuration error: The resource '" + databaseType
-                            + ".properties' could not be found;"
-                            + " Please verify the databaseType property";
+            String msg = "Configuration error: The resource '" + databaseType
+                    + ".properties' could not be found;"
+                    + " Please verify the databaseType property";
             throw new DataStoreException(msg);
         }
         Properties prop = new Properties();
