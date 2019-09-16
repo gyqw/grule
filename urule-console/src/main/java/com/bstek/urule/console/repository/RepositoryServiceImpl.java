@@ -29,6 +29,7 @@ import org.springframework.context.ApplicationContextAware;
 import javax.jcr.*;
 import javax.jcr.lock.Lock;
 import javax.jcr.nodetype.NodeType;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,6 +41,7 @@ import java.util.List;
 
 /**
  * @author Jacky.gao
+ * @author fred
  * 2016年5月24日
  */
 public class RepositoryServiceImpl extends BaseRepositoryService implements RepositoryService, ApplicationContextAware {
@@ -315,66 +317,70 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         List<String> projectNames = new ArrayList<>();
         repo.setProjectNames(projectNames);
         RepositoryFile rootFile = new RepositoryFile();
-        rootFile.setFullPath("/");
+        rootFile.setFullPath(getProjectRelativePath("/"));
         rootFile.setName("项目列表");
         rootFile.setType(Type.root);
-        Node rootNode = getRootNode();
-        NodeIterator nodeIterator = rootNode.getNodes();
-        while (nodeIterator.hasNext()) {
-            Node projectNode = nodeIterator.nextNode();
-            if (!projectNode.hasProperty(FILE)) {
-                continue;
-            }
-            if (StringUtils.isNotEmpty(companyId)) {
-                if (projectNode.hasProperty(COMPANY_ID)) {
-                    String id = projectNode.getProperty(COMPANY_ID).getString();
-                    if (!companyId.equals(id)) {
-                        continue;
-                    }
+
+        File file = new File(getAbsPath(PROJECT_DATA_DIR));
+        File[] files = file.listFiles();
+        if (files != null) {
+            for (File subFile : files) {
+                if (!subFile.isDirectory()) {
+                    continue;
                 }
+//            if (StringUtils.isNotEmpty(companyId)) {
+//                if (projectNode.hasProperty(COMPANY_ID)) {
+//                    String id = projectNode.getProperty(COMPANY_ID).getString();
+//                    if (!companyId.equals(id)) {
+//                        continue;
+//                    }
+//                }
+//            }
+                String projectName = subFile.getName();
+                if (StringUtils.isNotBlank(project) && !project.equals(projectName)) {
+                    continue;
+                }
+                if (!permissionService.projectHasPermission(subFile.getPath())) {
+                    continue;
+                }
+                if (StringUtils.isBlank(project)) {
+                    projectNames.add(projectName);
+                }
+                RepositoryFile projectFile = buildProjectFile(subFile, types, classify, searchFileName);
+                rootFile.addChild(projectFile, false);
             }
-            String projectName = projectNode.getName();
-            if (projectName.contains(RESOURCE_SECURITY_CONFIG_FILE)) {
-                continue;
-            }
-            if (StringUtils.isNotBlank(project) && !project.equals(projectName)) {
-                continue;
-            }
-            if (!permissionService.projectHasPermission(projectNode.getPath())) {
-                continue;
-            }
-            if (StringUtils.isBlank(project)) {
-                projectNames.add(projectName);
-            }
-            RepositoryFile projectFile = buildProjectFile(projectNode, types, classify, searchFileName);
-            rootFile.addChild(projectFile, false);
         }
+
         repo.setRootFile(rootFile);
         return repo;
     }
 
-    private RepositoryFile buildProjectFile(Node projectNode, FileType[] types, boolean classify, String searchFileName) throws Exception {
+    private RepositoryFile buildProjectFile(File projectDir, FileType[] types, boolean classify, String searchFileName) throws Exception {
         RepositoryFile projectFile = new RepositoryFile();
         projectFile.setType(Type.project);
-        projectFile.setName(projectNode.getName());
-        projectFile.setFullPath("/" + projectNode.getName());
+        projectFile.setName(projectDir.getName());
+        projectFile.setFullPath(getProjectRelativePath(projectDir.getName()));
+
         RepositoryFile resDir = new RepositoryFile();
         resDir.setFullPath(projectFile.getFullPath());
         resDir.setName("资源");
-        if ((types == null || types.length == 0) && permissionService.projectPackageHasReadPermission(projectNode.getPath())) {
+
+        if ((types == null || types.length == 0) && permissionService.projectPackageHasReadPermission(projectDir.getPath())) {
             RepositoryFile packageFile = new RepositoryFile();
             packageFile.setName("知识包");
             packageFile.setType(Type.resourcePackage);
             packageFile.setFullPath(projectFile.getFullPath());
             projectFile.addChild(packageFile, false);
         }
+
         if (classify) {
             resDir.setType(Type.resource);
-            createResourceCategory(projectNode, resDir, types, searchFileName);
+            createResourceCategory(projectDir, resDir, types, searchFileName);
         } else {
             resDir.setType(Type.all);
-            buildResources(projectNode, resDir, types, searchFileName);
+            buildResources(projectDir, resDir, types, searchFileName);
         }
+
         projectFile.addChild(resDir, false);
         return projectFile;
     }
@@ -391,6 +397,20 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         }
         libDir.setLibType(LibType.all);
         buildNodes(projectNode.getNodes(), libDir, fileTypes, Type.all, searchFileName);
+    }
+
+    private void buildResources(File projectDir, RepositoryFile libDir, FileType[] types, String searchFileName) throws Exception {
+        FileType[] fileTypes = types;
+        if (types == null || types.length == 0) {
+            fileTypes = new FileType[]{FileType.VariableLibrary,
+                    FileType.ParameterLibrary, FileType.ConstantLibrary,
+                    FileType.ActionLibrary, FileType.Ruleset,
+                    FileType.RuleFlow, FileType.DecisionTable,
+                    FileType.DecisionTree, FileType.ScriptDecisionTable,
+                    FileType.UL, FileType.Scorecard, FileType.ComplexScorecard};
+        }
+        libDir.setLibType(LibType.all);
+        buildNodes(projectDir, libDir, fileTypes, Type.all, searchFileName);
     }
 
     private void createResourceCategory(Node projectNode, RepositoryFile libDir, FileType[] types, String searchFileName) throws Exception {
@@ -460,12 +480,191 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         buildNodes(projectNode.getNodes(), flowLib, libraryFlowTypes, Type.flowLib, searchFileName);
     }
 
+    private void createResourceCategory(File projectDir, RepositoryFile libDir, FileType[] types, String searchFileName) throws Exception {
+        RepositoryFile subLib = buildLibFile(libDir, "库", LibType.res);
+        subLib.setType(Type.lib);
+        libDir.addChild(subLib, false);
+        FileType[] librarySubTypes = types;
+        if (types == null || types.length == 0) {
+            librarySubTypes = new FileType[]{FileType.VariableLibrary, FileType.ParameterLibrary, FileType.ConstantLibrary, FileType.ActionLibrary};
+        }
+        buildNodes(projectDir, subLib, librarySubTypes, Type.lib, searchFileName);
+
+        RepositoryFile rulesLib = buildLibFile(libDir, "决策集", LibType.ruleset);
+        rulesLib.setFullPath(libDir.getFullPath());
+        rulesLib.setType(Type.ruleLib);
+
+        RepositoryFile decisionTableLib = buildLibFile(libDir, "决策表", LibType.decisiontable);
+        decisionTableLib.setFullPath(libDir.getFullPath());
+        decisionTableLib.setType(Type.decisionTableLib);
+
+        RepositoryFile decisionTreeLib = buildLibFile(libDir, "决策树", LibType.decisiontree);
+        decisionTreeLib.setFullPath(libDir.getFullPath());
+        decisionTreeLib.setType(Type.decisionTreeLib);
+
+        RepositoryFile scorecardLib = buildLibFile(libDir, "评分卡", LibType.scorecard);
+        scorecardLib.setFullPath(libDir.getFullPath());
+        scorecardLib.setType(Type.scorecardLib);
+
+        RepositoryFile flowLib = buildLibFile(libDir, "决策流", LibType.ruleflow);
+        flowLib.setFullPath(libDir.getFullPath());
+        flowLib.setType(Type.flowLib);
+
+        libDir.addChild(rulesLib, false);
+        libDir.addChild(decisionTableLib, false);
+        libDir.addChild(decisionTreeLib, false);
+        libDir.addChild(scorecardLib, false);
+        libDir.addChild(flowLib, false);
+
+        FileType[] libraryRuleTypes = types;
+        if (types == null || types.length == 0) {
+            libraryRuleTypes = new FileType[]{FileType.Ruleset, FileType.UL};
+        }
+
+        FileType[] libraryDecisionTypes = types;
+        if (types == null || types.length == 0) {
+            libraryDecisionTypes = new FileType[]{FileType.DecisionTable, FileType.ScriptDecisionTable};
+        }
+        FileType[] libraryDecisionTreeTypes = types;
+        if (types == null || types.length == 0) {
+            libraryDecisionTreeTypes = new FileType[]{FileType.DecisionTree};
+        }
+
+        FileType[] libraryFlowTypes = types;
+        if (types == null || types.length == 0) {
+            libraryFlowTypes = new FileType[]{FileType.RuleFlow};
+        }
+
+        FileType[] libraryScorecardTypes = types;
+        if (types == null || types.length == 0) {
+            libraryScorecardTypes = new FileType[]{FileType.Scorecard, FileType.ComplexScorecard};
+        }
+
+        buildNodes(projectDir, rulesLib, libraryRuleTypes, Type.ruleLib, searchFileName);
+        buildNodes(projectDir, decisionTableLib, libraryDecisionTypes, Type.decisionTableLib, searchFileName);
+        buildNodes(projectDir, decisionTreeLib, libraryDecisionTreeTypes, Type.decisionTreeLib, searchFileName);
+        buildNodes(projectDir, scorecardLib, libraryScorecardTypes, Type.scorecardLib, searchFileName);
+        buildNodes(projectDir, flowLib, libraryFlowTypes, Type.flowLib, searchFileName);
+    }
+
     private RepositoryFile buildLibFile(RepositoryFile libraryDir, String name, LibType libType) {
         RepositoryFile subLib = new RepositoryFile();
         subLib.setFullPath(libraryDir.getFullPath());
         subLib.setName(name);
         subLib.setLibType(libType);
         return subLib;
+    }
+
+    private void buildNodes(File projectDir, RepositoryFile parent, FileType[] types, Type folderType, String searchFileName) throws Exception {
+        LibType libType = parent.getLibType();
+        File[] files = projectDir.listFiles();
+        if (files != null) {
+            for (File fileNode : files) {
+                RepositoryFile file = new RepositoryFile();
+                String name = fileNode.getName();
+                if (name.toLowerCase().contains(RES_PACKGE_FILE) ||
+                        name.toLowerCase().contains(CLIENT_CONFIG_FILE) ||
+                        name.toLowerCase().contains(RESOURCE_SECURITY_CONFIG_FILE)) {
+                    continue;
+                }
+                if (!fileNode.isDirectory()) {
+                    if (!permissionService.fileHasReadPermission(fileNode.getPath())) {
+                        continue;
+                    }
+                    FileType fileType = null;
+                    boolean add = false;
+                    for (FileType type : types) {
+                        if (name.toLowerCase().endsWith(type.toString())) {
+                            fileType = type;
+                            add = true;
+                            break;
+                        }
+                    }
+                    if (!add) {
+                        continue;
+                    }
+
+                    if (libType.equals(LibType.res)) {
+                        if (!fileType.equals(FileType.ActionLibrary) && !fileType.equals(FileType.ParameterLibrary) && !fileType.equals(FileType.ConstantLibrary) && !fileType.equals(FileType.VariableLibrary)) {
+                            continue;
+                        }
+                    }
+
+                    if (libType.equals(LibType.decisiontable)) {
+                        if (!fileType.equals(FileType.ScriptDecisionTable) && !fileType.equals(FileType.DecisionTable)) {
+                            continue;
+                        }
+                    }
+
+                    if (libType.equals(LibType.decisiontree)) {
+                        if (!fileType.equals(FileType.DecisionTree)) {
+                            continue;
+                        }
+                    }
+
+                    if (libType.equals(LibType.ruleflow)) {
+                        if (!fileType.equals(FileType.RuleFlow)) {
+                            continue;
+                        }
+                    }
+
+                    if (libType.equals(LibType.scorecard)) {
+                        if (!fileType.equals(FileType.Scorecard) && !fileType.equals(FileType.ComplexScorecard)) {
+                            continue;
+                        }
+                    }
+
+                    if (libType.equals(LibType.ruleset)) {
+                        if (!fileType.equals(FileType.Ruleset) && !fileType.equals(FileType.UL)) {
+                            continue;
+                        }
+                    }
+                    if (StringUtils.isNotBlank(searchFileName)) {
+                        if (!name.toLowerCase().contains(searchFileName.toLowerCase())) {
+                            continue;
+                        }
+                    }
+                    if (name.toLowerCase().endsWith(FileType.ActionLibrary.toString())) {
+                        file.setType(Type.action);
+                    } else if (name.toLowerCase().endsWith(FileType.VariableLibrary.toString())) {
+                        file.setType(Type.variable);
+                    } else if (name.toLowerCase().endsWith(FileType.ConstantLibrary.toString())) {
+                        file.setType(Type.constant);
+                    } else if (name.toLowerCase().endsWith(FileType.Ruleset.toString())) {
+                        file.setType(Type.rule);
+                    } else if (name.toLowerCase().endsWith(FileType.DecisionTable.toString())) {
+                        file.setType(Type.decisionTable);
+                    } else if (name.toLowerCase().endsWith(FileType.UL.toString())) {
+                        file.setType(Type.ul);
+                    } else if (name.toLowerCase().endsWith(FileType.ParameterLibrary.toString())) {
+                        file.setType(Type.parameter);
+                    } else if (name.toLowerCase().endsWith(FileType.RuleFlow.toString())) {
+                        file.setType(Type.flow);
+                    } else if (name.toLowerCase().endsWith(FileType.ScriptDecisionTable.toString())) {
+                        file.setType(Type.scriptDecisionTable);
+                    } else if (name.toLowerCase().endsWith(FileType.DecisionTree.toString())) {
+                        file.setType(Type.decisionTree);
+                    } else if (name.toLowerCase().endsWith(FileType.Scorecard.toString())) {
+                        file.setType(Type.scorecard);
+                    } else if (name.toLowerCase().endsWith(FileType.ComplexScorecard.toString())) {
+                        file.setType(Type.complexscorecard);
+                    }
+                    file.setFullPath(getProjectRelativePath(projectDir.getName() + "/" + fileNode.getName()));
+                    file.setName(name);
+                    buildNodeLockInfo(fileNode, file);
+                    parent.addChild(file, false);
+                    buildNodes(fileNode, file, types, folderType, searchFileName);
+                } else {
+                    file.setFullPath(getProjectRelativePath(projectDir.getName() + "/" + fileNode.getName()));
+                    file.setName(name);
+                    file.setType(Type.folder);
+                    buildNodeLockInfo(fileNode, file);
+                    file.setFolderType(folderType);
+                    parent.addChild(file, true);
+                    buildNodes(fileNode, file, types, folderType, searchFileName);
+                }
+            }
+        }
     }
 
     private void buildNodes(NodeIterator nodeIterator, RepositoryFile parent, FileType[] types, Type folderType, String searchFileName) throws Exception {
@@ -478,7 +677,9 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
             RepositoryFile file = new RepositoryFile();
             file.setLibType(libType);
             String name = fileNode.getName();
-            if (name.toLowerCase().indexOf(RES_PACKGE_FILE) > -1 || name.toLowerCase().indexOf(CLIENT_CONFIG_FILE) > -1 || name.toLowerCase().indexOf(RESOURCE_SECURITY_CONFIG_FILE) > -1) {
+            if (name.toLowerCase().contains(RES_PACKGE_FILE) ||
+                    name.toLowerCase().contains(CLIENT_CONFIG_FILE) ||
+                    name.toLowerCase().contains(RESOURCE_SECURITY_CONFIG_FILE)) {
                 continue;
             }
             if (!fileNode.hasProperty(DIR_TAG)) {
@@ -534,7 +735,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
                     }
                 }
                 if (StringUtils.isNotBlank(searchFileName)) {
-                    if (name.toLowerCase().indexOf(searchFileName.toLowerCase()) == -1) {
+                    if (!name.toLowerCase().contains(searchFileName.toLowerCase())) {
                         continue;
                     }
                 }
@@ -578,6 +779,16 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
                 buildNodes(fileNode.getNodes(), file, types, folderType, searchFileName);
             }
         }
+    }
+
+    private void buildNodeLockInfo(File node, RepositoryFile file) throws Exception {
+//        String absPath = node.getPath();
+//        if (!lockManager.isLocked(absPath)) {
+//            return;
+//        }
+//        String owner = lockManager.getLock(absPath).getLockOwner();
+        file.setLock(true);
+        file.setLockInfo("被" + "owner" + "锁定");
     }
 
     private void buildNodeLockInfo(Node node, RepositoryFile file) throws Exception {
@@ -712,7 +923,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
     @Override
     public void saveFile(String path, String content, boolean newVersion, String versionComment, User user) throws Exception {
         path = Utils.decodeURL(path);
-        if (path.indexOf(RES_PACKGE_FILE) > -1) {
+        if (path.contains(RES_PACKGE_FILE)) {
             if (!permissionService.projectPackageHasWritePermission(path)) {
                 throw new NoPermissionException();
             }
@@ -727,27 +938,27 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         if (pos != -1) {
             path = path.substring(0, pos);
         }
-        Node rootNode = getRootNode();
-        if (!rootNode.hasNode(path)) {
+        if (!fileExistCheck(path)) {
             throw new RuleException("File [" + path + "] not exist.");
         }
-        Node fileNode = rootNode.getNode(path);
+        String absPath = getProjectAbsPath(path);
+
+        File fileNode = new File(path);
         lockCheck(fileNode, user);
-        versionManager.checkout(fileNode.getPath());
-        Binary fileBinary = new BinaryImpl(content.getBytes("utf-8"));
-        fileNode.setProperty(DATA, fileBinary);
-        fileNode.setProperty(FILE, true);
-        fileNode.setProperty(CRATE_USER, user.getUsername());
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        DateValue dateValue = new DateValue(calendar);
-        fileNode.setProperty(CRATE_DATE, dateValue);
-        if (newVersion && StringUtils.isNotBlank(versionComment)) {
-            fileNode.setProperty(VERSION_COMMENT, versionComment);
-        }
-        session.save();
+        // TODO: 9/11/19
+//        versionManager.checkout(fileNode.getPath());
+
+//        fileNode.setProperty(CRATE_USER, user.getUsername());
+//        fileNode.setProperty(CRATE_DATE, dateValue);
+        FileOperator.createFile(absPath, content);
+
+        this.git.add().addFilepattern(absPath).call();
+        versionComment = org.springframework.util.StringUtils.isEmpty(versionComment) ? "Add file " + path : versionComment;
+        this.git.commit().setAuthor(user.getUsername(), user.getEmail()).setMessage(versionComment).call();
+
         if (newVersion) {
-            versionManager.checkin(fileNode.getPath());
+            // TODO: 9/11/19
+//            versionManager.checkin(fileNode.getPath());
         }
     }
 
@@ -759,7 +970,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         for (String nodePath : files) {
             InputStream inputStream = readFile(nodePath, null);
             try {
-                String content = IOUtils.toString(inputStream, "UTF-8");
+                String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
                 inputStream.close();
                 boolean containPath = content.contains(path);
                 boolean containText = content.contains(searchText);
@@ -775,7 +986,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
 
     private List<String> getFiles(Node rootNode, String path) throws Exception {
         String project = getProjects(path);
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         Node projectNode = rootNode.getNode(project);
         buildPath(list, projectNode);
         return list;
@@ -814,15 +1025,8 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
 
     @Override
     public boolean fileExistCheck(String filePath) throws Exception {
-        Node rootNode = getRootNode();
-        filePath = processPath(filePath);
-        if (filePath.contains(" ") || filePath.equals("")) {
-            return true;
-        }
-        if (rootNode.hasNode(filePath)) {
-            return true;
-        }
-        return false;
+        filePath = getProjectAbsPath(filePath);
+        return FileOperator.hasFile(filePath);
     }
 
     @Override
@@ -831,20 +1035,15 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
             throw new NoPermissionException();
         }
         repositoryInteceptor.createProject(projectName);
-        Node rootNode = getRootNode();
-        if (rootNode.hasNode(projectName)) {
+        if (fileExistCheck(projectName)) {
             throw new RuleException("Project [" + projectName + "] already exist.");
         }
-        Node projectNode = rootNode.addNode(projectName);
-        projectNode.addMixin("mix:versionable");
-        projectNode.setProperty(FILE, true);
-        projectNode.setProperty(CRATE_USER, user.getUsername());
-        projectNode.setProperty(COMPANY_ID, user.getCompanyId());
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        DateValue dateValue = new DateValue(calendar);
-        projectNode.setProperty(CRATE_DATE, dateValue);
-        session.save();
+
+        File projectNode = new File(getAbsPath(PROJECT_DATA_DIR + "/" + projectName));
+        // TODO: 9/11/19
+//        projectNode.setProperty(CRATE_USER, user.getUsername());
+//        projectNode.setProperty(COMPANY_ID, user.getCompanyId());
+//        projectNode.setProperty(CRATE_DATE, dateValue);
         createResourcePackageFile(projectName, user);
         createClientConfigFile(projectName, user);
         return buildProjectFile(projectNode, null, classify, null);
@@ -950,56 +1149,55 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
     }
 
     private void createResourcePackageFile(String project, User user) throws Exception {
-        String filePath = processPath(project) + "/" + RES_PACKGE_FILE;
-        Node rootNode = getRootNode();
-        if (!rootNode.hasNode(filePath)) {
+        String filePath = PROJECT_DATA_DIR + "/" + project + "/" + RES_PACKGE_FILE;
+        if (!FileOperator.hasFile(processPath(filePath))) {
             createFile(filePath, "<?xml version=\"1.0\" encoding=\"utf-8\"?><res-packages></res-packages>", user);
         }
     }
 
     private void createClientConfigFile(String project, User user) throws Exception {
-        Node rootNode = getRootNode();
-        String filePath = processPath(project) + "/" + CLIENT_CONFIG_FILE;
-        if (!rootNode.hasNode(filePath)) {
+        String filePath = PROJECT_DATA_DIR + "/" + project + "/" + CLIENT_CONFIG_FILE;
+        if (!FileOperator.hasFile(processPath(filePath))) {
             createFile(filePath, "<?xml version=\"1.0\" encoding=\"utf-8\"?><client-config></client-config>", user);
         }
     }
 
     private void createSecurityConfigFile(User user) throws Exception {
         String companyId = user.getCompanyId();
-        String filePath = RESOURCE_SECURITY_CONFIG_FILE + (companyId == null ? "" : companyId);
-        Node rootNode = getRootNode();
-        if (!rootNode.hasNode(filePath)) {
+        String filePath = getAbsPath(RESOURCE_SECURITY_CONFIG_FILE + (companyId == null ? "" : companyId));
+        if (!FileOperator.hasFile(filePath)) {
             createFileNode(filePath, "<?xml version=\"1.0\" encoding=\"utf-8\"?><user-permission></user-permission>", user, false);
         }
     }
 
     private void createFileNode(String path, String content, User user, boolean isFile) throws Exception {
         String createUser = user.getUsername();
+        String email = user.getEmail();
+
         repositoryInteceptor.createFile(path, content);
-        Node rootNode = getRootNode();
-        path = processPath(path);
+        String fullPath = getAbsPath(path);
         try {
-            if (rootNode.hasNode(path)) {
+            if (FileOperator.hasFile(fullPath)) {
                 throw new RuleException("File [" + path + "] already exist.");
             }
-            Node fileNode = rootNode.addNode(path);
-            fileNode.addMixin("mix:versionable");
-            fileNode.addMixin("mix:lockable");
-            Binary fileBinary = new BinaryImpl(content.getBytes());
-            fileNode.setProperty(DATA, fileBinary);
-            if (isFile) {
-                fileNode.setProperty(FILE, true);
-            }
-            fileNode.setProperty(CRATE_USER, createUser);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(new Date());
-            DateValue dateValue = new DateValue(calendar);
-            fileNode.setProperty(CRATE_DATE, dateValue);
-            session.save();
+            FileOperator.createFile(fullPath, content);
+
+            this.git.add().addFilepattern(path).call();
+            this.git.commit().setAuthor(createUser, email).setMessage("Add file " + path).call();
         } catch (Exception ex) {
             throw new RuleException(ex);
         }
+    }
+
+    private void lockCheck(File node, User user) throws Exception {
+        // TODO: 9/11/19
+//        if (lockManager.isLocked(node.getPath())) {
+//            String lockOwner = lockManager.getLock(node.getPath()).getLockOwner();
+//            if (lockOwner.equals(user.getUsername())) {
+//                return;
+//            }
+//            throw new NodeLockException("【" + node.getName() + "】已被" + lockOwner + "锁定!");
+//        }
     }
 
     private void lockCheck(Node node, User user) throws Exception {

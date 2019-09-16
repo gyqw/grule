@@ -11,6 +11,11 @@ public interface User {
     String getUsername();
 
     /**
+     * @return 电子邮箱
+     */
+    String getEmail();
+
+    /**
      * @return 所在公司ID
      */
     String getCompanyId();

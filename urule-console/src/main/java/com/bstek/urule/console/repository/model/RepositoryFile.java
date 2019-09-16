@@ -8,7 +8,7 @@ import java.util.UUID;
 
 /**
  * @author Jacky.gao
- * @since 2014年12月24日
+ * 2014年12月24日
  */
 public class RepositoryFile {
     private String id;
@@ -67,7 +67,7 @@ public class RepositoryFile {
 
     public void addChild(RepositoryFile fileInfo, boolean isdir) {
         if (this.children == null) {
-            this.children = new ArrayList<RepositoryFile>();
+            this.children = new ArrayList<>();
         }
         fileInfo.setParentFile(this);
         if (isdir) {
