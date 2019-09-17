@@ -28,13 +28,13 @@ import org.springframework.context.ApplicationContextAware;
 import javax.jcr.*;
 import javax.jcr.lock.Lock;
 import javax.jcr.nodetype.NodeType;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @author Jacky.gao
@@ -1019,7 +1019,38 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         if (!permissionService.isAdmin()) {
             throw new NoPermissionException();
         }
-        session.exportSystemView(projectPath, outputStream, false, false);
+
+        ZipOutputStream zos = new ZipOutputStream(outputStream);
+        File zipToFile = new File(getAbsPath(projectPath));
+        zipFile(zipToFile, zipToFile.getName(), zos);
+        zos.close();
+    }
+
+    private void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
+        if (fileToZip.isDirectory()) {
+            if (fileName.endsWith("/")) {
+                zipOut.putNextEntry(new ZipEntry(fileName));
+                zipOut.closeEntry();
+            } else {
+                zipOut.putNextEntry(new ZipEntry(fileName + "/"));
+                zipOut.closeEntry();
+            }
+            File[] children = fileToZip.listFiles();
+            for (File childFile : children) {
+                zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
+            }
+            return;
+        }
+
+        FileInputStream fis = new FileInputStream(fileToZip);
+        ZipEntry zipEntry = new ZipEntry(fileName);
+        zipOut.putNextEntry(zipEntry);
+        byte[] bytes = new byte[1024];
+        int length;
+        while ((length = fis.read(bytes)) >= 0) {
+            zipOut.write(bytes, 0, length);
+        }
+        fis.close();
     }
 
     @Override
@@ -1027,13 +1058,36 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         if (!permissionService.isAdmin()) {
             throw new NoPermissionException();
         }
-        String rootNodePath = getRootNode().getPath();
-        if (overwrite) {
-            session.importXML(rootNodePath, inputStream, ImportUUIDBehavior.IMPORT_UUID_COLLISION_REPLACE_EXISTING);
-        } else {
-            session.importXML(rootNodePath, inputStream, ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW);
+
+        // TODO: 9/17/19 不覆盖的操作 
+//        if (overwrite) {
+//            session.importXML(rootNodePath, inputStream, ImportUUIDBehavior.IMPORT_UUID_COLLISION_REPLACE_EXISTING);
+//        } else {
+//            session.importXML(rootNodePath, inputStream, ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW);
+//        }
+
+        byte[] buffer = new byte[1024];
+        ZipInputStream zis = new ZipInputStream(inputStream);
+        ZipEntry zipEntry = zis.getNextEntry();
+        while (zipEntry != null) {
+            File newFile = new File(getProjectAbsPath(File.separator) + File.separator + processPath(zipEntry.getName()));
+            if (zipEntry.getName().endsWith(File.separator)) {
+                FileOperator.createDir(newFile);
+            } else {
+                FileOperator.createFile(newFile);
+
+                FileOutputStream fos = new FileOutputStream(newFile);
+                int len;
+                while ((len = zis.read(buffer)) > 0) {
+                    fos.write(buffer, 0, len);
+                }
+                fos.close();
+            }
+
+            zipEntry = zis.getNextEntry();
         }
-        session.save();
+        zis.closeEntry();
+        zis.close();
     }
 
     private void createResourcePackageFile(String project, User user) throws Exception {

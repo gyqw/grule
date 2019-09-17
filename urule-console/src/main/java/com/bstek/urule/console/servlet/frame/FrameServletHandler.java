@@ -36,6 +36,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @author Jacky.gao
@@ -388,10 +389,10 @@ public class FrameServletHandler extends RenderPageServletHandler {
             throw new RuleException("Export project not be null.");
         }
         SimpleDateFormat sd = new SimpleDateFormat("yyyyMMddHHmmss");
-        String projectName = projectPath.substring(1, projectPath.length());
-        String filename = projectName + "-urule-repo-" + sd.format(new Date()) + ".bak";
+        String projectName = projectPath.split("/")[1];
+        String filename = projectName + "-urule-repo-" + sd.format(new Date()) + ".zip";
         resp.setContentType("application/octet-stream");
-        resp.setHeader("Content-Disposition", "attachment; filename=\"" + new String(filename.getBytes("utf-8"), "iso-8859-1") + "\"");
+        resp.setHeader("Content-Disposition", "attachment; filename=\"" + new String(filename.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1) + "\"");
         resp.setHeader("content-type", "application/octet-stream");
         OutputStream outputStream = resp.getOutputStream();
         repositoryService.exportXml(projectPath, outputStream);

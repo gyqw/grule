@@ -207,7 +207,7 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
     }
 
     protected String processPath(String path) {
-        if (path.startsWith("/")) {
+        if (path.startsWith(File.separator)) {
             path = path.substring(1);
         }
         return path;
@@ -221,10 +221,10 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
     }
 
     protected String getProjectAbsPath(String path) {
-        if (path.startsWith("/")) {
+        if (path.startsWith(File.separator)) {
             path = path.substring(1);
         }
-        return this.repoHomeDir + PROJECT_DATA_DIR + "/" + path;
+        return this.repoHomeDir + PROJECT_DATA_DIR + File.separator + path;
     }
 
     protected String getProjectRelativePath(String path) {

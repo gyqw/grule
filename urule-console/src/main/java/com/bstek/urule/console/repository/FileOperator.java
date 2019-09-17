@@ -18,8 +18,11 @@ public class FileOperator {
     private static Logger logger = LoggerFactory.getLogger(FileOperator.class);
 
     public static boolean createDir(String path) {
+        return createDir(new File(path));
+    }
+
+    public static boolean createDir(File dir) {
         try {
-            File dir = new File(path);
             if (!dir.exists()) {
                 //创建目录
                 return dir.mkdirs();
@@ -67,13 +70,17 @@ public class FileOperator {
     }
 
     public static boolean createFile(String filePath) {
-        File file = new File(filePath);
+        return createFile(new File(filePath));
+    }
+
+    public static boolean createFile(File file) {
+        String path = file.getAbsolutePath();
         if (file.exists()) {
-            logger.info("创建单个文件{}失败，目标文件已存在！", filePath);
+            logger.info("创建单个文件{}失败，目标文件已存在！", path);
             return false;
         }
-        if (filePath.endsWith(File.separator)) {
-            logger.info("创建单个文件{}失败，目标文件不能为目录！", filePath);
+        if (file.getAbsolutePath().endsWith(File.separator)) {
+            logger.info("创建单个文件{}失败，目标文件不能为目录！", path);
             return false;
         }
         if (!file.getParentFile().exists()) {
@@ -87,7 +94,7 @@ public class FileOperator {
         try {
             return file.createNewFile();
         } catch (IOException e) {
-            logger.error(String.format("创建单个文件%s失败！", filePath), e);
+            logger.error(String.format("创建单个文件%s失败！", path), e);
             return false;
         }
     }
