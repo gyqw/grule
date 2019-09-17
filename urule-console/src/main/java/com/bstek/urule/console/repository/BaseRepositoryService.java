@@ -4,6 +4,10 @@ import com.bstek.urule.console.DefaultRepositoryInteceptor;
 import com.bstek.urule.console.RepositoryInteceptor;
 import com.bstek.urule.console.repository.model.*;
 import com.bstek.urule.exception.RuleException;
+<<<<<<< HEAD
+=======
+import org.apache.commons.io.IOUtils;
+>>>>>>> re/master
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -19,19 +23,17 @@ import javax.jcr.version.Version;
 import javax.jcr.version.VersionHistory;
 import javax.jcr.version.VersionIterator;
 import javax.jcr.version.VersionManager;
+<<<<<<< HEAD
 import java.io.File;
 import java.io.FileInputStream;
+=======
+>>>>>>> re/master
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * @author Jacky.gao
- * @author fred
- * 2017年12月15日
- */
 public abstract class BaseRepositoryService implements RepositoryReader, ApplicationContextAware {
     public static final String RES_PACKGE_FILE = "___res__package__file__";
     public static final String CLIENT_CONFIG_FILE = "___client_config__file__";

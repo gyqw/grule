@@ -7,10 +7,13 @@ import com.bstek.urule.console.repository.model.VersionFile;
 import java.io.InputStream;
 import java.util.List;
 
+<<<<<<< HEAD
 /**
  * @author Jacky.gao
  * @since 2017年12月15日
  */
+=======
+>>>>>>> re/master
 public interface RepositoryReader {
     public static final String BEAN_ID = RepositoryService.BEAN_ID;
 
@@ -46,7 +49,11 @@ public interface RepositoryReader {
      *
      * @param path 文件路径
      * @return 返回版本信息列表
+<<<<<<< HEAD
      * @throws Exception
+=======
+     * @throws Exception 版本异常信息
+>>>>>>> re/master
      */
     List<VersionFile> getVersionFiles(String path) throws Exception;
 

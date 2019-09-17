@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * @author Jacky.gao
- * @since 2014年12月23日
+ * 2014年12月23日
  */
 @SuppressWarnings("rawtypes")
 public class FlowDefinitionParser implements Parser<FlowDefinition>, ApplicationContextAware {

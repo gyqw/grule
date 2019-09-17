@@ -28,7 +28,13 @@ import org.springframework.context.ApplicationContextAware;
 import javax.jcr.*;
 import javax.jcr.lock.Lock;
 import javax.jcr.nodetype.NodeType;
+<<<<<<< HEAD
 import java.io.*;
+=======
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+>>>>>>> re/master
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,11 +42,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+<<<<<<< HEAD
 /**
  * @author Jacky.gao
  * @author fred
  * 2016年5月24日
  */
+=======
+>>>>>>> re/master
 public class RepositoryServiceImpl extends BaseRepositoryService implements RepositoryService, ApplicationContextAware {
     protected RefactorService refactorService;
     private PermissionService permissionService;
@@ -137,7 +146,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
             throw new RuleException("File [" + path + "] not exist.");
         } else {
             Node fileNode = rootNode.getNode(path);
-            Binary fileBinary = new BinaryImpl(content.getBytes("utf-8"));
+            Binary fileBinary = new BinaryImpl(content.getBytes(StandardCharsets.UTF_8));
             fileNode.setProperty("_data", fileBinary);
             fileNode.setProperty("_file", true);
             this.session.save();

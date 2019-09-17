@@ -10,10 +10,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+<<<<<<< HEAD
 /**
  * @author Jacky.gao
  * 2015年3月24日
  */
+=======
+>>>>>>> re/master
 public interface RepositoryService extends RepositoryReader {
     public static final String BEAN_ID = "urule.repositoryService";
 
