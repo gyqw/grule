@@ -66,7 +66,7 @@ public class FlowDefinitionParser implements Parser<FlowDefinition>, Application
             return lib;
         } else {
             int versionPos = path.lastIndexOf(":");
-            String version = path.substring(versionPos + 1, path.length());
+            String version = path.substring(versionPos + 1);
             if (version.equals("LATEST")) version = null;
             path = path.substring(0, versionPos);
             Library lib = new Library(path, version, type);

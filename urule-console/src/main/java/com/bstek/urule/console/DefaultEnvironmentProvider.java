@@ -14,8 +14,9 @@ public class DefaultEnvironmentProvider implements EnvironmentProvider {
     @Override
     public User getLoginUser(RequestContext context) {
         DefaultUser user = new DefaultUser();
-        user.setCompanyId("bstek");
         user.setUsername("admin");
+        user.setEmail("admin@bstek.com");
+        user.setCompanyId("bstek");
         user.setAdmin(true);
         return user;
     }

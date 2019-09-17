@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -66,12 +66,12 @@ public class CommonServletHandler extends RenderPageServletHandler {
         String content = req.getParameter("content");
         content = Utils.decodeContent(content);
         String versionComment = req.getParameter("versionComment");
-        boolean newVersion = Boolean.valueOf(req.getParameter("newVersion"));
+        boolean newVersion = Boolean.parseBoolean(req.getParameter("newVersion"));
         User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
 
         // 检验文件合规性
         try {
-            InputStream inputStream = new ByteArrayInputStream(content.getBytes(Charset.forName("UTF-8")));
+            InputStream inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
             Element element = parseXml(inputStream);
             for (Deserializer<?> des : deserializers) {
                 if (des.support(element)) {
@@ -213,12 +213,13 @@ public class CommonServletHandler extends RenderPageServletHandler {
     public void loadResourceTreeData(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String project = req.getParameter("project");
         project = Utils.decodeURL(project);
+        project = buildProjectNameFromFile(project);
         String forLib = req.getParameter("forLib");
         String fileType = req.getParameter("fileType");
         String searchFileName = req.getParameter("searchFileName");
 
         User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
-        FileType[] types = null;
+        FileType[] types;
         if (StringUtils.isNotBlank(forLib) && forLib.equals("true")) {
             types = new FileType[]{FileType.ActionLibrary, FileType.ConstantLibrary, FileType.VariableLibrary, FileType.ParameterLibrary};
         } else if (StringUtils.isNotBlank(fileType)) {

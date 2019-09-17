@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * @author Jacky.gao
- * @since 2015年3月27日
+ * 2015年3月27日
  */
 public interface EnvironmentProvider {
     /**
