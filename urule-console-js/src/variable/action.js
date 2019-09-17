@@ -1,6 +1,3 @@
-/**
- * Created by Jacky.gao on 2016/6/3.
- */
 import {ajaxSave} from '../Utils.js';
 
 export const LOAD_MASTER_COMPLETED = 'load_master_completed';
@@ -87,8 +84,8 @@ export function importFields(rowIndex, jsonResult) {
     return {rowIndex, jsonResult, type: IMPORT_FIELDS};
 }
 
-export function addMaster() {
-    return {type: ADD_MASTER};
+export function addMaster(masterName) {
+    return {masterName, type: ADD_MASTER};
 }
 
 export function deleteMaster(rowIndex) {

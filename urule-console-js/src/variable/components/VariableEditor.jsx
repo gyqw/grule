@@ -1,6 +1,3 @@
-/**
- * Created by Jacky.gao on 2016/6/3.
- */
 import React, {Component} from 'react';
 import Grid from '../../components/grid/component/Grid.jsx';
 import * as action from '../action.js';
@@ -19,12 +16,12 @@ class VariableEditor extends Component {
     render() {
         const {masterData, masterRowData, dispatch, file} = this.props;
         const masterGridHeaders = [
-            {id: 'master-name', name: 'name', label: '名称', filterable: true, editable: true, width: '130px'},
+            {id: 'master-name', name: 'name', label: '名称', filterable: true, editable: false, width: '130px'},
             {id: 'master-clazz', name: 'clazz', label: '类路径', filterable: true, editable: true}
         ];
         const slaveGridHeaders = [
-            {id: 'slave-name', name: 'name', label: '字段名', filterable: true, editable: true},
-            {id: 'slave-label', name: 'label', label: '标题', filterable: true, width: '220px', editable: true},
+            {id: 'slave-name', name: 'name', label: '字段名', filterable: true, editable: false},
+            {id: 'slave-label', name: 'label', label: '标题', filterable: true, width: '220px', editable: false},
             {
                 id: 'slave-type',
                 name: 'type',
@@ -32,7 +29,7 @@ class VariableEditor extends Component {
                 width: '95px',
                 editorType: 'select',
                 selectData: ['String', 'Integer', 'Char', 'Double', 'Long', 'Float', 'BigDecimal', 'Boolean', 'Date', 'List', 'Set', 'Map', 'Enum', 'Object'],
-                editable: true
+                editable: false
             }
         ];
 
@@ -103,18 +100,23 @@ class VariableEditor extends Component {
                         <div style={{margin: '2px'}}>
                             <div className="btn-group btn-group-sm" style={{margin: '2px'}}>
                                 <button className="btn btn-primary" type="button" onClick={(e) => {
-                                    dispatch(action.addMaster())
-                                }}><i className="glyphicon glyphicon-plus-sign"></i> 添加
+                                    bootbox.prompt("请输入类名称", function (masterName) {
+                                        if (!masterName) {
+                                            return;
+                                        }
+                                        dispatch(action.addMaster(masterName))
+                                    });
+                                }}><i className="glyphicon glyphicon-plus-sign"/> 添加
                                 </button>
                             </div>
                             <div className="btn-group btn-group-sm" style={{margin: '2px'}}>
                                 <button className="btn btn-danger" type="button" onClick={() => {
                                     dispatch(action.save(false, file))
-                                }}><i className="rf rf-save"></i> 保存
+                                }}><i className="rf rf-save"/> 保存
                                 </button>
                                 <button className="btn btn-danger" type="button" onClick={() => {
                                     dispatch(action.save(true, file))
-                                }}><i className="rf rf-savenewversion"></i> 保存为新版本
+                                }}><i className="rf rf-savenewversion"/> 保存为新版本
                                 </button>
                             </div>
                             <div className="btn-group btn-group-sm" style={{margin: '2px'}}>
@@ -132,7 +134,7 @@ class VariableEditor extends Component {
                                         varName: this.currentData.name
                                     };
                                     refEvent.eventEmitter.emit(refEvent.OPEN_REFERENCE_DIALOG, data, title);
-                                }}><i className="rf rf-link"></i> 查看引用
+                                }}><i className="rf rf-link"/> 查看引用
                                 </button>
                             </div>
                         </div>
@@ -144,7 +146,7 @@ class VariableEditor extends Component {
                             setTimeout(function () {
                                 dispatch(action.loadSlaveData(rowData));
                             }, 1);
-                        }}></Grid>
+                        }}/>
                         <ImportXmlDialog dispatch={dispatch}/>
                     </div>
                     <div style={{padding: '0px'}}>
@@ -152,20 +154,20 @@ class VariableEditor extends Component {
                             <div className="btn-group btn-group-sm" style={{margin: '2px'}}>
                                 <button className="btn btn-primary" type="button" onClick={(e) => {
                                     dispatch(action.addSlave())
-                                }}><i className="glyphicon glyphicon-plus-sign"></i> 添加字段
+                                }}><i className="glyphicon glyphicon-plus-sign"/> 添加字段
                                 </button>
                             </div>
                         </div>
                         <Grid headers={slaveGridHeaders} dispatch={dispatch} operationConfig={slaveGridOperationCol}
                               rows={masterRowData.variables || []} rowClick={(rowData) => {
                             this.currentData = rowData;
-                        }}></Grid>
+                        }}/>
                     </div>
                 </Splitter>
             </div>
         );
     }
-};
+}
 
 function select(state) {
     return {
