@@ -16,7 +16,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
 
 
-@SpringBootApplication()
+@SpringBootApplication
 @ImportResource({"classpath:urule-console-context.xml"})
 public class GeexRuleApplication implements CommandLineRunner {
     private Logger logger = LoggerFactory.getLogger(GeexRuleApplication.class);
