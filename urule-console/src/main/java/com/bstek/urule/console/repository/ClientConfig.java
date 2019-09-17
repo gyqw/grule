@@ -1,5 +1,12 @@
 package com.bstek.urule.console.repository;
 
+<<<<<<< HEAD
+/**
+ * @author Jacky.gao
+ * 2016年8月11日
+ */
+=======
+>>>>>>> re/master
 public class ClientConfig {
     private String name;
     private String client;

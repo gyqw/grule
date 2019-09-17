@@ -147,8 +147,6 @@
           destroy-method="destroy">
         <property name="repositoryXml" value="${urule.repository.xml}"/>
         <property name="repoHomeDir" value="${urule.repository.dir}"/>
-        <property name="repositoryDatasourceName" value="${urule.repository.datasourcename}"/>
-        <property name="databaseType" value="${urule.repository.databasetype}"/>
     </bean>
 
     <bean id="urule.repositoryService" class="com.bstek.urule.console.repository.RepositoryServiceImpl">

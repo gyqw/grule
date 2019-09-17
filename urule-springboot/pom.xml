@@ -19,7 +19,7 @@
         <tomcat.version>8.5.5</tomcat.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <urule.version>2.2.4-SNAPSHOT</urule.version>
+        <urule.version>2.3.1-SNAPSHOT</urule.version>
         <urule-pro.version>2.1.6</urule-pro.version>
     </properties>
 

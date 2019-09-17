@@ -1,6 +1,10 @@
 package com.bstek.urule.console.repository;
 
 import com.bstek.urule.exception.RuleException;
+<<<<<<< HEAD
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.jgit.api.Git;
+=======
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.core.RepositoryImpl;
@@ -20,6 +24,7 @@ import org.apache.jackrabbit.core.util.CooperativeFileLock;
 import org.apache.jackrabbit.core.util.RepositoryLockMechanism;
 import org.apache.jackrabbit.core.util.RepositoryLockMechanismFactory;
 import org.apache.jackrabbit.core.util.db.ConnectionFactory;
+>>>>>>> re/master
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -27,9 +32,22 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.context.WebApplicationContext;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
+<<<<<<< HEAD
+import javax.servlet.ServletContext;
+import java.io.File;
+import java.io.InputStream;
+
+/**
+ * @author Jacky.gao
+ * @author fred
+ * 2016年5月24日
+ */
+public class RepositoryBuilder implements InitializingBean, ApplicationContextAware {
+    private Logger log = LoggerFactory.getLogger(RepositoryBuilder.class);
+
+    private Git git;
+=======
 import javax.jcr.RepositoryException;
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
@@ -42,11 +60,12 @@ import java.util.Properties;
 public class RepositoryBuilder implements InitializingBean, ApplicationContextAware {
     private Logger logger = LoggerFactory.getLogger(RepositoryBuilder.class.getName());
 
+>>>>>>> re/master
     private String repoHomeDir;
-    private Element workspaceTemplate;
-    private RepositoryImpl repository;
     private String repositoryXml;
     private ApplicationContext applicationContext;
+<<<<<<< HEAD
+=======
     private String repositoryDatasourceName;
     public static String databaseType;
     public static DataSource datasource;
@@ -54,95 +73,20 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
     public RepositoryImpl getRepository() {
         return repository;
     }
+>>>>>>> re/master
 
-    private SecurityConfig buildSecurityConfig() {
-        SecurityConfig securityConfig = new SecurityConfig("uruleRepoSecurity", buildSecurityManagerConfig(), buildAccessManagerConfig(), buildLoginModuleConfig());
-        return securityConfig;
-    }
-
-    private RepositoryLockMechanismFactory buildRepositoryLockMechanismFactory() {
-        return new RepositoryLockMechanismFactory() {
-            public RepositoryLockMechanism getRepositoryLockMechanism() throws RepositoryException {
-                return new CooperativeFileLock();
-            }
-        };
-    }
-
-    private FileSystemFactory buildFileSystemFactory(final String dirName) {
-        return new FileSystemFactory() {
-            public FileSystem getFileSystem() throws RepositoryException {
-                try {
-                    LocalFileSystem fs = new LocalFileSystem();
-                    fs.setPath("" + repoHomeDir + "/" + dirName);
-                    fs.init();
-                    return fs;
-                } catch (FileSystemException e) {
-                    throw new RepositoryException("File system initialization failure.", e);
-                }
-            }
-        };
-    }
-
-    private DataStoreFactory buildDataStoreFactory() {
-        return new DataStoreFactory() {
-            public DataStore getDataStore() throws RepositoryException {
-                FileDataStore datastore = new FileDataStore();
-                datastore.setPath("" + repoHomeDir + "/repository/datastore");
-                datastore.setMinRecordLength(100);
-                return null;
-            }
-        };
-    }
-
-    private VersioningConfig buildVersioningConfig() {
+    private boolean buildVersioningConfig() {
         String homeDir = "" + repoHomeDir + "/version";
-        FileSystemFactory fileSystemFactory = buildFileSystemFactory("version");
-        PersistenceManagerConfig persistenceManagerConfig = buildPersistenceManagerConfig();
-        ISMLockingFactory ismLockingFactory = buildISMLockingFactory();
-        VersioningConfig versioningConfig = new VersioningConfig(homeDir, fileSystemFactory, persistenceManagerConfig, ismLockingFactory);
-        return versioningConfig;
-    }
-
-    private ISMLockingFactory buildISMLockingFactory() {
-        return new ISMLockingFactory() {
-            public ISMLocking getISMLocking() throws RepositoryException {
-                return new DefaultISMLocking();
-            }
-        };
-    }
-
-    private PersistenceManagerConfig buildPersistenceManagerConfig() {
-        Properties prop = new Properties();
-        BeanConfig beanConfig = new BeanConfig("org.apache.jackrabbit.core.persistence.bundle.BundleFsPersistenceManager", prop);
-        PersistenceManagerConfig persistenceManagerConfig = new PersistenceManagerConfig(beanConfig);
-        return persistenceManagerConfig;
-    }
-
-    private SecurityManagerConfig buildSecurityManagerConfig() {
-        Properties prop = new Properties();
-        BeanConfig beanConfig = new BeanConfig("org.apache.jackrabbit.core.security.simple.SimpleSecurityManager", prop);
-        SecurityManagerConfig securityManagerConfig = new SecurityManagerConfig(beanConfig, "default", null);
-        return securityManagerConfig;
-    }
-
-    private AccessManagerConfig buildAccessManagerConfig() {
-        Properties prop = new Properties();
-        BeanConfig beanConfig = new BeanConfig("org.apache.jackrabbit.core.security.simple.SimpleAccessManager", prop);
-        AccessManagerConfig accessManagerConfig = new AccessManagerConfig(beanConfig);
-        return accessManagerConfig;
-    }
-
-    private LoginModuleConfig buildLoginModuleConfig() {
-        Properties prop = new Properties();
-        prop.put("anonymousId", "anonymous");
-        prop.put("adminId", "admin");
-        BeanConfig beanConfig = new BeanConfig("org.apache.jackrabbit.core.security.simple.SimpleLoginModule", prop);
-        LoginModuleConfig loginModuleConfig = new LoginModuleConfig(beanConfig);
-        return loginModuleConfig;
+        return FileOperator.createDir(homeDir);
     }
 
     private void initRepositoryByXml(String xml) throws Exception {
+<<<<<<< HEAD
+        // TODO: 9/11/19
+        log.info("Build repository from user custom xml file...");
+=======
         logger.info("Build repository from user custom xml file...");
+>>>>>>> re/master
         InputStream inputStream = null;
         try {
             inputStream = this.applicationContext.getResource(xml).getInputStream();
@@ -158,8 +102,6 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
             } else {
                 tempRepoHomeDir = "";
             }
-            RepositoryConfig repositoryConfig = RepositoryConfig.create(inputStream, tempRepoHomeDir);
-            repository = RepositoryImpl.create(repositoryConfig);
         } finally {
             if (inputStream != null) {
                 inputStream.close();
@@ -177,44 +119,14 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
     }
 
     private void initDefaultRepository() throws Exception {
-        SecurityConfig securityConfig = buildSecurityConfig();
-        FileSystemFactory fileSystemFactory = buildFileSystemFactory("repository");
-        String workspaceDirectory = "" + repoHomeDir + "/workspaces";
-        String workspaceConfigDirectory = null;
-        String defaultWorkspace = "default";
-        int workspaceMaxIdleTime = 0;
-        VersioningConfig versioningConfig = buildVersioningConfig();
-        QueryHandlerFactory queryHandlerFactory = null;
-        ClusterConfig clusterConfig = null;
-        DataStoreFactory dataStoreFactory = buildDataStoreFactory();
-        RepositoryLockMechanismFactory repositoryLockMechanismFactory = buildRepositoryLockMechanismFactory();
-        DataSourceConfig dataSourceConfig = new DataSourceConfig();
-        ConnectionFactory connectionFactory = new ConnectionFactory();
-        RepositoryConfigurationParser repositoryConfigurationParser = new RepositoryConfigurationParser(new Properties());
-        initWorkspaceTemplate();
-        RepositoryConfig repositoryConfig = new RepositoryConfig(repoHomeDir, securityConfig,
-                fileSystemFactory, workspaceDirectory,
-                workspaceConfigDirectory, defaultWorkspace,
-                workspaceMaxIdleTime, workspaceTemplate, versioningConfig,
-                queryHandlerFactory, clusterConfig, dataStoreFactory,
-                repositoryLockMechanismFactory, dataSourceConfig,
-                connectionFactory, repositoryConfigurationParser);
-        repositoryConfig.init();
-        repository = RepositoryImpl.create(repositoryConfig);
-    }
+        // 初始化git
+        File dir = new File(this.repoHomeDir + "/.git");
+        this.git = Git.init().setGitDir(dir).setDirectory(dir.getParentFile()).call();
 
-    private void initWorkspaceTemplate() {
-        InputStream inputStream = null;
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            inputStream = applicationContext.getResource("classpath:com/bstek/urule/console/repository/workspace_template.xml").getInputStream();
-            Document doc = builder.parse(inputStream);
-            workspaceTemplate = doc.getDocumentElement();
-        } catch (Exception e) {
-            throw new RuleException(e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
+        // 创建配置文件夹
+        if (buildVersioningConfig()) {
+            this.git.add().addFilepattern(".").call();
+            this.git.commit().setMessage("config init commit").call();
         }
     }
 
@@ -241,22 +153,11 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
     }
 
     public void afterPropertiesSet() throws Exception {
-        if (StringUtils.isNotBlank(repositoryDatasourceName)) {
-            RepositoryBuilder.datasource = (DataSource) this.applicationContext.getBean(repositoryDatasourceName);
-        }
-        if (repository != null) {
-            repository.shutdown();
-        }
         if (StringUtils.isNotBlank(repoHomeDir) && !repoHomeDir.equals("${urule.repository.dir}")) {
             initRepositoryDir(applicationContext);
         }
         if (StringUtils.isNotBlank(repositoryXml)) {
             initRepositoryByXml(repositoryXml);
-        } else if (RepositoryBuilder.datasource != null) {
-            if (RepositoryBuilder.databaseType == null) {
-                throw new RuleException("You need config \"urule.repository.databasetype\" property when use spring datasource!");
-            }
-            initRepositoryFromSpringDatasource();
         } else {
             if (StringUtils.isBlank(repoHomeDir)) {
                 throw new RuleException("You need config \"urule.repository.dir\" property for set repository home dir.");
@@ -265,32 +166,25 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
         }
     }
 
-    private void initRepositoryFromSpringDatasource() throws Exception {
-        System.out.println("Init repository from spring datasource [" + repositoryDatasourceName + "] with database type [" + RepositoryBuilder.databaseType + "]...");
-        String xml = "classpath:com/bstek/urule/console/repository/database/configs/" + RepositoryBuilder.databaseType + ".xml";
-        initRepositoryByXml(xml);
+    public Git getGit() {
+        return git;
+    }
+
+    public String getRepoHomeDir() {
+        return repoHomeDir;
     }
 
     public void setRepoHomeDir(String repoHomeDir) {
         this.repoHomeDir = repoHomeDir;
     }
 
-
     public void setRepositoryXml(String repositoryXml) {
         this.repositoryXml = repositoryXml;
     }
 
-    public void setDatabaseType(String databaseType) {
-        RepositoryBuilder.databaseType = databaseType;
-    }
-
-    public void setRepositoryDatasourceName(String repositoryDatasourceName) {
-        this.repositoryDatasourceName = repositoryDatasourceName;
-    }
-
     public void destroy() {
         System.out.println("Shutdown repository...");
-        repository.shutdown();
+        this.git.close();
         System.out.println("Shutdown repository completed...");
     }
 }

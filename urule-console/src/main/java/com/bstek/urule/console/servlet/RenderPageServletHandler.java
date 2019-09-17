@@ -10,9 +10,12 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import java.io.File;
+
 
 /**
  * @author Jacky.gao
+ * @author fred
  * 2016年6月6日
  */
 public abstract class RenderPageServletHandler extends WriteJsonServletHandler implements ApplicationContextAware {
@@ -23,10 +26,9 @@ public abstract class RenderPageServletHandler extends WriteJsonServletHandler i
         String project = null;
         if (StringUtils.isNotBlank(file)) {
             file = Utils.decodeURL(file);
-            if (file.startsWith("/")) {
-                file = file.substring(1);
-                int pos = file.indexOf("/");
-                project = file.substring(0, pos);
+            String[] filePath = file.split(File.separator);
+            if (filePath.length > 2) {
+                project = filePath[1];
             }
         }
         return project;

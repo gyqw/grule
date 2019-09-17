@@ -4,12 +4,15 @@ import com.bstek.urule.console.DefaultRepositoryInteceptor;
 import com.bstek.urule.console.RepositoryInteceptor;
 import com.bstek.urule.console.repository.model.*;
 import com.bstek.urule.exception.RuleException;
+<<<<<<< HEAD
+=======
 import org.apache.commons.io.IOUtils;
+>>>>>>> re/master
 import org.apache.commons.lang.StringUtils;
-import org.apache.jackrabbit.core.RepositoryImpl;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.eclipse.jgit.api.Git;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -20,6 +23,11 @@ import javax.jcr.version.Version;
 import javax.jcr.version.VersionHistory;
 import javax.jcr.version.VersionIterator;
 import javax.jcr.version.VersionManager;
+<<<<<<< HEAD
+import java.io.File;
+import java.io.FileInputStream;
+=======
+>>>>>>> re/master
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,6 +38,7 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
     public static final String RES_PACKGE_FILE = "___res__package__file__";
     public static final String CLIENT_CONFIG_FILE = "___client_config__file__";
     public static final String RESOURCE_SECURITY_CONFIG_FILE = "___resource_security_config__file__";
+    public static final String PROJECT_DATA_DIR = "project_data";
     protected final String DATA = "_data";
     protected final String DIR_TAG = "_dir";
     protected final String FILE = "_file";
@@ -39,7 +48,8 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
     protected final String COMPANY_ID = "_company_id";
 
     protected RepositoryBuilder repositoryBuilder;
-    protected RepositoryImpl repository;
+    protected Git git;
+    protected String repoHomeDir;
     protected Session session;
     protected VersionManager versionManager;
     protected LockManager lockManager;
@@ -64,7 +74,7 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
                     }
                 }
             }
-            if (projectNode.getName().indexOf(RESOURCE_SECURITY_CONFIG_FILE) > -1) {
+            if (projectNode.getName().contains(RESOURCE_SECURITY_CONFIG_FILE)) {
                 continue;
             }
             RepositoryFile projectFile = new RepositoryFile();
@@ -91,7 +101,8 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
             Version version = iterator.nextVersion();
             String versionName = version.getName();
             if (versionName.startsWith("jcr:")) {
-                continue; // skip root version
+                // skip root version
+                continue;
             }
             Node fnode = version.getFrozenNode();
             VersionFile file = new VersionFile();
@@ -122,24 +133,16 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
             return readVersionFile(path, version);
         } else {
             repositoryInteceptor.readFile(path);
-            Node rootNode = getRootNode();
             int colonPos = path.lastIndexOf(":");
             if (colonPos > -1) {
                 version = path.substring(colonPos + 1);
                 path = path.substring(0, colonPos);
                 return readFile(path, version);
             }
-            path = processPath(path);
-            if (!rootNode.hasNode(path)) {
-                throw new RuleException("File [" + path + "] not exist.");
-            }
-            Node fileNode = rootNode.getNode(path);
-            Property property = fileNode.getProperty(DATA);
-            Binary fileBinary = property.getBinary();
-            return fileBinary.getStream();
+            path = getAbsPath(path);
+            return new FileInputStream(path);
         }
     }
-
 
     private InputStream readVersionFile(String path, String version) throws Exception {
         path = processPath(path);
@@ -158,18 +161,15 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
 
     @Override
     public List<ResourcePackage> loadProjectResourcePackages(String project) throws Exception {
-        Node rootNode = getRootNode();
-        String filePath = processPath(project) + "/" + RES_PACKGE_FILE;
+        List<ResourcePackage> packages = new ArrayList<>();
+
+        String filePath = getAbsPath(project) + "/" + RES_PACKGE_FILE;
         SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Node fileNode = rootNode.getNode(filePath);
-        Property property = fileNode.getProperty(DATA);
-        Binary fileBinary = property.getBinary();
-        InputStream inputStream = fileBinary.getStream();
-        String content = IOUtils.toString(inputStream, "utf-8");
-        inputStream.close();
+        String content = FileOperator.readFileContent(filePath);
+
         Document document = DocumentHelper.parseText(content);
         Element rootElement = document.getRootElement();
-        List<ResourcePackage> packages = new ArrayList<>();
+
         for (Object obj : rootElement.elements()) {
             if (!(obj instanceof Element)) {
                 continue;
@@ -209,13 +209,35 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
     }
 
     protected String processPath(String path) {
-        if (path.startsWith("/")) {
-            return path.substring(1);
+        if (path.startsWith(File.separator)) {
+            path = path.substring(1);
         }
         return path;
     }
 
+    protected String getAbsPath(String path) {
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+        return this.repoHomeDir + path;
+    }
+
+    protected String getProjectAbsPath(String path) {
+        if (path.startsWith(File.separator)) {
+            path = path.substring(1);
+        }
+        return this.repoHomeDir + PROJECT_DATA_DIR + File.separator + path;
+    }
+
+    protected String getProjectRelativePath(String path) {
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+        return PROJECT_DATA_DIR + "/" + path;
+    }
+
     protected Node getRootNode() throws Exception {
+        this.git.getRepository().getDirectory();
         return session.getRootNode();
     }
 
@@ -226,12 +248,17 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         try {
-            repository = repositoryBuilder.getRepository();
-            SimpleCredentials cred = new SimpleCredentials("admin", "admin".toCharArray());
-            cred.setAttribute("AutoRefresh", true);
-            session = repository.login(cred, null);
-            versionManager = session.getWorkspace().getVersionManager();
-            lockManager = session.getWorkspace().getLockManager();
+            this.git = this.repositoryBuilder.getGit();
+            this.repoHomeDir = this.repositoryBuilder.getRepoHomeDir();
+            if (!this.repoHomeDir.endsWith(File.separator)) {
+                this.repoHomeDir += File.separator;
+            }
+
+            // TODO: 9/11/19 need to remove
+            versionManager = null;
+            // TODO: 9/11/19 need to remove
+            lockManager = null;
+
             Collection<RepositoryInteceptor> repositoryInteceptors = applicationContext.getBeansOfType(RepositoryInteceptor.class).values();
             if (repositoryInteceptors.size() == 0) {
                 repositoryInteceptor = new DefaultRepositoryInteceptor();
