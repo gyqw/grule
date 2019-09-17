@@ -2,7 +2,7 @@ package com.bstek.urule.exception;
 
 /**
  * @author fred
- * @since 2018-11-05 5:33 PM
+ * 2018-11-05 5:33 PM
  */
 public class RuleException extends RuntimeException {
     private static final long serialVersionUID = -8624533394127244753L;
