@@ -1,6 +1,3 @@
-/**
- * Created by Jacky.gao on 2016/6/3.
- */
 import * as ACTIONS from './action.js';
 import {combineReducers} from 'redux';
 
@@ -14,8 +11,11 @@ function master(state = {}, action) {
             newData.splice(rowIndex, 1);
             return Object.assign({}, state.prototype, {data: newData});
         case ACTIONS.ADD_MASTER:
+            console.log(action);
+            console.log(state);
+            var masterName = action.masterName;
             var newData = [...state.data];
-            newData.push({name: '', clazz: '', type: 'Custom', variables: []});
+            newData.push({name: masterName, clazz: '', type: 'Custom', variables: []});
             return Object.assign({}, state.prototype, {data: newData});
         case ACTIONS.GENERATED_FIELDS:
             var newData = [...state.data];
