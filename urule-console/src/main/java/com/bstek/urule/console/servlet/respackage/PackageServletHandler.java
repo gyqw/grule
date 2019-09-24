@@ -130,7 +130,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
         resp.setHeader("Content-Disposition", "attachment; filename=urule-batch-test-template.xlsx");
         OutputStream outputStream = resp.getOutputStream();
         wb.write(outputStream);
-        ;
+
         outputStream.flush();
         outputStream.close();
     }
@@ -173,7 +173,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
     @SuppressWarnings("resource")
     private List<Map<String, Object>> parseExcel(InputStream stream) throws Exception {
-        List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> mapList = new ArrayList<>();
         XSSFWorkbook wb = new XSSFWorkbook(stream);
         for (int i = 0; i < wb.getNumberOfSheets(); i++) {
             XSSFSheet sheet = wb.getSheetAt(i);
@@ -181,7 +181,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
                 continue;
             }
             String name = sheet.getSheetName();
-            Map<String, Object> map = new HashMap<String, Object>();
+            Map<String, Object> map = new HashMap<>();
             map.put("name", name);
             map.put("data", buildVariables(sheet));
             mapList.add(map);
@@ -190,12 +190,12 @@ public class PackageServletHandler extends RenderPageServletHandler {
     }
 
     private List<Map<String, String>> buildVariables(XSSFSheet sheet) {
-        Map<Integer, String> headerMap = new HashMap<Integer, String>();
-        List<Map<String, String>> mapList = new ArrayList<Map<String, String>>();
+        Map<Integer, String> headerMap = new HashMap<>();
+        List<Map<String, String>> mapList = new ArrayList<>();
         int totalRow = sheet.getLastRowNum();
         XSSFRow headerRow = sheet.getRow(0);
         int totalColumn = headerRow.getLastCellNum();
-        Map<String, String> noDataRowMap = new HashMap<String, String>();
+        Map<String, String> noDataRowMap = new HashMap<>();
         for (int i = 0; i < totalColumn; i++) {
             XSSFCell cell = headerRow.getCell(i);
             String value = cell.getStringCellValue();
