@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author Jacky.gao
  * @author fred
- * @since 2015年4月20日
+ * 2015年4月20日
  */
 public abstract class BindingNode extends FlowNode {
     private Logger logger = LoggerFactory.getLogger(BindingNode.class);
