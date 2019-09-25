@@ -6,7 +6,7 @@ import com.bstek.urule.model.flow.ins.FlowInstance;
 
 /**
  * @author Jacky.gao
- * @since 2015年2月28日
+ * 2015年2月28日
  */
 public class ActionNode extends FlowNode {
     private String actionBean;

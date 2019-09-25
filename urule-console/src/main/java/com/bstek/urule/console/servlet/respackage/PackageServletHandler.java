@@ -1,20 +1,7 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.servlet.respackage;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.bstek.urule.Configure;
 import com.bstek.urule.KnowledgePackageReceiverServlet;
 import com.bstek.urule.Utils;
@@ -24,6 +11,7 @@ import com.bstek.urule.builder.ResourceBase;
 import com.bstek.urule.console.EnvironmentUtils;
 import com.bstek.urule.console.User;
 import com.bstek.urule.console.repository.ClientConfig;
+import com.bstek.urule.console.repository.ExternalRepository;
 import com.bstek.urule.console.repository.RepositoryService;
 import com.bstek.urule.console.repository.RepositoryServiceImpl;
 import com.bstek.urule.console.repository.model.ResourcePackage;
@@ -82,7 +70,9 @@ public class PackageServletHandler extends RenderPageServletHandler {
     public static final String KB_KEY = "_kb";
     public static final String VCS_KEY = "_vcs";
     public static final String IMPORT_EXCEL_DATA = "_import_excel_data";
+
     private RepositoryService repositoryService;
+    private ExternalRepository externalRepository;
     private KnowledgeBuilder knowledgeBuilder;
     private HttpSessionKnowledgeCache httpSessionKnowledgeCache;
 
@@ -135,6 +125,92 @@ public class PackageServletHandler extends RenderPageServletHandler {
         outputStream.close();
     }
 
+    @SuppressWarnings("unchecked")
+    public void exportExcelData(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        List<VariableCategory> variableCategories = (List<VariableCategory>) httpSessionKnowledgeCache.get(req, VCS_KEY);
+
+        if (variableCategories == null) {
+            KnowledgeBase knowledgeBase = buildKnowledgeBase(req);
+            variableCategories = knowledgeBase.getResourceLibrary().getVariableCategories();
+        }
+
+        // 获取历史数据
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String startDate = req.getParameter("startTime");
+        String endDate = req.getParameter("endTime");
+        JSONArray data = applicationContext.getBean("externalRepositoryImpl", ExternalRepository.class).findDataByDate(sdf.parse(startDate), sdf.parse(endDate));
+
+        SXSSFWorkbook wb = new SXSSFWorkbook();
+        XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
+        Color c = new Color(147, 208, 15);
+        XSSFColor xssfColor = new XSSFColor(c);
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setFillForegroundColor(xssfColor);
+
+        for (VariableCategory vc : variableCategories) {
+            buildSheet(wb, vc, style, data);
+        }
+
+        resp.setContentType("application/x-xls");
+        resp.setHeader("Content-Disposition", "attachment; filename=urule-batch-0.xlsx");
+        OutputStream outputStream = resp.getOutputStream();
+        wb.write(outputStream);
+
+        outputStream.flush();
+        outputStream.close();
+    }
+
+    private void buildSheet(SXSSFWorkbook wb, VariableCategory vc, XSSFCellStyle style, JSONArray data) {
+        String name = vc.getName();
+        Sheet sheet = wb.createSheet(name);
+        int rowNum = 0;
+
+        // 表头
+        Row row0 = sheet.createRow(rowNum);
+        List<Variable> variables = vc.getVariables();
+        for (int i = 0; i < variables.size(); i++) {
+            sheet.setColumnWidth(i, 4000);
+            Cell cell = row0.createCell(i);
+            Variable var = variables.get(i);
+            cell.setCellValue(var.getLabel());
+            cell.setCellStyle(style);
+        }
+
+        // 历史数据
+        for (Object obj : data.toArray()) {
+            rowNum++;
+
+            JSONObject jobj = (JSONObject) obj;
+            Object dataSource = jobj.get(vc.getClazz());
+            if (dataSource == null) {
+                continue;
+            }
+
+            JSONObject dataSourceJobj = (JSONObject) dataSource;
+            Row row = sheet.createRow(rowNum);
+            for (int i = 0; i < variables.size(); i++) {
+                Cell cell = row.createCell(i);
+                Variable var = variables.get(i);
+
+                Object value = dataSourceJobj.get(var.getName());
+                if (value == null) {
+                    continue;
+                }
+                switch (var.getType()) {
+                    case Integer:
+                        cell.setCellValue((Integer) value);
+                        break;
+                    case Double:
+                        cell.setCellValue((Double) value);
+                        break;
+                    case String:
+                    default:
+                        cell.setCellValue(String.valueOf(value));
+                }
+            }
+        }
+    }
+
     private void buildSheet(SXSSFWorkbook wb, VariableCategory vc, XSSFCellStyle style) {
         String name = vc.getName();
         Sheet sheet = wb.createSheet(name);
@@ -156,7 +232,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
         Iterator<FileItem> itr = items.iterator();
         List<Map<String, Object>> mapData = null;
         while (itr.hasNext()) {
-            FileItem item = (FileItem) itr.next();
+            FileItem item = itr.next();
             String name = item.getFieldName();
             if (!name.equals("file")) {
                 continue;
@@ -412,7 +488,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
     @SuppressWarnings("unchecked")
     private List<VariableCategory> mapToVariableCategories(List<Map<String, Object>> mapList) {
-        List<VariableCategory> list = new ArrayList<VariableCategory>();
+        List<VariableCategory> list = new ArrayList<>();
         for (Map<String, Object> map : mapList) {
             VariableCategory category = new VariableCategory();
             list.add(category);
@@ -454,7 +530,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
         if (vcs == null) {
             vcs = buildKnowledgeBase(req).getResourceLibrary().getVariableCategories();
         }
-        Map<String, VariableCategory> vcmap = new HashMap<String, VariableCategory>();
+        Map<String, VariableCategory> vcmap = new HashMap<>();
         for (VariableCategory vc : vcs) {
             vcmap.put(vc.getName(), vc);
         }
@@ -462,7 +538,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
         if (data == null) {
             throw new RuleException("Import excel data for test has expired,please import the excel and try again.");
         }
-        Map<String, List<Object>> factMap = new HashMap<String, List<Object>>();
+        Map<String, List<Object>> factMap = new HashMap<>();
         for (Map<String, Object> map : data) {
             String name = (String) map.get("name");
             VariableCategory vc = vcmap.get(name);
@@ -472,7 +548,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
             String clazz = vc.getClazz();
             List<Map<String, Object>> rowList = (List<Map<String, Object>>) map.get("data");
             List<Variable> variables = vc.getVariables();
-            List<Object> factList = new ArrayList<Object>();
+            List<Object> factList = new ArrayList<>();
             for (Map<String, Object> rowMap : rowList) {
                 Object entity = null;
                 if (vc.getName().equals(VariableCategory.PARAM_CATEGORY)) {
@@ -489,7 +565,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
             throw new RuleException("Import data cannot match current knowledge package.");
         }
         int rowSize = 0;
-        List<String> keyList = new ArrayList<String>();
+        List<String> keyList = new ArrayList<>();
         for (String key : factMap.keySet()) {
             keyList.add(key);
             List<Object> facts = factMap.get(key);
@@ -497,7 +573,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
                 rowSize = facts.size();
             }
         }
-        List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> resultList = new ArrayList<>();
         int mapSize = factMap.size();
         KnowledgeBase knowledgeBase = (KnowledgeBase) httpSessionKnowledgeCache.get(req, KB_KEY);
         KnowledgePackage knowledgePackage = knowledgeBase.getKnowledgePackage();
@@ -529,7 +605,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
                     session.fireRules();
                 } else {
                     session.fireRules(parameterMap);
-                    Map<String, Object> p = new HashMap<String, Object>();
+                    Map<String, Object> p = new HashMap<>();
                     p.putAll(session.getParameters());
                     p.remove("return_to_");
                     buildResult(resultList, VariableCategory.PARAM_CATEGORY, p);
@@ -550,7 +626,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
             sb.append("次,");
         }
         sb.append("" + "耗时：" + elapse + "ms");
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
         result.put("info", sb.toString());
         result.put("data", resultList);
         writeObjectToJson(resp, result);
@@ -835,6 +911,10 @@ public class PackageServletHandler extends RenderPageServletHandler {
     public void setHttpSessionKnowledgeCache(
             HttpSessionKnowledgeCache httpSessionKnowledgeCache) {
         this.httpSessionKnowledgeCache = httpSessionKnowledgeCache;
+    }
+
+    public void setExternalRepository(ExternalRepository externalRepository) {
+        this.externalRepository = externalRepository;
     }
 
     @Override
