@@ -18,6 +18,7 @@ export function createNewFile(newFileName, fileType, parentNodeData) {
         const url = window._server + '/frame/createFile';
         const fileName = newFileName + "." + fileType;
         const path = parentNodeData.fullPath + "/" + fileName;
+
         $.ajax({
             url,
             data: {path: encodeURI(parentNodeData.fullPath + "/" + fileName), type: fileType},
@@ -60,7 +61,7 @@ export function createNewFile(newFileName, fileType, parentNodeData) {
             }
         });
     }
-};
+}
 
 export function rename(path, newPath) {
     return function (dispatch) {
@@ -95,7 +96,7 @@ export function rename(path, newPath) {
             }
         });
     }
-};
+}
 
 export function createNewProject(newProjectName, parentNodeData) {
     return function (dispatch) {
@@ -123,7 +124,7 @@ export function createNewProject(newProjectName, parentNodeData) {
             }
         });
     };
-};
+}
 
 export function createNewFolder(newFolderName, parentNodeData) {
     const fullFolderName = parentNodeData.fullPath + '/' + newFolderName;
@@ -158,7 +159,7 @@ export function createNewFolder(newFolderName, parentNodeData) {
             }
         });
     };
-};
+}
 
 export function fileRename(itemData, newName) {
     return function (dispatch) {
@@ -205,7 +206,7 @@ export function fileRename(itemData, newName) {
             }
         });
     }
-};
+}
 
 function moveFile(path, newPath, dispatch) {
     var url = window._server + "/frame/fileRename";
@@ -237,15 +238,15 @@ function moveFile(path, newPath, dispatch) {
 
 export function add(data) {
     return {data, type: ADD};
-};
+}
 
 export function del(index) {
     return {index, type: DEL};
-};
+}
 
 export function update(index, data) {
     return {index, data, type: UPDATE};
-};
+}
 
 export function loadData(classify, projectName, types, searchFileName) {
     if (classify === null || classify === 'undefined') {
@@ -278,7 +279,7 @@ export function loadData(classify, projectName, types, searchFileName) {
             }
         });
     }
-};
+}
 
 export function buildType(fileType) {
     let pos = fileType.indexOf(':');
@@ -381,13 +382,13 @@ function buildData(data, level) {
                         });
                     }
                 },
-                {
-                    name: '修改项目名称',
-                    icon: 'rf rf-rename',
-                    click: function (data) {
-                        event.eventEmitter.emit(event.OPEN_UPDATE_PROJECT_DIALOG, data);
-                    }
-                },
+                // {
+                //     name: '修改项目名称',
+                //     icon: 'rf rf-rename',
+                //     click: function (data) {
+                //         event.eventEmitter.emit(event.OPEN_UPDATE_PROJECT_DIALOG, data);
+                //     }
+                // },
                 {
                     name: '删除项目',
                     icon: 'rf rf-remove',
@@ -577,6 +578,13 @@ function buildData(data, level) {
                     click: function () {
                         event.eventEmitter.emit(event.OPEN_CREATE_FILE_DIALOG, {fileType: 'sc', nodeData: data})
                     }
+                },
+                {
+                    name: "添加复杂评分卡",
+                    icon: Styles.frameStyle.getComplexScorecardIcon(),
+                    click: function () {
+                        event.eventEmitter.emit(event.OPEN_CREATE_FILE_DIALOG, {fileType: "scc", nodeData: data})
+                    }
                 }
             ];
             break;
@@ -631,10 +639,10 @@ function buildData(data, level) {
             buildData(child, level);
         });
     }
-};
+}
 
 function buildLibContextMenu() {
-    const menus = [
+    return [
         {
             name: '添加目录',
             icon: Styles.frameStyle.getFolderIcon(),
@@ -671,7 +679,6 @@ function buildLibContextMenu() {
             }
         }
     ];
-    return menus;
 }
 
 function buildFullContextMenu(isFolder, folderType) {
@@ -840,7 +847,7 @@ function buildFullContextMenu(isFolder, folderType) {
         }
     }
     return menus;
-};
+}
 
 function buildPasteMenuItem() {
     return {
@@ -964,7 +971,7 @@ function buildFileContextMenu() {
             }
         }
     ];
-};
+}
 
 export function lockFile(file, dispatch) {
     componentEvent.eventEmitter.emit(componentEvent.SHOW_LOADING);
@@ -993,7 +1000,7 @@ export function lockFile(file, dispatch) {
             }
         }
     });
-};
+}
 
 export function unlockFile(file, dispatch) {
     componentEvent.eventEmitter.emit(componentEvent.SHOW_LOADING);
@@ -1022,7 +1029,7 @@ export function unlockFile(file, dispatch) {
             }
         }
     });
-};
+}
 
 export function saveFileSource(file, content) {
     content = encodeURIComponent(content);
@@ -1046,7 +1053,7 @@ export function saveFileSource(file, content) {
             }
         }
     });
-};
+}
 
 export function seeFileSource(data) {
     var url = window._server + "/frame/fileSource";
@@ -1069,7 +1076,7 @@ export function seeFileSource(data) {
             }
         }
     });
-};
+}
 
 function seeFileVersions(data) {
     var url = window._server + "/frame/fileVersions";
@@ -1092,7 +1099,7 @@ function seeFileVersions(data) {
             }
         }
     });
-};
+}
 
 function fileDelete(item, dispatch, isFolder) {
     componentEvent.eventEmitter.emit(componentEvent.SHOW_LOADING);
@@ -1132,4 +1139,4 @@ function fileDelete(item, dispatch, isFolder) {
             }
         });
     }, 150);
-};
+}

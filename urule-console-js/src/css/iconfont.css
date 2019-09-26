@@ -103,5 +103,7 @@
 
 .rf-scorecard:before { content: "\e62c"; }
 
+.rf-complexscordcard:before { content: "\e673"; }
+
 .rf-lock:before { content: "\e62d"; }
 
