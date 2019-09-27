@@ -12,7 +12,8 @@ var func354 = function (t, e, n) {
             return function (e, n, r) {
                 return n && t(e.prototype, n), r && t(e, r), e
             }
-        }(), i = d(n(353)), o = d(n(350)), a = d(n(347)), s = d(n(346)), c = d(n(281)), f = n(16), u = n(88), l = n(27),
+        }(),
+        i = d(n(353)), o = d(n(350)), a = d(n(347)), s = d(n(346)), c = d(n(281)), f = n(16), u = n(88), l = n(27),
         h = d(n(291));
 
     function d(t) {
@@ -108,8 +109,8 @@ var func354 = function (t, e, n) {
                 }), $("#saveButtonNewVersion").click(function () {
                     s(!0)
                 }), 1 === Math.floor(10 * Math.random())) {
-                    var d = "%u60A8%u5F53%u524D%u6B63%u5728%u4F7F%u7528%u7684", p = window._core_version;
-                    p ? (p = (0, u.encrypt)(p)) !== window._lis_ && (d += "%u662FURule%20Pro%u8BD5%u7528%u7248", bootbox.alert(unescape(d))) : (d += "%u662FURule%20Pro%u8BD5%u7528%u7248", bootbox.alert(unescape(d)))
+                    var d = "您当前正在使用的", p = window._core_version;
+                    p ? (p = (0, u.encrypt)(p)) !== window._lis_ && (d += "是URule Pro试用版", bootbox.alert(unescape(d))) : (d += "是URule Pro试用版", bootbox.alert(unescape(d)))
                 }
                 this.table = $('<table class="table table-bordered" style="width: max-content;max-width: none;margin-left: 15px"></table>'), t.append(this.table), this.tbody = $("<tbody></tbody>"), this.table.append(this.tbody), this.headerRow = new i.default(this), this.table.append(this.headerRow.tr), new c.default(this), this.loadFile(this._buildLoadDataFunction());
                 var b = $('<div style="padding-left:10px"></div>');
@@ -440,4 +441,4 @@ var func354 = function (t, e, n) {
         }]), t
     }();
     e.default = p
-}
+};

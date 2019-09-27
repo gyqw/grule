@@ -66,7 +66,9 @@
         fs.writeFile('./debundle/complexScoreCard/functions/' + func + '.js', 'var func'+func + ' = ' + t[func].toString(), function (err) {
         });
     }
-}([function (t, e) {
+}([
+
+    function (t, e) {
     "function" == typeof Object.create ? t.exports = function (t, e) {
         t.super_ = e, t.prototype = Object.create(e.prototype, {
             constructor: {
@@ -82,7 +84,9 @@
         };
         n.prototype = e.prototype, t.prototype = new n, t.prototype.constructor = t
     }
-}, function (t, e, n) {
+},
+
+function (t, e, n) {
     var r = n(2), i = r.Buffer;
 
     function o(t, e) {
@@ -107,7 +111,10 @@
         if ("number" != typeof t) throw new TypeError("Argument must be a number");
         return r.SlowBuffer(t)
     }
-}, function (t, e, n) {
+},
+
+
+    function (t, e, n) {
     "use strict";
     (function (t) {
         var r = n(179), i = n(178), o = n(82);
@@ -754,7 +761,8 @@
             return i
         }
     }).call(this, n(8))
-}, function (t, e, n) {
+},
+    function (t, e, n) {
     (function (t) {
         !function (t, e) {
             "use strict";
@@ -1648,7 +1656,8 @@
             }
         }(void 0 === t || t, this)
     }).call(this, n(138)(t))
-}, function (t, e, n) {
+},
+    function (t, e, n) {
     "use strict";
     var r = e;
     r.version = n(131).version, r.utils = n(130), r.rand = n(61), r.curve = n(29), r.curves = n(125), r.ec = n(116), r.eddsa = n(112)

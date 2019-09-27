@@ -1,6 +1,0 @@
-var func19 = function (t, e, n) {
-    "use strict";
-    Object.defineProperty(e, "__esModule", {value: !0}), e.eventEmitter = e.HIDE_CONTENT_REFACTOR_DIALOG = e.OPEN_CONTENT_REFACTOR_DIALOG = e.HIDE_CATEGORY_REFACTOR_DIALOG = e.OPEN_CATEGORY_REFACTOR_DIALOG = e.HIDE_VERSION_SELECT_DIALOG = e.OPEN_VERSION_SELECT_DIALOG = e.HIDE_KNOWLEDGE_TREE_DIALOG = e.OPEN_KNOWLEDGE_TREE_DIALOG = e.TREE_DIR_NODE_CLICK = e.TREE_NODE_CLICK = e.HIDE_LOADING = e.SHOW_LOADING = void 0;
-    var r, i = (r = n(15)) && r.__esModule ? r : {default: r};
-    e.SHOW_LOADING = "show_loading", e.HIDE_LOADING = "hide_loading", e.TREE_NODE_CLICK = "tree_node_click", e.TREE_DIR_NODE_CLICK = "tree_dir_node_click", e.OPEN_KNOWLEDGE_TREE_DIALOG = "open_knowledge_tree_dialog", e.HIDE_KNOWLEDGE_TREE_DIALOG = "hide_knowledge_tree_dialog", e.OPEN_VERSION_SELECT_DIALOG = "open_version_select_dialog", e.HIDE_VERSION_SELECT_DIALOG = "hide_version_select_dialog", e.OPEN_CATEGORY_REFACTOR_DIALOG = "open_category_refactor_dialog", e.HIDE_CATEGORY_REFACTOR_DIALOG = "hide_category_refactor_dialog", e.OPEN_CONTENT_REFACTOR_DIALOG = "open_content_refactor_dialog", e.HIDE_CONTENT_REFACTOR_DIALOG = "hide_content_refactor_dialog", e.eventEmitter = new i.default.EventEmitter
-}

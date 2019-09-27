@@ -9,6 +9,29 @@ export function uniqueID() {
     return '_ui_' + (__ui_id++);
 }
 
+// todo unused function
+export function refactorContent(file, callback) {
+    var url = window._server + "/common/refactorContent";
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: file,
+        success: function () {
+            callback.call(this)
+        }, error: function (t) {
+            if (t.status === 401) {
+                bootbox.alert("权限不足，不能进行此操作.");
+            } else {
+                if (t && t.responseText) {
+                    bootbox.alert("<span style='color: red'>服务端错误：" + t.responseText + "</span>");
+                } else {
+                    bootbox.alert("<span style='color: red'>服务端出错</span>");
+                }
+            }
+        }
+    })
+}
+
 export function loadFileVersions(file, callback) {
     var url = window._server + '/frame/loadFileVersions';
     $.ajax({
@@ -138,6 +161,11 @@ function buildData(data) {
             data._icon = Styles.frameStyle.getScorecardIcon();
             data._style = Styles.frameStyle.getScorecardIconStyle();
             data.editorPath = "/scorecardeditor";
+            break;
+        case "complexscorecard":
+            data._icon = Styles.frameStyle.getComplexScorecardIcon();
+            data._style = Styles.frameStyle.getComplexScorecardIconStyle();
+            data.editorPath = "/complexscorecardeditor";
             break;
     }
     var children = data.children;
