@@ -9,7 +9,7 @@ import java.util.Collection;
 
 /**
  * @author Jacky.gao
- * @since 2015年1月6日
+ * 2015年1月6日
  */
 public class EnvironmentUtils {
     private static EnvironmentProvider environmentProvider;
