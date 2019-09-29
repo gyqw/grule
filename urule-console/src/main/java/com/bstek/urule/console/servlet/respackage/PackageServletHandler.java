@@ -195,20 +195,25 @@ public class PackageServletHandler extends RenderPageServletHandler {
                     Cell cell = row.createCell(i);
                     Variable var = variables.get(i);
 
-                    Object value = dataSourceJobj.get(var.getName());
-                    if (value == null) {
+                    if (dataSourceJobj.get(var.getName()) == null) {
                         continue;
                     }
                     switch (var.getType()) {
                         case Integer:
-                            cell.setCellValue((Integer) value);
+                            cell.setCellValue(dataSourceJobj.getInteger(var.getName()));
                             break;
                         case Double:
-                            cell.setCellValue((Double) value);
+                            cell.setCellValue(dataSourceJobj.getDouble(var.getName()));
+                            break;
+                        case Long:
+                            cell.setCellValue(dataSourceJobj.getLong(var.getName()));
+                            break;
+                        case BigDecimal:
+                            cell.setCellValue(dataSourceJobj.getBigDecimal(var.getName()).doubleValue());
                             break;
                         case String:
                         default:
-                            cell.setCellValue(String.valueOf(value));
+                            cell.setCellValue(dataSourceJobj.getString(var.getName()));
                     }
                 }
             }
