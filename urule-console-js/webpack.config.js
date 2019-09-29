@@ -22,6 +22,7 @@ module.exports = {
         clientConfigEditor: './src/client/index.jsx',
         ulEditor: './src/editor/ul/index.jsx',
         scoreCardTable: './src/scorecard/index.jsx',
+        complexScoreCardTable: './src/complexscorecard/index.jsx',
         permissionConfigEditor: './src/permission/index.jsx'
     },
     output: {

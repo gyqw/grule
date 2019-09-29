@@ -48,7 +48,8 @@
     "270": "editor/decisiontable/Join.js",
     "271": "editor/decisiontable/Condition.js",
     "272": "editor/decisiontable/CellCondition.js",
-    "291": "scorecard/TableAction.js"
+    "291": "scorecard/TableAction.js",
+    "355": "complexscorecard/index.jsx"
   },
   "node_modules": {
     "5": "react",

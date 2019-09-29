@@ -136,9 +136,11 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
         // 获取历史数据
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String startDate = req.getParameter("startTime");
-        String endDate = req.getParameter("endTime");
-        JSONArray data = applicationContext.getBean("externalRepositoryImpl", ExternalRepository.class).findDataByDate(sdf.parse(startDate), sdf.parse(endDate));
+        String startDateStr = req.getParameter("startTime");
+        String endDateStr = req.getParameter("endTime");
+        Date startDate = sdf.parse(startDateStr);
+        Date endDate = sdf.parse(endDateStr);
+        JSONArray data = applicationContext.getBean(ExternalRepository.class).findDataByDate(startDate, endDate);
 
         SXSSFWorkbook wb = new SXSSFWorkbook();
         XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
@@ -177,35 +179,37 @@ public class PackageServletHandler extends RenderPageServletHandler {
         }
 
         // 历史数据
-        for (Object obj : data.toArray()) {
-            rowNum++;
+        if (data != null) {
+            for (Object obj : data.toArray()) {
+                rowNum++;
 
-            JSONObject jobj = (JSONObject) obj;
-            Object dataSource = jobj.get(vc.getClazz());
-            if (dataSource == null) {
-                continue;
-            }
-
-            JSONObject dataSourceJobj = (JSONObject) dataSource;
-            Row row = sheet.createRow(rowNum);
-            for (int i = 0; i < variables.size(); i++) {
-                Cell cell = row.createCell(i);
-                Variable var = variables.get(i);
-
-                Object value = dataSourceJobj.get(var.getName());
-                if (value == null) {
+                JSONObject jobj = (JSONObject) obj;
+                Object dataSource = jobj.get(vc.getClazz());
+                if (dataSource == null) {
                     continue;
                 }
-                switch (var.getType()) {
-                    case Integer:
-                        cell.setCellValue((Integer) value);
-                        break;
-                    case Double:
-                        cell.setCellValue((Double) value);
-                        break;
-                    case String:
-                    default:
-                        cell.setCellValue(String.valueOf(value));
+
+                JSONObject dataSourceJobj = (JSONObject) dataSource;
+                Row row = sheet.createRow(rowNum);
+                for (int i = 0; i < variables.size(); i++) {
+                    Cell cell = row.createCell(i);
+                    Variable var = variables.get(i);
+
+                    Object value = dataSourceJobj.get(var.getName());
+                    if (value == null) {
+                        continue;
+                    }
+                    switch (var.getType()) {
+                        case Integer:
+                            cell.setCellValue((Integer) value);
+                            break;
+                        case Double:
+                            cell.setCellValue((Double) value);
+                            break;
+                        case String:
+                        default:
+                            cell.setCellValue(String.valueOf(value));
+                    }
                 }
             }
         }
