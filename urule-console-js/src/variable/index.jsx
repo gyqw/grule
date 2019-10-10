@@ -6,7 +6,7 @@ import '../css/iconfont.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {createStore,applyMiddleware} from 'redux';
+import {applyMiddleware, createStore} from 'redux';
 import thunk from 'redux-thunk';
 import {Provider} from 'react-redux';
 import reducer from './reducer.js';
@@ -14,9 +14,9 @@ import * as action from './action.js';
 import VariableEditor from './components/VariableEditor.jsx';
 
 $(document).ready(function () {
-    const store=createStore(reducer,applyMiddleware(thunk));
-    const file=_getParameter('file');
-    if(!file || file.length<1){
+    const store = createStore(reducer, applyMiddleware(thunk));
+    const file = _getParameter('file');
+    if (!file || file.length < 1) {
         bootbox.alert('请先指定要加载的变量库文件.');
         return;
     }
@@ -31,9 +31,10 @@ $(document).ready(function () {
         document.getElementById("container")
     );
 });
+
 function _getParameter(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
     var r = window.location.search.substr(1).match(reg);
-    if (r != null)return unescape(r[2]);
+    if (r != null) return unescape(r[2]);
     return null;
-};
+}

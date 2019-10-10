@@ -16,6 +16,7 @@ public class ExternalRepositoryImpl implements ExternalRepository {
 
     @Override
     public JSONArray findDataByDate(Date start, Date end) {
-        return JSON.parseArray("[{\"com.bstek.urule.springboot.model.OrderModel\":{\"appStatus\":1,\"ddgStatus\":1,\"storeTag\":\"fhp\"}}]");
+        return JSON.parseArray("[{\"com.bstek.urule.springboot.model.OrderModel\":{\"appStatus\":1,\"ddgStatus\":1,\"storeTag\":\"fhp\"}}," +
+                "{\"com.bstek.urule.springboot.model.OrderModel\":{\"appStatus\":1,\"ddgStatus\":1,\"storeTag\":\"fhp\"}}]");
     }
 }

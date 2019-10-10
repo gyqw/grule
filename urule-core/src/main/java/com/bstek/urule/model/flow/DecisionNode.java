@@ -11,10 +11,7 @@ import com.bstek.urule.runtime.KnowledgeSession;
 import com.bstek.urule.runtime.response.ExecutionResponseImpl;
 import com.bstek.urule.runtime.response.NodeExecutionResponseImpl;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class DecisionNode extends BindingNode {
@@ -103,26 +100,25 @@ public class DecisionNode extends BindingNode {
     }
 
     private PercentItem computePercent(List<PercentItem> items, long total) {
-        BigDecimal totalValue = new BigDecimal(total);
-        Iterator var5 = items.iterator();
+        // 总权重
+        int totalWeight = 0;
+        // 权重item map
+        Map<Integer, PercentItem> percentItemMap = new LinkedHashMap<>();
 
-        PercentItem item;
-        int result;
-        do {
-            if (!var5.hasNext()) {
-                return (PercentItem) items.get(0);
+        for (PercentItem item : items) {
+            totalWeight += item.getPercent();
+            percentItemMap.put(totalWeight, item);
+        }
+
+        // 加权随机
+        int random = (int) (Math.random() * totalWeight + 1);
+        for (Integer key : percentItemMap.keySet()) {
+            if (random <= key) {
+                return percentItemMap.get(key);
             }
+        }
 
-            item = (PercentItem) var5.next();
-            long itemTotal = item.getTotal();
-            BigDecimal left = new BigDecimal(itemTotal);
-            BigDecimal newPercent = left.divide(totalValue, 20, 6);
-            BigDecimal defaultPercent = new BigDecimal(item.getPercent());
-            defaultPercent = defaultPercent.divide(new BigDecimal(100), 2, 6);
-            result = newPercent.compareTo(defaultPercent);
-        } while (result != -1);
-
-        return item;
+        return items.get(0);
     }
 
     public FlowNodeType getType() {

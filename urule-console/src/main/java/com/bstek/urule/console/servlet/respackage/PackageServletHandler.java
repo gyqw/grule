@@ -31,6 +31,8 @@ import com.bstek.urule.runtime.KnowledgeSessionFactory;
 import com.bstek.urule.runtime.cache.CacheUtils;
 import com.bstek.urule.runtime.response.ExecutionResponse;
 import com.bstek.urule.runtime.response.ExecutionResponseImpl;
+import com.bstek.urule.runtime.response.FlowExecutionResponse;
+import com.bstek.urule.runtime.response.NodeExecutionResponse;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -136,9 +138,11 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
         // 获取历史数据
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String startDate = req.getParameter("startTime");
-        String endDate = req.getParameter("endTime");
-        JSONArray data = applicationContext.getBean("externalRepositoryImpl", ExternalRepository.class).findDataByDate(sdf.parse(startDate), sdf.parse(endDate));
+        String startDateStr = req.getParameter("startTime");
+        String endDateStr = req.getParameter("endTime");
+        Date startDate = sdf.parse(startDateStr);
+        Date endDate = sdf.parse(endDateStr);
+        JSONArray data = applicationContext.getBean(ExternalRepository.class).findDataByDate(startDate, endDate);
 
         SXSSFWorkbook wb = new SXSSFWorkbook();
         XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
@@ -177,35 +181,42 @@ public class PackageServletHandler extends RenderPageServletHandler {
         }
 
         // 历史数据
-        for (Object obj : data.toArray()) {
-            rowNum++;
+        if (data != null) {
+            for (Object obj : data.toArray()) {
+                rowNum++;
 
-            JSONObject jobj = (JSONObject) obj;
-            Object dataSource = jobj.get(vc.getClazz());
-            if (dataSource == null) {
-                continue;
-            }
-
-            JSONObject dataSourceJobj = (JSONObject) dataSource;
-            Row row = sheet.createRow(rowNum);
-            for (int i = 0; i < variables.size(); i++) {
-                Cell cell = row.createCell(i);
-                Variable var = variables.get(i);
-
-                Object value = dataSourceJobj.get(var.getName());
-                if (value == null) {
+                JSONObject jobj = (JSONObject) obj;
+                Object dataSource = jobj.get(vc.getClazz());
+                if (dataSource == null) {
                     continue;
                 }
-                switch (var.getType()) {
-                    case Integer:
-                        cell.setCellValue((Integer) value);
-                        break;
-                    case Double:
-                        cell.setCellValue((Double) value);
-                        break;
-                    case String:
-                    default:
-                        cell.setCellValue(String.valueOf(value));
+
+                JSONObject dataSourceJobj = (JSONObject) dataSource;
+                Row row = sheet.createRow(rowNum);
+                for (int i = 0; i < variables.size(); i++) {
+                    Cell cell = row.createCell(i);
+                    Variable var = variables.get(i);
+
+                    if (dataSourceJobj.get(var.getName()) == null) {
+                        continue;
+                    }
+                    switch (var.getType()) {
+                        case Integer:
+                            cell.setCellValue(dataSourceJobj.getInteger(var.getName()));
+                            break;
+                        case Double:
+                            cell.setCellValue(dataSourceJobj.getDouble(var.getName()));
+                            break;
+                        case Long:
+                            cell.setCellValue(dataSourceJobj.getLong(var.getName()));
+                            break;
+                        case BigDecimal:
+                            cell.setCellValue(dataSourceJobj.getBigDecimal(var.getName()).doubleValue());
+                            break;
+                        case String:
+                        default:
+                            cell.setCellValue(dataSourceJobj.getString(var.getName()));
+                    }
                 }
             }
         }
@@ -475,7 +486,6 @@ public class PackageServletHandler extends RenderPageServletHandler {
         return knowledgeBase;
     }
 
-
     public void saveResourcePackages(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String project = req.getParameter("project");
         project = Utils.decodeURL(project);
@@ -521,7 +531,6 @@ public class PackageServletHandler extends RenderPageServletHandler {
         }
         return list;
     }
-
 
     @SuppressWarnings("unchecked")
     public void doBatchTest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
@@ -578,6 +587,10 @@ public class PackageServletHandler extends RenderPageServletHandler {
         KnowledgeBase knowledgeBase = (KnowledgeBase) httpSessionKnowledgeCache.get(req, KB_KEY);
         KnowledgePackage knowledgePackage = knowledgeBase.getKnowledgePackage();
         KnowledgeSession session = KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
+        Set<String> flowIdSet = knowledgePackage.getFlowMap().keySet();
+        flowId = flowIdSet.iterator().next();
+        Map<String, Integer> flowMap = new HashMap<>();
+
         long start = System.currentTimeMillis();
         for (int i = 0; i < rowSize; i++) {
             Map<String, Object> parameterMap = null;
@@ -594,11 +607,26 @@ public class PackageServletHandler extends RenderPageServletHandler {
                     buildResult(resultList, categoryName, fact);
                 }
             }
-            if (StringUtils.isNotEmpty(flowId)) {
+
+            if (!org.springframework.util.StringUtils.isEmpty(flowId)) {
+                FlowExecutionResponse flowExecutionResponse;
                 if (parameterMap != null) {
-                    session.startProcess(flowId, parameterMap);
+                    flowExecutionResponse = session.startProcess(flowId, parameterMap);
                 } else {
-                    session.startProcess(flowId);
+                    flowExecutionResponse = session.startProcess(flowId);
+                }
+
+                // 记录执行节点
+                for (NodeExecutionResponse nodeExecutionResponse : flowExecutionResponse.getNodeExecutionResponseList()) {
+                    if (!org.springframework.util.StringUtils.isEmpty(nodeExecutionResponse.getDecisionNodeName())) {
+                        String nodeKey = nodeExecutionResponse.getDecisionNodeName();
+
+                        if (flowMap.get(nodeKey) == null) {
+                            flowMap.put(nodeKey, 0);
+                        }
+                        flowMap.put(nodeKey, flowMap.get(nodeKey) + 1);
+                    }
+
                 }
             } else {
                 if (parameterMap == null) {
@@ -629,6 +657,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
         Map<String, Object> result = new HashMap<>();
         result.put("info", sb.toString());
         result.put("data", resultList);
+        result.put("node", JSONObject.toJSON(flowMap));
         writeObjectToJson(resp, result);
     }
 

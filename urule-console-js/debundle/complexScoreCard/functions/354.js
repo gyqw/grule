@@ -13,6 +13,8 @@ var func354 = function (t, e, n) {
                 return n && t(e.prototype, n), r && t(e, r), e
             }
         }(),
+
+
         i = d(n(353)), o = d(n(350)), a = d(n(347)), s = d(n(346)), c = d(n(281)), f = n(16), u = n(88), l = n(27),
         h = d(n(291));
 
@@ -24,7 +26,8 @@ var func354 = function (t, e, n) {
         function t(e) {
             !function (t, e) {
                 if (!(t instanceof e)) throw new TypeError("Cannot call a class as a function")
-            }(this, t), this.id = 0, this.conditionColumns = [], this.actionColumns = [], this.contentRows = [], this.properties = [], this.cells = [], this.init(e)
+            }(this, t),
+                this.id = 0, this.conditionColumns = [], this.actionColumns = [], this.contentRows = [], this.properties = [], this.cells = [], this.init(e)
         }
 
         return r(t, [{
@@ -112,7 +115,7 @@ var func354 = function (t, e, n) {
                     var d = "您当前正在使用的", p = window._core_version;
                     p ? (p = (0, u.encrypt)(p)) !== window._lis_ && (d += "是URule Pro试用版", bootbox.alert(unescape(d))) : (d += "是URule Pro试用版", bootbox.alert(unescape(d)))
                 }
-                this.table = $('<table class="table table-bordered" style="width: max-content;max-width: none;margin-left: 15px"></table>'), t.append(this.table), this.tbody = $("<tbody></tbody>"), this.table.append(this.tbody), this.headerRow = new i.default(this), this.table.append(this.headerRow.tr), new c.default(this), this.loadFile(this._buildLoadDataFunction());
+                this.table = $('<table class="table table-bordered" style="width: max-content;max-width: none;margin-left: 15px"/>'), t.append(this.table), this.tbody = $("<tbody></tbody>"), this.table.append(this.tbody), this.headerRow = new i.default(this), this.table.append(this.headerRow.tr), new c.default(this), this.loadFile(this._buildLoadDataFunction());
                 var b = $('<div style="padding-left:10px"></div>');
                 t.append(b), this.tableAction = new h.default(b, !0)
             }

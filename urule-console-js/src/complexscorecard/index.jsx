@@ -1,4 +1,13 @@
-import '../../node_modules/bootstrap/dist/css/bootstrap.css';
-import '../css/iconfont.css';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import KnowledgeTreeDialog from "../components/dialog/component/KnowledgeTreeDialog.jsx";
 
-import '../common/common.bundle';
+$(document).ready(function () {
+    ReactDOM.render(
+        <div>
+            <KnowledgeTreeDialog/>
+        </div>,
+        document.getElementById("dialogContainer")
+    );
+});
+

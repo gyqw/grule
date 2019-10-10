@@ -16,6 +16,11 @@ export default class ExportExcelDataDialog extends Component {
         event.eventEmitter.on(event.OPEN_EXPORT_EXCEL_DIALOG, (files) => {
             $(ReactDOM.findDOMNode(this)).modal('show');
             this.setState({files});
+
+            $('.datepicker').datepicker({
+                format: 'yyyy-mm-dd',
+                autoclose: true
+            });
         });
         event.eventEmitter.on(event.HIDE_EXPORT_EXCEL_DIALOG, () => {
             $(ReactDOM.findDOMNode(this)).modal('hide');
@@ -35,11 +40,11 @@ export default class ExportExcelDataDialog extends Component {
                     <div>
                         <div className="form-group">
                             <label>开始时间:</label>
-                            <input type="text" className="form-control" name="startTime"/>
+                            <input type="text" className="form-control datepicker" name="startTime" autoComplete="off"/>
                         </div>
                         <div className="form-group">
                             <label>结束时间:</label>
-                            <input type="text" className="form-control" name="endTime"/>
+                            <input type="text" className="form-control datepicker" name="endTime" autoComplete="off"/>
                         </div>
                     </div>
                 </form>

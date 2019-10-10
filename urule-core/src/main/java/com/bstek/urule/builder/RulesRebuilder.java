@@ -1,33 +1,10 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.builder;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-
-import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.action.Action;
 import com.bstek.urule.action.ConsolePrintAction;
 import com.bstek.urule.action.ExecuteMethodAction;
 import com.bstek.urule.action.VariableAssignAction;
+import com.bstek.urule.exception.RuleException;
 import com.bstek.urule.model.flow.Connection;
 import com.bstek.urule.model.flow.DecisionItem;
 import com.bstek.urule.model.library.Datatype;
@@ -38,42 +15,15 @@ import com.bstek.urule.model.library.action.SpringBean;
 import com.bstek.urule.model.library.constant.ConstantCategory;
 import com.bstek.urule.model.library.variable.Variable;
 import com.bstek.urule.model.library.variable.VariableCategory;
-import com.bstek.urule.model.rule.CommonFunctionValue;
-import com.bstek.urule.model.rule.ComplexArithmetic;
-import com.bstek.urule.model.rule.ConstantValue;
-import com.bstek.urule.model.rule.Library;
-import com.bstek.urule.model.rule.MethodValue;
-import com.bstek.urule.model.rule.NamedReferenceValue;
-import com.bstek.urule.model.rule.Other;
-import com.bstek.urule.model.rule.Parameter;
-import com.bstek.urule.model.rule.ParameterValue;
-import com.bstek.urule.model.rule.ParenValue;
-import com.bstek.urule.model.rule.Rhs;
-import com.bstek.urule.model.rule.Rule;
-import com.bstek.urule.model.rule.Value;
-import com.bstek.urule.model.rule.VariableCategoryValue;
-import com.bstek.urule.model.rule.VariableValue;
-import com.bstek.urule.model.rule.lhs.AbstractLeftPart;
-import com.bstek.urule.model.rule.lhs.CommonFunctionLeftPart;
-import com.bstek.urule.model.rule.lhs.CommonFunctionParameter;
-import com.bstek.urule.model.rule.lhs.Criteria;
-import com.bstek.urule.model.rule.lhs.CriteriaUnit;
-import com.bstek.urule.model.rule.lhs.Criterion;
-import com.bstek.urule.model.rule.lhs.FunctionLeftPart;
-import com.bstek.urule.model.rule.lhs.Junction;
-import com.bstek.urule.model.rule.lhs.JunctionType;
-import com.bstek.urule.model.rule.lhs.Left;
-import com.bstek.urule.model.rule.lhs.LeftPart;
-import com.bstek.urule.model.rule.lhs.LeftType;
-import com.bstek.urule.model.rule.lhs.MethodLeftPart;
-import com.bstek.urule.model.rule.lhs.NamedCriteria;
-import com.bstek.urule.model.rule.lhs.NamedItem;
-import com.bstek.urule.model.rule.lhs.NamedJunction;
-import com.bstek.urule.model.rule.lhs.VariableLeftPart;
+import com.bstek.urule.model.rule.*;
+import com.bstek.urule.model.rule.lhs.*;
 import com.bstek.urule.model.rule.loop.LoopEnd;
 import com.bstek.urule.model.rule.loop.LoopRule;
 import com.bstek.urule.model.rule.loop.LoopStart;
 import com.bstek.urule.model.rule.loop.LoopTarget;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.*;
 
 /**
  * @author Jacky.gao
@@ -91,47 +41,52 @@ public class RulesRebuilder {
         }
         ResourceLibrary resLibraries = resourceLibraryBuilder.buildResourceLibrary(libraries);
         for (Rule rule : rules) {
-            Map<String, String> namedMap = new HashMap<>();
-            if (rule.getLhs() != null) {
-                Criterion criterion = rule.getLhs().getCriterion();
-                rebuildCriterion(criterion, resLibraries, namedMap, false);
-            }
-            Rhs rhs = rule.getRhs();
-            List<Action> actions = rhs.getActions();
-            if (actions != null) {
-                for (Action action : actions) {
-                    rebuildAction(action, resLibraries, namedMap, false);
+            try {
+                Map<String, String> namedMap = new HashMap<>();
+                if (rule.getLhs() != null) {
+                    Criterion criterion = rule.getLhs().getCriterion();
+                    rebuildCriterion(criterion, resLibraries, namedMap, false);
                 }
-            }
-            Other other = rule.getOther();
-            if (other != null) {
-                List<Action> otherActions = other.getActions();
-                if (otherActions != null) {
-                    for (Action action : otherActions) {
+                Rhs rhs = rule.getRhs();
+                List<Action> actions = rhs.getActions();
+                if (actions != null) {
+                    for (Action action : actions) {
                         rebuildAction(action, resLibraries, namedMap, false);
                     }
                 }
-            }
-            if (rule instanceof LoopRule) {
-                LoopRule loopRule = (LoopRule) rule;
-                LoopTarget target = loopRule.getLoopTarget();
-                if (target != null) {
-                    Value value = target.getValue();
-                    rebuildValue(value, resLibraries, namedMap, false);
+                Other other = rule.getOther();
+                if (other != null) {
+                    List<Action> otherActions = other.getActions();
+                    if (otherActions != null) {
+                        for (Action action : otherActions) {
+                            rebuildAction(action, resLibraries, namedMap, false);
+                        }
+                    }
                 }
+                if (rule instanceof LoopRule) {
+                    LoopRule loopRule = (LoopRule) rule;
+                    LoopTarget target = loopRule.getLoopTarget();
+                    if (target != null) {
+                        Value value = target.getValue();
+                        rebuildValue(value, resLibraries, namedMap, false);
+                    }
 
-                LoopStart start = loopRule.getLoopStart();
-                if (start != null && start.getActions() != null) {
-                    for (Action action : start.getActions()) {
-                        rebuildAction(action, resLibraries, namedMap, false);
+                    LoopStart start = loopRule.getLoopStart();
+                    if (start != null && start.getActions() != null) {
+                        for (Action action : start.getActions()) {
+                            rebuildAction(action, resLibraries, namedMap, false);
+                        }
+                    }
+                    LoopEnd end = loopRule.getLoopEnd();
+                    if (end != null && end.getActions() != null) {
+                        for (Action action : end.getActions()) {
+                            rebuildAction(action, resLibraries, namedMap, false);
+                        }
                     }
                 }
-                LoopEnd end = loopRule.getLoopEnd();
-                if (end != null && end.getActions() != null) {
-                    for (Action action : end.getActions()) {
-                        rebuildAction(action, resLibraries, namedMap, false);
-                    }
-                }
+            } catch (Exception e) {
+                String errorMsg = String.format("规则【%s】包含语法错误", rule.getName());
+                throw new RuleException(errorMsg);
             }
         }
     }
@@ -282,6 +237,11 @@ public class RulesRebuilder {
             if (type == null || !type.equals(LeftType.NamedReference)) {
                 String variableCategory = varAction.getVariableCategory();
                 String variableLabel = varAction.getVariableLabel();
+                // 检查字段名是否为空
+                if (variableLabel == null) {
+                    throw new RuleException("变量字段名为空");
+                }
+
                 if (variableLabel.equals(Connection.RETURN_VALUE_KEY)) {
                     varAction.setVariableName(variableLabel);
                     varAction.setDatatype(Datatype.Boolean);
