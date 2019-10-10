@@ -40,11 +40,11 @@ export default class ExportExcelDataDialog extends Component {
                     <div>
                         <div className="form-group">
                             <label>开始时间:</label>
-                            <input type="text" className="form-control datepicker" name="startTime" autocomplete="off"/>
+                            <input type="text" className="form-control datepicker" name="startTime" autoComplete="off"/>
                         </div>
                         <div className="form-group">
                             <label>结束时间:</label>
-                            <input type="text" className="form-control datepicker" name="endTime" autocomplete="off"/>
+                            <input type="text" className="form-control datepicker" name="endTime" autoComplete="off"/>
                         </div>
                     </div>
                 </form>
