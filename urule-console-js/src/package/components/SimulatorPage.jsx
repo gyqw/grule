@@ -128,10 +128,10 @@ export default class SimulatorPage extends Component {
                                 event.eventEmitter.emit(event.OPEN_EXPORT_EXCEL_DIALOG, this.state.files);
                             }}><i className="glyphicon glyphicon-download"/> 下载批量测试数据
                             </button>
-                            {/*<button className="btn btn-danger" type="button" onClick={() => {*/}
-                            {/*    event.eventEmitter.emit(event.OPEN_IMPORT_EXCEL_DIALOG, this.state.files);*/}
-                            {/*}}><i className="glyphicon glyphicon-upload"/> 上传Excel测试数据*/}
-                            {/*</button>*/}
+                            <button className="btn btn-danger" type="button" onClick={() => {
+                                event.eventEmitter.emit(event.OPEN_IMPORT_EXCEL_DIALOG, this.state.files);
+                            }}><i className="glyphicon glyphicon-upload"/> 上传Excel测试数据
+                            </button>
                         </div>
                     </div>
                     <div className="row" style={{margin: 0}}>

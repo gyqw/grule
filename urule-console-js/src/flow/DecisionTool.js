@@ -145,7 +145,7 @@ export default class DecisionTool extends BaseTool {
                         };
 
                         codeMirror.on('change', function (cm, e) {
-                            if (e.text === '.') {
+                            if (e.text == '.') {
                                 CodeMirror.commands.autocomplete(cm);
                             }
                         });

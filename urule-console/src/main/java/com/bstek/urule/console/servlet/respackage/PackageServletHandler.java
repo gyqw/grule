@@ -255,6 +255,8 @@ public class PackageServletHandler extends RenderPageServletHandler {
             break;
         }
         httpSessionKnowledgeCache.put(req, IMPORT_EXCEL_DATA, mapData);
+
+        mapData = null;
         writeObjectToJson(resp, mapData);
     }
 
@@ -430,7 +432,6 @@ public class PackageServletHandler extends RenderPageServletHandler {
             }
         }
     }
-
 
     public void refreshKnowledgeCache(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String project = req.getParameter("project");
