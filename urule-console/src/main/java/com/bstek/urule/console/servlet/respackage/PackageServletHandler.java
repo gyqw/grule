@@ -50,6 +50,8 @@ import org.apache.velocity.VelocityContext;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -69,6 +71,8 @@ import java.util.*;
  * 2016年6月3日
  */
 public class PackageServletHandler extends RenderPageServletHandler {
+    private Logger logger = LoggerFactory.getLogger(PackageServletHandler.class);
+
     public static final String KB_KEY = "_kb";
     public static final String VCS_KEY = "_vcs";
     public static final String IMPORT_EXCEL_DATA = "_import_excel_data";
@@ -255,6 +259,8 @@ public class PackageServletHandler extends RenderPageServletHandler {
             break;
         }
         httpSessionKnowledgeCache.put(req, IMPORT_EXCEL_DATA, mapData);
+
+        mapData = null;
         writeObjectToJson(resp, mapData);
     }
 
@@ -431,7 +437,6 @@ public class PackageServletHandler extends RenderPageServletHandler {
         }
     }
 
-
     public void refreshKnowledgeCache(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String project = req.getParameter("project");
         project = Utils.decodeURL(project);
@@ -534,133 +539,142 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
     @SuppressWarnings("unchecked")
     public void doBatchTest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        String flowId = req.getParameter("flowId");
-        List<VariableCategory> vcs = (List<VariableCategory>) httpSessionKnowledgeCache.get(req, VCS_KEY);
-        if (vcs == null) {
-            vcs = buildKnowledgeBase(req).getResourceLibrary().getVariableCategories();
-        }
-        Map<String, VariableCategory> vcmap = new HashMap<>();
-        for (VariableCategory vc : vcs) {
-            vcmap.put(vc.getName(), vc);
-        }
-        List<Map<String, Object>> data = (List<Map<String, Object>>) httpSessionKnowledgeCache.get(req, IMPORT_EXCEL_DATA);
-        if (data == null) {
-            throw new RuleException("Import excel data for test has expired,please import the excel and try again.");
-        }
-        Map<String, List<Object>> factMap = new HashMap<>();
-        for (Map<String, Object> map : data) {
-            String name = (String) map.get("name");
-            VariableCategory vc = vcmap.get(name);
-            if (vc == null) {
-                continue;
+        try {
+            String flowId = req.getParameter("flowId");
+            List<VariableCategory> vcs = (List<VariableCategory>) httpSessionKnowledgeCache.get(req, VCS_KEY);
+            if (vcs == null) {
+                vcs = buildKnowledgeBase(req).getResourceLibrary().getVariableCategories();
             }
-            String clazz = vc.getClazz();
-            List<Map<String, Object>> rowList = (List<Map<String, Object>>) map.get("data");
-            List<Variable> variables = vc.getVariables();
-            List<Object> factList = new ArrayList<>();
-            for (Map<String, Object> rowMap : rowList) {
-                Object entity = null;
-                if (vc.getName().equals(VariableCategory.PARAM_CATEGORY)) {
-                    entity = new HashMap<String, Object>();
-                } else {
-                    entity = new GeneralEntity(clazz);
-                }
-                buildObject(entity, rowMap, variables);
-                factList.add(entity);
+            Map<String, VariableCategory> vcmap = new HashMap<>();
+            for (VariableCategory vc : vcs) {
+                vcmap.put(vc.getName(), vc);
             }
-            factMap.put(name, factList);
-        }
-        if (factMap.size() == 0) {
-            throw new RuleException("Import data cannot match current knowledge package.");
-        }
-        int rowSize = 0;
-        List<String> keyList = new ArrayList<>();
-        for (String key : factMap.keySet()) {
-            keyList.add(key);
-            List<Object> facts = factMap.get(key);
-            if (facts.size() > rowSize) {
-                rowSize = facts.size();
+            List<Map<String, Object>> data = (List<Map<String, Object>>) httpSessionKnowledgeCache.get(req, IMPORT_EXCEL_DATA);
+            if (data == null) {
+                throw new RuleException("Import excel data for test has expired,please import the excel and try again.");
             }
-        }
-        List<Map<String, Object>> resultList = new ArrayList<>();
-        int mapSize = factMap.size();
-        KnowledgeBase knowledgeBase = (KnowledgeBase) httpSessionKnowledgeCache.get(req, KB_KEY);
-        KnowledgePackage knowledgePackage = knowledgeBase.getKnowledgePackage();
-        KnowledgeSession session = KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
-        Set<String> flowIdSet = knowledgePackage.getFlowMap().keySet();
-        flowId = flowIdSet.iterator().next();
-        Map<String, Integer> flowMap = new HashMap<>();
-
-        long start = System.currentTimeMillis();
-        for (int i = 0; i < rowSize; i++) {
-            Map<String, Object> parameterMap = null;
-            for (int j = 0; j < mapSize; j++) {
-                String categoryName = keyList.get(j);
-                Object fact = fetchFact(factMap, keyList, j, i);
-                if (fact == null) {
+            Map<String, List<Object>> factMap = new HashMap<>();
+            for (Map<String, Object> map : data) {
+                String name = (String) map.get("name");
+                VariableCategory vc = vcmap.get(name);
+                if (vc == null) {
                     continue;
                 }
-                if ((fact instanceof Map) && !(fact instanceof GeneralEntity)) {
-                    parameterMap = (Map<String, Object>) fact;
-                } else {
-                    session.insert(fact);
-                    buildResult(resultList, categoryName, fact);
+                String clazz = vc.getClazz();
+                List<Map<String, Object>> rowList = (List<Map<String, Object>>) map.get("data");
+                List<Variable> variables = vc.getVariables();
+                List<Object> factList = new ArrayList<>();
+                for (Map<String, Object> rowMap : rowList) {
+                    Object entity = null;
+                    if (vc.getName().equals(VariableCategory.PARAM_CATEGORY)) {
+                        entity = new HashMap<String, Object>();
+                    } else {
+                        entity = new GeneralEntity(clazz);
+                    }
+                    buildObject(entity, rowMap, variables);
+                    factList.add(entity);
+                }
+                factMap.put(name, factList);
+            }
+            if (factMap.size() == 0) {
+                throw new RuleException("Import data cannot match current knowledge package.");
+            }
+            int rowSize = 0;
+            List<String> keyList = new ArrayList<>();
+            for (String key : factMap.keySet()) {
+                keyList.add(key);
+                List<Object> facts = factMap.get(key);
+                if (facts.size() > rowSize) {
+                    rowSize = facts.size();
                 }
             }
+            List<Map<String, Object>> resultList = new ArrayList<>();
+            int mapSize = factMap.size();
+            KnowledgeBase knowledgeBase = (KnowledgeBase) httpSessionKnowledgeCache.get(req, KB_KEY);
+            KnowledgePackage knowledgePackage = knowledgeBase.getKnowledgePackage();
+            KnowledgeSession session = KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
+            Set<String> flowIdSet = knowledgePackage.getFlowMap().keySet();
+            if (flowIdSet.size() > 0) {
+                flowId = flowIdSet.iterator().next();
+            }
+            Map<String, Integer> flowMap = new HashMap<>();
 
-            if (!org.springframework.util.StringUtils.isEmpty(flowId)) {
-                FlowExecutionResponse flowExecutionResponse;
-                if (parameterMap != null) {
-                    flowExecutionResponse = session.startProcess(flowId, parameterMap);
-                } else {
-                    flowExecutionResponse = session.startProcess(flowId);
+            long start = System.currentTimeMillis();
+            for (int i = 0; i < rowSize; i++) {
+                Map<String, Object> parameterMap = null;
+                for (int j = 0; j < mapSize; j++) {
+                    String categoryName = keyList.get(j);
+                    Object fact = fetchFact(factMap, keyList, j, i);
+                    if (fact == null) {
+                        continue;
+                    }
+                    if ((fact instanceof Map) && !(fact instanceof GeneralEntity)) {
+                        parameterMap = (Map<String, Object>) fact;
+                    } else {
+                        session.insert(fact);
+                        buildResult(resultList, categoryName, fact);
+                    }
                 }
 
-                // 记录执行节点
-                for (NodeExecutionResponse nodeExecutionResponse : flowExecutionResponse.getNodeExecutionResponseList()) {
-                    if (!org.springframework.util.StringUtils.isEmpty(nodeExecutionResponse.getDecisionNodeName())) {
-                        String nodeKey = nodeExecutionResponse.getDecisionNodeName();
-
-                        if (flowMap.get(nodeKey) == null) {
-                            flowMap.put(nodeKey, 0);
-                        }
-                        flowMap.put(nodeKey, flowMap.get(nodeKey) + 1);
+                if (!org.springframework.util.StringUtils.isEmpty(flowId)) {
+                    FlowExecutionResponse flowExecutionResponse;
+                    if (parameterMap != null) {
+                        flowExecutionResponse = session.startProcess(flowId, parameterMap);
+                    } else {
+                        flowExecutionResponse = session.startProcess(flowId);
                     }
 
-                }
-            } else {
-                if (parameterMap == null) {
-                    session.fireRules();
-                } else {
-                    session.fireRules(parameterMap);
-                    Map<String, Object> p = new HashMap<>();
-                    p.putAll(session.getParameters());
-                    p.remove("return_to_");
-                    buildResult(resultList, VariableCategory.PARAM_CATEGORY, p);
-                }
-            }
-        }
-        long end = System.currentTimeMillis();
-        long elapse = end - start;
-        StringBuffer sb = new StringBuffer();
-        if (StringUtils.isNotEmpty(flowId)) {
-            sb.append("共执行规则流");
-            sb.append("[" + flowId + "]");
-            sb.append(rowSize);
-            sb.append("次,");
-        } else {
-            sb.append("共测试规则");
-            sb.append(rowSize);
-            sb.append("次,");
-        }
-        sb.append("" + "耗时：" + elapse + "ms");
-        Map<String, Object> result = new HashMap<>();
-        result.put("info", sb.toString());
-        result.put("data", resultList);
-        result.put("node", JSONObject.toJSON(flowMap));
-        writeObjectToJson(resp, result);
-    }
+                    // 记录执行节点
+                    for (NodeExecutionResponse nodeExecutionResponse : flowExecutionResponse.getNodeExecutionResponseList()) {
+                        if (!org.springframework.util.StringUtils.isEmpty(nodeExecutionResponse.getDecisionNodeName())) {
+                            String nodeKey = nodeExecutionResponse.getDecisionNodeName();
 
+                            if (flowMap.get(nodeKey) == null) {
+                                flowMap.put(nodeKey, 0);
+                            }
+                            flowMap.put(nodeKey, flowMap.get(nodeKey) + 1);
+                        }
+
+                    }
+                } else {
+                    if (parameterMap == null) {
+                        session.fireRules();
+                    } else {
+                        session.fireRules(parameterMap);
+                        Map<String, Object> p = new HashMap<>();
+                        p.putAll(session.getParameters());
+                        p.remove("return_to_");
+                        buildResult(resultList, VariableCategory.PARAM_CATEGORY, p);
+                    }
+                }
+
+                // 重置session
+                session = KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
+            }
+            long end = System.currentTimeMillis();
+            long elapse = end - start;
+            StringBuffer sb = new StringBuffer();
+            if (StringUtils.isNotEmpty(flowId)) {
+                sb.append("共执行规则流");
+                sb.append("[" + flowId + "]");
+                sb.append(rowSize);
+                sb.append("次,");
+            } else {
+                sb.append("共测试规则");
+                sb.append(rowSize);
+                sb.append("次,");
+            }
+            sb.append("" + "耗时：" + elapse + "ms");
+            Map<String, Object> result = new HashMap<>();
+            result.put("info", sb.toString());
+            result.put("data", resultList);
+            result.put("node", JSONObject.toJSON(flowMap));
+            writeObjectToJson(resp, result);
+        } catch (Exception e) {
+            logger.error("doBatchTest error", e);
+            throw e;
+        }
+    }
 
     @SuppressWarnings("unchecked")
     private void buildResult(List<Map<String, Object>> list, String categoryName, Object fact) {
@@ -672,8 +686,8 @@ public class PackageServletHandler extends RenderPageServletHandler {
             }
         }
         if (rowList == null) {
-            rowList = new ArrayList<Object>();
-            Map<String, Object> dataMap = new HashMap<String, Object>();
+            rowList = new ArrayList<>();
+            Map<String, Object> dataMap = new HashMap<>();
             dataMap.put("name", categoryName);
             dataMap.put("data", rowList);
             dataMap.put("id", UUID.randomUUID().toString());
@@ -692,7 +706,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
             return null;
         }
         if (objectIndex >= factList.size()) {
-            return null;
+            return factList.get(factList.size() - 1);
         }
         return factList.get(objectIndex);
     }
