@@ -160,7 +160,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
         }
 
         resp.setContentType("application/x-xls");
-        resp.setHeader("Content-Disposition", "attachment; filename=urule-batch-0.xlsx");
+        resp.setHeader("Content-Disposition", "attachment; filename=urule-batch-data.xlsx");
         OutputStream outputStream = resp.getOutputStream();
         wb.write(outputStream);
 
@@ -221,6 +221,65 @@ public class PackageServletHandler extends RenderPageServletHandler {
                         default:
                             cell.setCellValue(dataSourceJobj.getString(var.getName()));
                     }
+                }
+            }
+        }
+    }
+
+    private void buildSheet(SXSSFWorkbook wb, VariableCategory vc, XSSFCellStyle style, List<Map<String, Object>> data) {
+        String name = vc.getName();
+        Sheet sheet = wb.createSheet(name);
+        int rowNum = 0;
+
+        // 表头
+        Row row0 = sheet.createRow(rowNum);
+        List<Variable> variables = vc.getVariables();
+        for (int i = 0; i < variables.size(); i++) {
+            sheet.setColumnWidth(i, 4000);
+            Cell cell = row0.createCell(i);
+            Variable var = variables.get(i);
+            cell.setCellValue(var.getLabel());
+            cell.setCellStyle(style);
+        }
+
+        // 输出信息
+        if (data != null) {
+            for (Map<String, Object> map : data) {
+                if (name.equals(map.get("name"))) {
+                    List<Map<String, Object>> dataList = (List<Map<String, Object>>) map.get("data");
+                    if (dataList != null && dataList.size() > 0) {
+                        for (Map<String, Object> mapItem : dataList) {
+                            rowNum++;
+                            Row row = sheet.createRow(rowNum);
+
+                            for (int i = 0; i < variables.size(); i++) {
+                                Cell cell = row.createCell(i);
+                                Variable var = variables.get(i);
+
+                                if (mapItem.get(var.getName()) == null) {
+                                    continue;
+                                }
+                                switch (var.getType()) {
+                                    case Integer:
+                                        cell.setCellValue((Integer) mapItem.get(var.getName()));
+                                        break;
+                                    case Double:
+                                        cell.setCellValue((Double) mapItem.get(var.getName()));
+                                        break;
+                                    case Long:
+                                        cell.setCellValue((Long) mapItem.get(var.getName()));
+                                        break;
+                                    case BigDecimal:
+                                        cell.setCellValue((Double) mapItem.get(var.getName()));
+                                        break;
+                                    case String:
+                                    default:
+                                        cell.setCellValue((String) mapItem.get(var.getName()));
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -653,23 +712,54 @@ public class PackageServletHandler extends RenderPageServletHandler {
             }
             long end = System.currentTimeMillis();
             long elapse = end - start;
-            StringBuffer sb = new StringBuffer();
-            if (StringUtils.isNotEmpty(flowId)) {
-                sb.append("共执行规则流");
-                sb.append("[" + flowId + "]");
-                sb.append(rowSize);
-                sb.append("次,");
-            } else {
-                sb.append("共测试规则");
-                sb.append(rowSize);
-                sb.append("次,");
+
+            // 输出测试excel
+            SXSSFWorkbook wb = new SXSSFWorkbook();
+            XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
+            Color c = new Color(147, 208, 15);
+            XSSFColor xssfColor = new XSSFColor(c);
+            style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            style.setFillForegroundColor(xssfColor);
+
+            for (VariableCategory vc : vcs) {
+                buildSheet(wb, vc, style, resultList);
             }
-            sb.append("" + "耗时：" + elapse + "ms");
-            Map<String, Object> result = new HashMap<>();
-            result.put("info", sb.toString());
-            result.put("data", resultList);
-            result.put("node", JSONObject.toJSON(flowMap));
-            writeObjectToJson(resp, result);
+
+            // 输出结果表
+            Sheet sheet = wb.createSheet("测试结果");
+            // 表头
+            Row row0 = sheet.createRow(0);
+            List<String> testResultSheetHead = new ArrayList<>();
+            testResultSheetHead.add("测试次数");
+            testResultSheetHead.add("耗时");
+            testResultSheetHead.addAll(flowMap.keySet());
+            for (int i = 0; i < testResultSheetHead.size(); i++) {
+                sheet.setColumnWidth(i, 4000);
+                Cell cell = row0.createCell(i);
+                String var = testResultSheetHead.get(i);
+                cell.setCellValue(var);
+                cell.setCellStyle(style);
+            }
+            // 内容
+            Row row1 = sheet.createRow(1);
+            Cell row1Cell0 = row1.createCell(0);
+            row1Cell0.setCellValue(rowSize);
+            Cell row1Cell1 = row1.createCell(1);
+            row1Cell1.setCellValue(elapse);
+            for (int i = 2; i < testResultSheetHead.size(); i++) {
+                Cell cell = row1.createCell(i);
+                cell.setCellValue(flowMap.get(testResultSheetHead.get(i)));
+            }
+
+            resp.setContentType("application/x-xls");
+            resp.setHeader("Content-Disposition", "attachment; filename=urule-test-batch-data.xlsx");
+            OutputStream outputStream = resp.getOutputStream();
+            wb.write(outputStream);
+
+            outputStream.flush();
+            outputStream.close();
+
+//            writeObjectToJson(resp, result);
         } catch (Exception e) {
             logger.error("doBatchTest error", e);
             throw e;
