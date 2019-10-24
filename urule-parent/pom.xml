@@ -131,7 +131,6 @@
                 <inherited>true</inherited>
                 <executions>
                     <execution>
-                        <!-- Tidy up all POMs before they are published -->
                         <id>flatten</id>
                         <phase>process-resources</phase>
                         <goals>
