@@ -408,7 +408,6 @@ public class PackageServletHandler extends RenderPageServletHandler {
         return mapList;
     }
 
-
     public void loadFlows(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         KnowledgeBase knowledgeBase = (KnowledgeBase) httpSessionKnowledgeCache.get(req, KB_KEY);
         Collection<FlowDefinition> col = knowledgeBase.getFlowMap().values();
@@ -685,23 +684,22 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
                     // 记录执行节点
                     for (NodeExecutionResponse nodeExecutionResponse : flowExecutionResponse.getNodeExecutionResponseList()) {
-                        if (!org.springframework.util.StringUtils.isEmpty(nodeExecutionResponse.getDecisionNodeName())) {
-                            String nodeKey = nodeExecutionResponse.getDecisionNodeName();
-
-                            if (flowMap.get(nodeKey) == null) {
-                                flowMap.put(nodeKey, 0);
-                            }
-                            flowMap.put(nodeKey, flowMap.get(nodeKey) + 1);
+                        String nodeKey = nodeExecutionResponse.getDecisionNodeName();
+                        if (org.springframework.util.StringUtils.isEmpty(nodeKey)) {
+                            nodeKey = nodeExecutionResponse.getRuleNodeName();
                         }
 
+                        if (flowMap.get(nodeKey) == null) {
+                            flowMap.put(nodeKey, 0);
+                        }
+                        flowMap.put(nodeKey, flowMap.get(nodeKey) + 1);
                     }
                 } else {
                     if (parameterMap == null) {
                         session.fireRules();
                     } else {
                         session.fireRules(parameterMap);
-                        Map<String, Object> p = new HashMap<>();
-                        p.putAll(session.getParameters());
+                        Map<String, Object> p = new HashMap<>(session.getParameters());
                         p.remove("return_to_");
                         buildResult(resultList, VariableCategory.PARAM_CATEGORY, p);
                     }
@@ -758,8 +756,6 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
             outputStream.flush();
             outputStream.close();
-
-//            writeObjectToJson(resp, result);
         } catch (Exception e) {
             logger.error("doBatchTest error", e);
             throw e;
@@ -801,7 +797,6 @@ public class PackageServletHandler extends RenderPageServletHandler {
         return factList.get(objectIndex);
     }
 
-
     private void buildObject(Object obj, Map<String, Object> map, List<Variable> variables) {
         for (String name : map.keySet()) {
             name = name.replaceAll("-", "\\.");
@@ -827,7 +822,6 @@ public class PackageServletHandler extends RenderPageServletHandler {
             Utils.setObjectProperty(obj, var.getName(), value);
         }
     }
-
 
     @SuppressWarnings({"unchecked"})
     public void doTest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
@@ -1005,7 +999,6 @@ public class PackageServletHandler extends RenderPageServletHandler {
             throw new RuleException(e);
         }
     }
-
 
     private void buildRulesName(List<RuleInfo> firedRules, StringBuffer sb) {
         sb.append("：");
