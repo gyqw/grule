@@ -10,4 +10,6 @@ import java.util.Date;
  */
 public interface ExternalRepository {
     JSONArray findDataByDate(Date start, Date end);
+
+    JSONArray findDataByDate(Date start, Date end, String projectId, String packageId);
 }

@@ -76,6 +76,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
     public static final String KB_KEY = "_kb";
     public static final String VCS_KEY = "_vcs";
     public static final String IMPORT_EXCEL_DATA = "_import_excel_data";
+    public static final String EXPORT_EXCEL_TEST_DATA = "_export_excel_test_data";
 
     private RepositoryService repositoryService;
     private ExternalRepository externalRepository;
@@ -146,7 +147,9 @@ public class PackageServletHandler extends RenderPageServletHandler {
         String endDateStr = req.getParameter("endTime");
         Date startDate = sdf.parse(startDateStr);
         Date endDate = sdf.parse(endDateStr);
-        JSONArray data = applicationContext.getBean(ExternalRepository.class).findDataByDate(startDate, endDate);
+        String projectId = req.getParameter("projectId");
+        String packageId = req.getParameter("packageId");
+        JSONArray data = applicationContext.getBean(ExternalRepository.class).findDataByDate(startDate, endDate, projectId, packageId);
 
         SXSSFWorkbook wb = new SXSSFWorkbook();
         XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
@@ -245,41 +248,34 @@ public class PackageServletHandler extends RenderPageServletHandler {
         // 输出信息
         if (data != null) {
             for (Map<String, Object> map : data) {
-                if (name.equals(map.get("name"))) {
-                    List<Map<String, Object>> dataList = (List<Map<String, Object>>) map.get("data");
-                    if (dataList != null && dataList.size() > 0) {
-                        for (Map<String, Object> mapItem : dataList) {
-                            rowNum++;
-                            Row row = sheet.createRow(rowNum);
+                Map<String, Object> mapItem = (Map<String, Object>) map.get(name);
+                rowNum++;
+                Row row = sheet.createRow(rowNum);
 
-                            for (int i = 0; i < variables.size(); i++) {
-                                Cell cell = row.createCell(i);
-                                Variable var = variables.get(i);
+                for (int i = 0; i < variables.size(); i++) {
+                    Cell cell = row.createCell(i);
+                    Variable var = variables.get(i);
 
-                                if (mapItem.get(var.getName()) == null) {
-                                    continue;
-                                }
-                                switch (var.getType()) {
-                                    case Integer:
-                                        cell.setCellValue((Integer) mapItem.get(var.getName()));
-                                        break;
-                                    case Double:
-                                        cell.setCellValue((Double) mapItem.get(var.getName()));
-                                        break;
-                                    case Long:
-                                        cell.setCellValue((Long) mapItem.get(var.getName()));
-                                        break;
-                                    case BigDecimal:
-                                        cell.setCellValue((Double) mapItem.get(var.getName()));
-                                        break;
-                                    case String:
-                                    default:
-                                        cell.setCellValue((String) mapItem.get(var.getName()));
-                                }
-                            }
-                        }
+                    if (mapItem.get(var.getName()) == null) {
+                        continue;
                     }
-
+                    switch (var.getType()) {
+                        case Integer:
+                            cell.setCellValue((Integer) mapItem.get(var.getName()));
+                            break;
+                        case Double:
+                            cell.setCellValue((Double) mapItem.get(var.getName()));
+                            break;
+                        case Long:
+                            cell.setCellValue((Long) mapItem.get(var.getName()));
+                            break;
+                        case BigDecimal:
+                            cell.setCellValue((Double) mapItem.get(var.getName()));
+                            break;
+                        case String:
+                        default:
+                            cell.setCellValue((String) mapItem.get(var.getName()));
+                    }
                 }
             }
         }
@@ -304,7 +300,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
         ServletFileUpload upload = new ServletFileUpload(factory);
         List<FileItem> items = upload.parseRequest(req);
         Iterator<FileItem> itr = items.iterator();
-        List<Map<String, Object>> mapData = null;
+        Map<Integer, Map<String, Object>> mapData = null;
         while (itr.hasNext()) {
             FileItem item = itr.next();
             String name = item.getFieldName();
@@ -324,21 +320,32 @@ public class PackageServletHandler extends RenderPageServletHandler {
     }
 
     @SuppressWarnings("resource")
-    private List<Map<String, Object>> parseExcel(InputStream stream) throws Exception {
-        List<Map<String, Object>> mapList = new ArrayList<>();
+    private Map<Integer, Map<String, Object>> parseExcel(InputStream stream) throws Exception {
+        Map<Integer, Map<String, Object>> mapMap = new HashMap<>();
         XSSFWorkbook wb = new XSSFWorkbook(stream);
+
+        // 遍历excel
         for (int i = 0; i < wb.getNumberOfSheets(); i++) {
             XSSFSheet sheet = wb.getSheetAt(i);
             if (sheet == null) {
                 continue;
             }
+
             String name = sheet.getSheetName();
-            Map<String, Object> map = new HashMap<>();
-            map.put("name", name);
-            map.put("data", buildVariables(sheet));
-            mapList.add(map);
+            // 遍历每个变量的数据
+            int ii = 0;
+            for (Map<String, String> sheetVariable : buildVariables(sheet)) {
+                if (mapMap.get(ii) == null) {
+                    mapMap.put(ii, new HashMap<String, Object>());
+                }
+                Map<String, Object> row = mapMap.get(ii);
+                row.put(name, sheetVariable);
+
+                ii++;
+            }
         }
-        return mapList;
+
+        return mapMap;
     }
 
     private List<Map<String, String>> buildVariables(XSSFSheet sheet) {
@@ -360,7 +367,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
             if (row == null) {
                 continue;
             }
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             mapList.add(map);
             for (int j = 0; j < totalColumn; j++) {
                 XSSFCell cell = row.getCell(j);
@@ -599,6 +606,14 @@ public class PackageServletHandler extends RenderPageServletHandler {
     public void doBatchTest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         try {
             String flowId = req.getParameter("flowId");
+
+            Map<Integer, Map<String, Map<String, Object>>> data =
+                    (Map<Integer, Map<String, Map<String, Object>>>) httpSessionKnowledgeCache.get(req, IMPORT_EXCEL_DATA);
+            if (data == null) {
+                throw new RuleException("Import excel data for test has expired, please import the excel and try again.");
+            }
+
+            // 获取项目变量
             List<VariableCategory> vcs = (List<VariableCategory>) httpSessionKnowledgeCache.get(req, VCS_KEY);
             if (vcs == null) {
                 vcs = buildKnowledgeBase(req).getResourceLibrary().getVariableCategories();
@@ -607,159 +622,165 @@ public class PackageServletHandler extends RenderPageServletHandler {
             for (VariableCategory vc : vcs) {
                 vcmap.put(vc.getName(), vc);
             }
-            List<Map<String, Object>> data = (List<Map<String, Object>>) httpSessionKnowledgeCache.get(req, IMPORT_EXCEL_DATA);
-            if (data == null) {
-                throw new RuleException("Import excel data for test has expired,please import the excel and try again.");
-            }
-            Map<String, List<Object>> factMap = new HashMap<>();
-            for (Map<String, Object> map : data) {
-                String name = (String) map.get("name");
-                VariableCategory vc = vcmap.get(name);
-                if (vc == null) {
-                    continue;
-                }
-                String clazz = vc.getClazz();
-                List<Map<String, Object>> rowList = (List<Map<String, Object>>) map.get("data");
-                List<Variable> variables = vc.getVariables();
-                List<Object> factList = new ArrayList<>();
-                for (Map<String, Object> rowMap : rowList) {
+
+            List<Map<String, Object>> rowList = new ArrayList<>();
+            // 遍历每条数据
+            for (Map<String, Map<String, Object>> map : data.values()) {
+                Map<String, Object> row = new HashMap<>();
+                // 遍历每个变量
+                for (String name : map.keySet()) {
+                    VariableCategory vc = vcmap.get(name);
+                    if (vc == null) {
+                        continue;
+                    }
+                    String clazz = vc.getClazz();
+                    List<Variable> variables = vc.getVariables();
                     Object entity = null;
                     if (vc.getName().equals(VariableCategory.PARAM_CATEGORY)) {
                         entity = new HashMap<String, Object>();
                     } else {
                         entity = new GeneralEntity(clazz);
                     }
-                    buildObject(entity, rowMap, variables);
-                    factList.add(entity);
+                    buildObject(entity, map.get(name), variables);
+                    row.put(name, entity);
                 }
-                factMap.put(name, factList);
+
+                rowList.add(row);
             }
-            if (factMap.size() == 0) {
+
+            if (rowList.size() == 0) {
                 throw new RuleException("Import data cannot match current knowledge package.");
             }
-            int rowSize = 0;
-            List<String> keyList = new ArrayList<>();
-            for (String key : factMap.keySet()) {
-                keyList.add(key);
-                List<Object> facts = factMap.get(key);
-                if (facts.size() > rowSize) {
-                    rowSize = facts.size();
-                }
-            }
-            List<Map<String, Object>> resultList = new ArrayList<>();
-            int mapSize = factMap.size();
+
             KnowledgeBase knowledgeBase = (KnowledgeBase) httpSessionKnowledgeCache.get(req, KB_KEY);
             KnowledgePackage knowledgePackage = knowledgeBase.getKnowledgePackage();
-            KnowledgeSession session = KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
             Set<String> flowIdSet = knowledgePackage.getFlowMap().keySet();
             if (flowIdSet.size() > 0) {
                 flowId = flowIdSet.iterator().next();
             }
+
             Map<String, Integer> flowMap = new HashMap<>();
-
-            long start = System.currentTimeMillis();
-            for (int i = 0; i < rowSize; i++) {
-                Map<String, Object> parameterMap = null;
-                for (int j = 0; j < mapSize; j++) {
-                    String categoryName = keyList.get(j);
-                    Object fact = fetchFact(factMap, keyList, j, i);
-                    if (fact == null) {
-                        continue;
-                    }
-                    if ((fact instanceof Map) && !(fact instanceof GeneralEntity)) {
-                        parameterMap = (Map<String, Object>) fact;
-                    } else {
-                        session.insert(fact);
-                        buildResult(resultList, categoryName, fact);
-                    }
-                }
-
-                if (!org.springframework.util.StringUtils.isEmpty(flowId)) {
-                    FlowExecutionResponse flowExecutionResponse;
-                    if (parameterMap != null) {
-                        flowExecutionResponse = session.startProcess(flowId, parameterMap);
-                    } else {
-                        flowExecutionResponse = session.startProcess(flowId);
-                    }
-
-                    // 记录执行节点
-                    for (NodeExecutionResponse nodeExecutionResponse : flowExecutionResponse.getNodeExecutionResponseList()) {
-                        String nodeKey = nodeExecutionResponse.getDecisionNodeName();
-                        if (org.springframework.util.StringUtils.isEmpty(nodeKey)) {
-                            nodeKey = nodeExecutionResponse.getRuleNodeName();
-                        }
-
-                        if (flowMap.get(nodeKey) == null) {
-                            flowMap.put(nodeKey, 0);
-                        }
-                        flowMap.put(nodeKey, flowMap.get(nodeKey) + 1);
-                    }
-                } else {
-                    if (parameterMap == null) {
-                        session.fireRules();
-                    } else {
-                        session.fireRules(parameterMap);
-                        Map<String, Object> p = new HashMap<>(session.getParameters());
-                        p.remove("return_to_");
-                        buildResult(resultList, VariableCategory.PARAM_CATEGORY, p);
-                    }
-                }
-
-                // 重置session
-                session = KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
+            for (Map<String, Object> row : rowList) {
+                // 试算每条数据
+                doSingleBatchTest(knowledgePackage, flowId, row, flowMap);
             }
-            long end = System.currentTimeMillis();
-            long elapse = end - start;
 
             // 输出测试excel
-            SXSSFWorkbook wb = new SXSSFWorkbook();
-            XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
-            Color c = new Color(147, 208, 15);
-            XSSFColor xssfColor = new XSSFColor(c);
-            style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            style.setFillForegroundColor(xssfColor);
+            SXSSFWorkbook wb = buildExcel(vcs, rowList, flowMap);
+            httpSessionKnowledgeCache.put(req, EXPORT_EXCEL_TEST_DATA, wb);
 
-            for (VariableCategory vc : vcs) {
-                buildSheet(wb, vc, style, resultList);
-            }
-
-            // 输出结果表
-            Sheet sheet = wb.createSheet("测试结果");
-            // 表头
-            Row row0 = sheet.createRow(0);
-            List<String> testResultSheetHead = new ArrayList<>();
-            testResultSheetHead.add("测试次数");
-            testResultSheetHead.add("耗时");
-            testResultSheetHead.addAll(flowMap.keySet());
-            for (int i = 0; i < testResultSheetHead.size(); i++) {
-                sheet.setColumnWidth(i, 4000);
-                Cell cell = row0.createCell(i);
-                String var = testResultSheetHead.get(i);
-                cell.setCellValue(var);
-                cell.setCellStyle(style);
-            }
-            // 内容
-            Row row1 = sheet.createRow(1);
-            Cell row1Cell0 = row1.createCell(0);
-            row1Cell0.setCellValue(rowSize);
-            Cell row1Cell1 = row1.createCell(1);
-            row1Cell1.setCellValue(elapse);
-            for (int i = 2; i < testResultSheetHead.size(); i++) {
-                Cell cell = row1.createCell(i);
-                cell.setCellValue(flowMap.get(testResultSheetHead.get(i)));
-            }
-
-            resp.setContentType("application/x-xls");
-            resp.setHeader("Content-Disposition", "attachment; filename=urule-test-batch-data.xlsx");
-            OutputStream outputStream = resp.getOutputStream();
-            wb.write(outputStream);
-
-            outputStream.flush();
-            outputStream.close();
+            writeObjectToJson(resp, flowMap);
         } catch (Exception e) {
             logger.error("doBatchTest error", e);
             throw e;
         }
+    }
+
+    public void exportBatchTestExcel(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        SXSSFWorkbook wb = (SXSSFWorkbook) httpSessionKnowledgeCache.get(req, EXPORT_EXCEL_TEST_DATA);
+        resp.setContentType("application/x-xls");
+        resp.setHeader("Content-Disposition", "attachment; filename=urule-test-batch-data.xlsx");
+        OutputStream outputStream = resp.getOutputStream();
+        wb.write(outputStream);
+        outputStream.flush();
+        outputStream.close();
+    }
+
+    private void doSingleBatchTest(KnowledgePackage knowledgePackage, String flowId, Map<String, Object> row, Map<String, Integer> flowMap) {
+        long start = System.currentTimeMillis();
+
+        // 获取session
+        KnowledgeSession session = KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
+
+        Map<String, Object> parameterMap = null;
+        for (String name : row.keySet()) {
+            Object fact = row.get(name);
+            if ((fact instanceof Map) && !(fact instanceof GeneralEntity)) {
+                parameterMap = (Map<String, Object>) fact;
+            } else {
+                session.insert(fact);
+            }
+        }
+
+        if (!org.springframework.util.StringUtils.isEmpty(flowId)) {
+            FlowExecutionResponse flowExecutionResponse;
+            if (parameterMap != null) {
+                flowExecutionResponse = session.startProcess(flowId, parameterMap);
+            } else {
+                flowExecutionResponse = session.startProcess(flowId);
+            }
+
+            Map<String, Object> result = new HashMap<>();
+            // 记录执行节点
+            for (NodeExecutionResponse nodeExecutionResponse : flowExecutionResponse.getNodeExecutionResponseList()) {
+                String nodeName = nodeExecutionResponse.getDecisionNodeName();
+                if (!org.springframework.util.StringUtils.isEmpty(nodeName)) {
+                    result.put(nodeName, nodeExecutionResponse.getDecisionNodeResult());
+                } else {
+                    nodeName = nodeExecutionResponse.getRuleNodeName();
+                    result.put(nodeName, 1);
+                }
+
+                // 汇总流程图数据
+                if (flowMap.get(nodeName) == null) {
+                    flowMap.put(nodeName, 0);
+                }
+                flowMap.put(nodeName, flowMap.get(nodeName) + 1);
+            }
+            long end = System.currentTimeMillis();
+            long elapse = end - start;
+
+            result.put("耗时", elapse);
+
+            row.put("测试结果", result);
+        }
+    }
+
+    private SXSSFWorkbook buildExcel(List<VariableCategory> vcs, List<Map<String, Object>> resultList, Map<String, Integer> flowMap) {
+        SXSSFWorkbook wb = new SXSSFWorkbook();
+
+        XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
+        Color c = new Color(147, 208, 15);
+        XSSFColor xssfColor = new XSSFColor(c);
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setFillForegroundColor(xssfColor);
+
+        for (VariableCategory vc : vcs) {
+            buildSheet(wb, vc, style, resultList);
+        }
+
+        // 输出结果表
+        String testSheetName = "测试结果";
+        Sheet sheet = wb.createSheet(testSheetName);
+        // 表头
+        Row row0 = sheet.createRow(0);
+        List<String> testResultSheetHead = new ArrayList<>();
+        testResultSheetHead.add("耗时");
+        testResultSheetHead.addAll(flowMap.keySet());
+        for (int i = 0; i < testResultSheetHead.size(); i++) {
+            sheet.setColumnWidth(i, 4000);
+            Cell cell = row0.createCell(i);
+            String var = testResultSheetHead.get(i);
+            cell.setCellValue(var);
+            cell.setCellStyle(style);
+        }
+        // 内容
+        int i = 1;
+        for (Map<String, Object> map : resultList) {
+            Map<String, Object> testResult = (Map<String, Object>) map.get(testSheetName);
+            Row rowx = sheet.createRow(i);
+            Cell row1Cell1 = rowx.createCell(0);
+            row1Cell1.setCellValue((long) testResult.get("耗时"));
+            for (int ii = 1; ii < testResultSheetHead.size(); ii++) {
+                Cell cell = rowx.createCell(ii);
+                Object cellVal = testResult.get(testResultSheetHead.get(ii));
+                cell.setCellValue(String.valueOf(cellVal));
+            }
+
+            i++;
+        }
+
+        return wb;
     }
 
     @SuppressWarnings("unchecked")
@@ -800,7 +821,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
     private void buildObject(Object obj, Map<String, Object> map, List<Variable> variables) {
         for (String name : map.keySet()) {
             name = name.replaceAll("-", "\\.");
-            if (name.indexOf(".") != -1) {
+            if (name.contains(".")) {
                 instanceChildObject(obj, name);
             }
             Object value = map.get(name);
@@ -903,7 +924,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
             sb.append("触发的规则共" + firedRules.size() + "个");
             buildRulesName(firedRules, sb);
         }
-        Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("info", sb.toString());
         resultMap.put("data", variableCategories);
         writeObjectToJson(resp, resultMap);
