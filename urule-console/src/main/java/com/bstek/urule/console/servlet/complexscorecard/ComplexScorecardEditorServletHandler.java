@@ -15,8 +15,6 @@ import java.io.PrintWriter;
  * 2018-12-11 6:35 PM
  */
 public class ComplexScorecardEditorServletHandler extends RenderPageServletHandler {
-    public ComplexScorecardEditorServletHandler() {
-    }
 
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String method = this.retriveMethod(req);

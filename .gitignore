@@ -1,6 +1,4 @@
 .idea/
 *.iml
-node_modules/
-dist/
 target/
 .flattened-pom.xml
