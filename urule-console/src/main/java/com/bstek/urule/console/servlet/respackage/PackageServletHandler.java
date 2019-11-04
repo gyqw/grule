@@ -58,6 +58,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.io.*;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -147,9 +148,9 @@ public class PackageServletHandler extends RenderPageServletHandler {
         String endDateStr = req.getParameter("endTime");
         Date startDate = sdf.parse(startDateStr);
         Date endDate = sdf.parse(endDateStr);
-        String projectId = req.getParameter("projectId");
-        String packageId = req.getParameter("packageId");
-        JSONArray data = applicationContext.getBean(ExternalRepository.class).findDataByDate(startDate, endDate, projectId, packageId);
+        String projectName = req.getParameter("projectName");
+        String packageName = req.getParameter("packageName");
+        JSONArray data = applicationContext.getBean(ExternalRepository.class).findDataByDate(startDate, endDate, projectName, packageName);
 
         SXSSFWorkbook wb = new SXSSFWorkbook();
         XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
@@ -256,7 +257,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
                     Cell cell = row.createCell(i);
                     Variable var = variables.get(i);
 
-                    if (mapItem.get(var.getName()) == null) {
+                    if (mapItem == null || mapItem.get(var.getName()) == null) {
                         continue;
                     }
                     switch (var.getType()) {
@@ -270,7 +271,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
                             cell.setCellValue((Long) mapItem.get(var.getName()));
                             break;
                         case BigDecimal:
-                            cell.setCellValue((Double) mapItem.get(var.getName()));
+                            cell.setCellValue(((BigDecimal) mapItem.get(var.getName())).doubleValue());
                             break;
                         case String:
                         default:
@@ -652,7 +653,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
                 throw new RuleException("Import data cannot match current knowledge package.");
             }
 
-            KnowledgeBase knowledgeBase = (KnowledgeBase) httpSessionKnowledgeCache.get(req, KB_KEY);
+            KnowledgeBase knowledgeBase = buildKnowledgeBase(req);
             KnowledgePackage knowledgePackage = knowledgeBase.getKnowledgePackage();
             Set<String> flowIdSet = knowledgePackage.getFlowMap().keySet();
             if (flowIdSet.size() > 0) {
@@ -783,41 +784,6 @@ public class PackageServletHandler extends RenderPageServletHandler {
         return wb;
     }
 
-    @SuppressWarnings("unchecked")
-    private void buildResult(List<Map<String, Object>> list, String categoryName, Object fact) {
-        List<Object> rowList = null;
-        for (Map<String, Object> map : list) {
-            if (map.get("name").equals(categoryName)) {
-                rowList = (List<Object>) map.get("data");
-                break;
-            }
-        }
-        if (rowList == null) {
-            rowList = new ArrayList<>();
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("name", categoryName);
-            dataMap.put("data", rowList);
-            dataMap.put("id", UUID.randomUUID().toString());
-            list.add(dataMap);
-        }
-        rowList.add(fact);
-    }
-
-    private Object fetchFact(Map<String, List<Object>> factMap, List<String> keyList, int i, int objectIndex) {
-        if (i > keyList.size()) {
-            return null;
-        }
-        String name = keyList.get(i);
-        List<Object> factList = factMap.get(name);
-        if (factList == null) {
-            return null;
-        }
-        if (objectIndex >= factList.size()) {
-            return factList.get(factList.size() - 1);
-        }
-        return factList.get(objectIndex);
-    }
-
     private void buildObject(Object obj, Map<String, Object> map, List<Variable> variables) {
         for (String name : map.keySet()) {
             name = name.replaceAll("-", "\\.");
@@ -839,7 +805,11 @@ public class PackageServletHandler extends RenderPageServletHandler {
             if (type.equals(Datatype.List) || type.equals(Datatype.Set) || type.equals(Datatype.Map)) {
                 continue;
             }
-            value = type.convert(value);
+            if (!org.springframework.util.StringUtils.isEmpty(value)) {
+                value = type.convert(value);
+            } else {
+                value = null;
+            }
             Utils.setObjectProperty(obj, var.getName(), value);
         }
     }
