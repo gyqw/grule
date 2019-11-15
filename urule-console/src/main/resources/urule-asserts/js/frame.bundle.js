@@ -11075,6 +11075,9 @@
                 case"rs.xml":
                     n = "向导式决策集";
                     break;
+                case 'rsl.xml':
+                    n = '向导式决策库';
+                    break;
                 case"ul":
                     n = "脚本式决策集";
                     break;
@@ -11092,6 +11095,7 @@
                     break;
                 case"sc":
                     n = "评分卡";
+                    break;
                 case"scc":
                     n = "复杂评分卡";
                     break;
@@ -11246,6 +11250,10 @@
                         name: "添加脚本式决策集", icon: r.default.frameStyle.getUlIcon(), click: function () {
                             i.eventEmitter.emit(i.OPEN_CREATE_FILE_DIALOG, {fileType: "ul", nodeData: t})
                         }
+                    }, {
+                        name: "添加向导式决策库", icon: r.default.frameStyle.getRuleIcon(), click: function () {
+                            i.eventEmitter.emit(i.OPEN_CREATE_FILE_DIALOG, {fileType: "rsl.xml", nodeData: t})
+                        }
                     }];
                     break;
                 case"decisionTableLib":
@@ -11366,6 +11374,10 @@
             }, {
                 name: "添加脚本式决策集", icon: r.default.frameStyle.getUlIcon(), click: function (t, e) {
                     i.eventEmitter.emit(i.OPEN_CREATE_FILE_DIALOG, {fileType: "ul", nodeData: t})
+                }
+            }, {
+                name: "添加向导式决策库", icon: r.default.frameStyle.getRuleIcon(), click: function (t, e) {
+                    i.eventEmitter.emit(i.OPEN_CREATE_FILE_DIALOG, {fileType: "rsl.xml", nodeData: t})
                 }
             }), o || (n.push(T()), o = !0)), e && "all" !== e && "decisionTableLib" !== e || (n.push.apply(n, [{
                 name: "添加决策表",
@@ -13230,16 +13242,7 @@
                             fontFamily: "Microsoft YaHei UI, Microsoft YaHei",
                             margin: "10px"
                         }
-                    }, A.default.createElement("h1", {style: {textAlign: "center"}}, "欢迎您使用URULE开源免费版本"), A.default.createElement("div", {style: {marginTop: "20px"}}, "您当前正在使用的是URULE开源免费版本，Github地址为：", A.default.createElement("a", {
-                        href: "https://github.com/youseries/urule",
-                        target: "_blank"
-                    }, "https://github.com/youseries/urule"), "。", A.default.createElement("div", {style: {marginTop: "10px"}}, "如果您需要更多功能，更完善的技术支持，可以选择", A.default.createElement("a", {
-                        href: "http://www.bstek.com/products/urule",
-                        target: "_blank"
-                    }, A.default.createElement("strong", null, "URULE PRO")), "版，点击", A.default.createElement("a", {
-                        href: "http://www.bstek.com/products/urule",
-                        target: "_blank"
-                    }, "此处"), "了解更多URULE PRO版信息")), A.default.createElement("table", {
+                    }, A.default.createElement("h1", {style: {textAlign: "center"}}, "欢迎使用决策系统"), A.default.createElement("table", {
                         className: "table table-bordered",
                         style: {marginTop: "20px"}
                     }, A.default.createElement("thead", null, A.default.createElement("tr", {
@@ -13250,102 +13253,30 @@
                             fontSize: "18px",
                             color: "#7b7a7a"
                         }
-                    }, A.default.createElement("td", {colSpan: "3"}, "URULE PRO版与开源版主要功能比较"))), A.default.createElement("tbody", null, A.default.createElement("tr", {
+                    }, A.default.createElement("td", {colSpan: "2"}, "主要功能"))), A.default.createElement("tbody", null, A.default.createElement("tr", {
                         style: {
                             fontSize: "14pt",
                             background: "#98908d",
                             color: "#fff"
                         }
-                    }, A.default.createElement("td", {style: {width: "200px"}}, "特性"), A.default.createElement("td", null, "URULE PRO版"), A.default.createElement("td", null, "URULE开源版")), A.default.createElement("tr", null, A.default.createElement("td", null, "向导式决策集"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
+                    }, A.default.createElement("td", null, "特性"), A.default.createElement("td", null, "当前版本")), A.default.createElement("tr", null, A.default.createElement("td", null, "向导式决策集"), A.default.createElement("td", null, A.default.createElement("i", {
                         className: "glyphicon glyphicon-ok",
                         style: {fontSize: "20px", color: "green"}
                     }))), A.default.createElement("tr", null, A.default.createElement("td", null, "脚本式决策集"), A.default.createElement("td", null, A.default.createElement("i", {
                         className: "glyphicon glyphicon-ok",
                         style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
                     }))), A.default.createElement("tr", null, A.default.createElement("td", null, "决策树"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
                         className: "glyphicon glyphicon-ok",
                         style: {fontSize: "20px", color: "green"}
                     }))), A.default.createElement("tr", null, A.default.createElement("td", null, "决策流"), A.default.createElement("td", null, A.default.createElement("i", {
                         className: "glyphicon glyphicon-ok",
                         style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
                     }))), A.default.createElement("tr", null, A.default.createElement("td", null, "决策表"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
                         className: "glyphicon glyphicon-ok",
                         style: {fontSize: "20px", color: "green"}
                     }))), A.default.createElement("tr", null, A.default.createElement("td", null, "交叉决策表"), A.default.createElement("td", null, A.default.createElement("i", {
                         className: "glyphicon glyphicon-ok",
                         style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "文件名、项目名重构"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "参数名、变量常量名重构"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "Excel决策表导入"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "规则集模版保存与加载"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "循环规则多循环单元支持"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "导入项目自动重命名功能"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "性能调优"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "更为完善的文件读写权限控制"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "技术支持"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
                     }))))))
                 }
             }]), e
