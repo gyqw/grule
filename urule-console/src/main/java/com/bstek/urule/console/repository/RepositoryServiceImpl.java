@@ -546,11 +546,34 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
                         continue;
                     }
                 }
+
                 if (StringUtils.isNotBlank(searchFileName)) {
-                    if (!name.toLowerCase().contains(searchFileName.toLowerCase())) {
-                        continue;
+                    boolean fileNameContain = name.toLowerCase().contains(searchFileName.toLowerCase());
+                    if (name.toLowerCase().endsWith(FileType.Ruleset.toString())) {
+                        // 搜索文件本身
+                        try {
+                            InputStream inputStream = null;
+                            inputStream = readFile(fileNode.getPath());
+
+
+                            byte[] bytes = new byte[0];
+                            bytes = new byte[inputStream.available()];
+                            inputStream.read(bytes);
+                            String ruleContent = new String(bytes);
+
+                            if (!ruleContent.toLowerCase().contains(searchFileName.toLowerCase()) && !fileNameContain) {
+                                continue;
+                            }
+                        } catch (Exception ex) {
+                        }
+                    } else {
+                        // 搜索文件名
+                        if (!fileNameContain) {
+                            continue;
+                        }
                     }
                 }
+
                 if (name.toLowerCase().endsWith(FileType.ActionLibrary.toString())) {
                     file.setType(Type.action);
                 } else if (name.toLowerCase().endsWith(FileType.VariableLibrary.toString())) {
