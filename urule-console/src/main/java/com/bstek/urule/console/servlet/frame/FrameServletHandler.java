@@ -432,16 +432,22 @@ public class FrameServletHandler extends RenderPageServletHandler {
         String typesStr = req.getParameter("types");
         FileType[] types = null;
         if (StringUtils.isNotBlank(typesStr) && !typesStr.equals("all")) {
-            if (typesStr.equals("lib")) {
-                types = new FileType[]{FileType.VariableLibrary, FileType.ConstantLibrary, FileType.ParameterLibrary, FileType.ActionLibrary};
-            } else if (typesStr.equals("rule")) {
-                types = new FileType[]{FileType.Ruleset, FileType.UL, FileType.RulesetLib};
-            } else if (typesStr.equals("table")) {
-                types = new FileType[]{FileType.DecisionTable, FileType.ScriptDecisionTable, FileType.ComplexScorecard};
-            } else if (typesStr.equals("tree")) {
-                types = new FileType[]{FileType.DecisionTree};
-            } else if (typesStr.equals("flow")) {
-                types = new FileType[]{FileType.RuleFlow};
+            switch (typesStr) {
+                case "lib":
+                    types = new FileType[]{FileType.VariableLibrary, FileType.ConstantLibrary, FileType.ParameterLibrary, FileType.ActionLibrary};
+                    break;
+                case "rule":
+                    types = new FileType[]{FileType.Ruleset, FileType.UL, FileType.RulesetLib};
+                    break;
+                case "table":
+                    types = new FileType[]{FileType.DecisionTable, FileType.ScriptDecisionTable, FileType.ComplexScorecard};
+                    break;
+                case "tree":
+                    types = new FileType[]{FileType.DecisionTree};
+                    break;
+                case "flow":
+                    types = new FileType[]{FileType.RuleFlow};
+                    break;
             }
         }
         Repository repo = repositoryService.loadRepository(projectName, user, classify, types, searchFileName);

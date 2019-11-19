@@ -10935,6 +10935,8 @@
                         }), i.eventEmitter.emit(i.EXPAND_TREE_NODE, n), i.eventEmitter.emit(i.CLOSE_CREATE_FILE_DIALOG)
                     },
                     error: function (t) {
+                        A.eventEmitter.emit(A.HIDE_LOADING);
+
                         401 === t.status ? bootbox.alert("权限不足，不能进行此操作.") : t && t.responseText ? bootbox.alert("<span style='color: red'>服务端错误：" + t.responseText + "</span>") : bootbox.alert("<span style='color: red'>服务端出错</span>")
                     }
                 })
@@ -10975,6 +10977,8 @@
                             parentNodeData: e
                         }), i.eventEmitter.emit(i.CLOSE_NEW_PROJECT_DIALOG), A.eventEmitter.emit(A.HIDE_LOADING)
                     }, error: function (t) {
+                        A.eventEmitter.emit(A.HIDE_LOADING);
+
                         401 === t.status ? bootbox.alert("权限不足，不能进行此操作.") : t && t.responseText ? bootbox.alert("<span style='color: red'>服务端错误：" + t.responseText + "</span>") : bootbox.alert("<span style='color: red'>服务端出错</span>")
                     }
                 })
@@ -11000,6 +11004,8 @@
                         }), i.eventEmitter.emit(i.CLOSE_CREATE_FOLDER_DIALOG), A.eventEmitter.emit(A.HIDE_LOADING)
                     },
                     error: function (t) {
+                        A.eventEmitter.emit(A.HIDE_LOADING);
+
                         401 === t.status ? bootbox.alert("权限不足，不能进行此操作.") : t && t.responseText ? bootbox.alert("<span style='color: red'>服务端错误：" + t.responseText + "</span>") : bootbox.alert("<span style='color: red'>服务端出错</span>")
                     }
                 })
@@ -11036,19 +11042,31 @@
             return {index: t, type: c}
         }, e.update = function (t, e) {
             return {index: t, data: e, type: s}
-        }, e.loadData = function (t, e, n, o) {
+        }, e.loadData = function (t, e, n, searchFileName) {
             return null !== t && "undefined" !== t || (t = !0), function (r) {
                 var a = window._server + "/frame/loadProjects";
                 $.ajax({
                     url: a,
                     type: "POST",
-                    data: {classify: t, projectName: e, types: n, searchFileName: o},
+                    data: {classify: t, projectName: e, types: n, searchFileName: searchFileName},
                     success: function (t) {
                         var e = t.classify, n = t.repo, o = n.rootFile, a = n.projectNames;
                         i.eventEmitter.emit(i.CHANGE_CLASSIFY, e), a && a.length > 0 && i.eventEmitter.emit(i.PROJECT_LIST_CHANGE, a), p(o, 1), r({
                             data: o,
                             type: u
-                        }), A.eventEmitter.emit(A.HIDE_LOADING)
+                        }), A.eventEmitter.emit(A.HIDE_LOADING);
+
+                        // 控制所有节点显示
+                        var $span = $('#node-' + o.id).parent("li");
+                        if (searchFileName == null || searchFileName === '') {
+                            var $liChildren = $span.find('ul > li > ul > li');
+                            $liChildren.hide('fast');
+                            $span.find('ul > li').find('i:first').addClass('rf-plus').removeClass('rf-minus');
+                        } else {
+                            var $liChildren = $span.find('li');
+                            $liChildren.show('fast');
+                            $span.find('ul > li').find('i:first').addClass('rf-minus').removeClass('rf-plus');
+                        }
                     },
                     error: function (t) {
                         A.eventEmitter.emit(A.HIDE_LOADING), t && t.responseText ? bootbox.alert("<span style='color: red'>加载数据失败,服务端错误：" + t.responseText + "</span>") : bootbox.alert("<span style='color: red'>加载数据失败,服务端出错</span>")

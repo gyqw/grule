@@ -444,7 +444,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
 
         FileType[] libraryRuleTypes = types;
         if (types == null || types.length == 0) {
-            libraryRuleTypes = new FileType[]{FileType.Ruleset, FileType.UL};
+            libraryRuleTypes = new FileType[]{FileType.Ruleset, FileType.RulesetLib, FileType.UL};
         }
 
         FileType[] libraryDecisionTypes = types;
@@ -750,7 +750,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
     @Override
     public void saveFile(String path, String content, boolean newVersion, String versionComment, User user) throws Exception {
         path = Utils.decodeURL(path);
-        if (path.indexOf(RES_PACKGE_FILE) > -1) {
+        if (path.contains(RES_PACKGE_FILE)) {
             if (!permissionService.projectPackageHasWritePermission(path)) {
                 throw new NoPermissionException();
             }
