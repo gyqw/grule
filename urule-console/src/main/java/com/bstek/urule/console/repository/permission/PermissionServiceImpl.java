@@ -147,6 +147,12 @@ public class PermissionServiceImpl implements PermissionStore, PermissionService
                 } else {
                     return config.isWriteRuleFile();
                 }
+            case RulesetLib:
+                if (permissionType == 0) {
+                    return config.isReadRuleFile();
+                } else {
+                    return config.isWriteRuleFile();
+                }
             case ScriptDecisionTable:
                 if (permissionType == 0) {
                     return config.isReadDecisionTableFile();

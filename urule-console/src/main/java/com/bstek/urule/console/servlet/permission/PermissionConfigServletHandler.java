@@ -99,7 +99,7 @@ public class PermissionConfigServletHandler extends RenderPageServletHandler {
     private void buildProjectConfigs(List<RepositoryFile> projects, UserPermission p) {
         List<ProjectConfig> configs = p.getProjectConfigs();
         if (configs == null) {
-            configs = new ArrayList<ProjectConfig>();
+            configs = new ArrayList<>();
             p.setProjectConfigs(configs);
         }
         for (RepositoryFile project : projects) {
