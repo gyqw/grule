@@ -347,7 +347,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
                 }
             }
             String projectName = projectNode.getName();
-            if (projectName.indexOf(RESOURCE_SECURITY_CONFIG_FILE) > -1) {
+            if (projectName.contains(RESOURCE_SECURITY_CONFIG_FILE)) {
                 continue;
             }
             if (StringUtils.isNotBlank(project) && !project.equals(projectName)) {
@@ -397,7 +397,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         if (types == null || types.length == 0) {
             fileTypes = new FileType[]{FileType.VariableLibrary,
                     FileType.ParameterLibrary, FileType.ConstantLibrary,
-                    FileType.ActionLibrary, FileType.Ruleset,
+                    FileType.ActionLibrary, FileType.Ruleset, FileType.RulesetLib,
                     FileType.RuleFlow, FileType.DecisionTable,
                     FileType.DecisionTree, FileType.ScriptDecisionTable,
                     FileType.UL, FileType.Scorecard, FileType.ComplexScorecard};
@@ -444,7 +444,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
 
         FileType[] libraryRuleTypes = types;
         if (types == null || types.length == 0) {
-            libraryRuleTypes = new FileType[]{FileType.Ruleset, FileType.UL};
+            libraryRuleTypes = new FileType[]{FileType.Ruleset, FileType.RulesetLib, FileType.UL};
         }
 
         FileType[] libraryDecisionTypes = types;
@@ -491,7 +491,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
             RepositoryFile file = new RepositoryFile();
             file.setLibType(libType);
             String name = fileNode.getName();
-            if (name.toLowerCase().indexOf(RES_PACKGE_FILE) > -1 || name.toLowerCase().indexOf(CLIENT_CONFIG_FILE) > -1 || name.toLowerCase().indexOf(RESOURCE_SECURITY_CONFIG_FILE) > -1) {
+            if (name.toLowerCase().contains(RES_PACKGE_FILE) || name.toLowerCase().contains(CLIENT_CONFIG_FILE) || name.toLowerCase().contains(RESOURCE_SECURITY_CONFIG_FILE)) {
                 continue;
             }
             if (!fileNode.hasProperty(DIR_TAG)) {
@@ -542,15 +542,38 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
                 }
 
                 if (libType.equals(LibType.ruleset)) {
-                    if (!fileType.equals(FileType.Ruleset) && !fileType.equals(FileType.UL)) {
+                    if (!fileType.equals(FileType.Ruleset) && !fileType.equals(FileType.UL) && !fileType.equals(FileType.RulesetLib)) {
                         continue;
                     }
                 }
+
                 if (StringUtils.isNotBlank(searchFileName)) {
-                    if (name.toLowerCase().indexOf(searchFileName.toLowerCase()) == -1) {
-                        continue;
+                    boolean fileNameContain = name.toLowerCase().contains(searchFileName.toLowerCase());
+                    if (name.toLowerCase().endsWith(FileType.Ruleset.toString())) {
+                        // 搜索文件本身
+                        try {
+                            InputStream inputStream = null;
+                            inputStream = readFile(fileNode.getPath());
+
+
+                            byte[] bytes = new byte[0];
+                            bytes = new byte[inputStream.available()];
+                            inputStream.read(bytes);
+                            String ruleContent = new String(bytes);
+
+                            if (!ruleContent.toLowerCase().contains(searchFileName.toLowerCase()) && !fileNameContain) {
+                                continue;
+                            }
+                        } catch (Exception ex) {
+                        }
+                    } else {
+                        // 搜索文件名
+                        if (!fileNameContain) {
+                            continue;
+                        }
                     }
                 }
+
                 if (name.toLowerCase().endsWith(FileType.ActionLibrary.toString())) {
                     file.setType(Type.action);
                 } else if (name.toLowerCase().endsWith(FileType.VariableLibrary.toString())) {
@@ -558,6 +581,8 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
                 } else if (name.toLowerCase().endsWith(FileType.ConstantLibrary.toString())) {
                     file.setType(Type.constant);
                 } else if (name.toLowerCase().endsWith(FileType.Ruleset.toString())) {
+                    file.setType(Type.rule);
+                } else if (name.toLowerCase().endsWith(FileType.RulesetLib.toString())) {
                     file.setType(Type.rule);
                 } else if (name.toLowerCase().endsWith(FileType.DecisionTable.toString())) {
                     file.setType(Type.decisionTable);
@@ -725,7 +750,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
     @Override
     public void saveFile(String path, String content, boolean newVersion, String versionComment, User user) throws Exception {
         path = Utils.decodeURL(path);
-        if (path.indexOf(RES_PACKGE_FILE) > -1) {
+        if (path.contains(RES_PACKGE_FILE)) {
             if (!permissionService.projectPackageHasWritePermission(path)) {
                 throw new NoPermissionException();
             }

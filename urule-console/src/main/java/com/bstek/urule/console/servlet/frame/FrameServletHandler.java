@@ -15,24 +15,18 @@
  ******************************************************************************/
 package com.bstek.urule.console.servlet.frame;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.bstek.urule.Utils;
+import com.bstek.urule.console.EnvironmentUtils;
+import com.bstek.urule.console.User;
+import com.bstek.urule.console.repository.Repository;
+import com.bstek.urule.console.repository.RepositoryService;
+import com.bstek.urule.console.repository.model.FileType;
+import com.bstek.urule.console.repository.model.RepositoryFile;
+import com.bstek.urule.console.repository.model.Type;
+import com.bstek.urule.console.repository.model.VersionFile;
+import com.bstek.urule.console.servlet.RenderPageServletHandler;
+import com.bstek.urule.console.servlet.RequestContext;
+import com.bstek.urule.exception.RuleException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -45,18 +39,17 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-import com.bstek.urule.exception.RuleException;
-import com.bstek.urule.Utils;
-import com.bstek.urule.console.EnvironmentUtils;
-import com.bstek.urule.console.User;
-import com.bstek.urule.console.repository.Repository;
-import com.bstek.urule.console.repository.RepositoryService;
-import com.bstek.urule.console.repository.model.FileType;
-import com.bstek.urule.console.repository.model.RepositoryFile;
-import com.bstek.urule.console.repository.model.Type;
-import com.bstek.urule.console.repository.model.VersionFile;
-import com.bstek.urule.console.servlet.RenderPageServletHandler;
-import com.bstek.urule.console.servlet.RequestContext;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao
@@ -287,7 +280,7 @@ public class FrameServletHandler extends RenderPageServletHandler {
             newFileInfo.setType(Type.decisionTable);
         } else if (fileType.equals(FileType.ScriptDecisionTable)) {
             newFileInfo.setType(Type.scriptDecisionTable);
-        } else if (fileType.equals(FileType.Ruleset)) {
+        } else if (fileType.equals(FileType.Ruleset) || fileType.equals(FileType.RulesetLib)) {
             newFileInfo.setType(Type.rule);
         } else if (fileType.equals(FileType.UL)) {
             newFileInfo.setType(Type.ul);
@@ -439,16 +432,22 @@ public class FrameServletHandler extends RenderPageServletHandler {
         String typesStr = req.getParameter("types");
         FileType[] types = null;
         if (StringUtils.isNotBlank(typesStr) && !typesStr.equals("all")) {
-            if (typesStr.equals("lib")) {
-                types = new FileType[]{FileType.VariableLibrary, FileType.ConstantLibrary, FileType.ParameterLibrary, FileType.ActionLibrary};
-            } else if (typesStr.equals("rule")) {
-                types = new FileType[]{FileType.Ruleset, FileType.UL};
-            } else if (typesStr.equals("table")) {
-                types = new FileType[]{FileType.DecisionTable, FileType.ScriptDecisionTable, FileType.ComplexScorecard};
-            } else if (typesStr.equals("tree")) {
-                types = new FileType[]{FileType.DecisionTree};
-            } else if (typesStr.equals("flow")) {
-                types = new FileType[]{FileType.RuleFlow};
+            switch (typesStr) {
+                case "lib":
+                    types = new FileType[]{FileType.VariableLibrary, FileType.ConstantLibrary, FileType.ParameterLibrary, FileType.ActionLibrary};
+                    break;
+                case "rule":
+                    types = new FileType[]{FileType.Ruleset, FileType.UL, FileType.RulesetLib};
+                    break;
+                case "table":
+                    types = new FileType[]{FileType.DecisionTable, FileType.ScriptDecisionTable, FileType.ComplexScorecard};
+                    break;
+                case "tree":
+                    types = new FileType[]{FileType.DecisionTree};
+                    break;
+                case "flow":
+                    types = new FileType[]{FileType.RuleFlow};
+                    break;
             }
         }
         Repository repo = repositoryService.loadRepository(projectName, user, classify, types, searchFileName);
