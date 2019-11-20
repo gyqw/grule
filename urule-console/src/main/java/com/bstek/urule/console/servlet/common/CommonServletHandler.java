@@ -7,6 +7,8 @@ import com.bstek.urule.console.repository.Repository;
 import com.bstek.urule.console.repository.RepositoryResourceProvider;
 import com.bstek.urule.console.repository.RepositoryService;
 import com.bstek.urule.console.repository.model.FileType;
+import com.bstek.urule.console.repository.model.RepositoryFile;
+import com.bstek.urule.console.repository.model.Type;
 import com.bstek.urule.console.servlet.RenderPageServletHandler;
 import com.bstek.urule.console.servlet.RequestContext;
 import com.bstek.urule.dsl.RuleParserLexer;
@@ -16,6 +18,8 @@ import com.bstek.urule.model.flow.*;
 import com.bstek.urule.model.function.FunctionDescriptor;
 import com.bstek.urule.model.library.action.ActionLibrary;
 import com.bstek.urule.model.library.action.SpringBean;
+import com.bstek.urule.model.rule.Rule;
+import com.bstek.urule.model.rule.RuleSet;
 import com.bstek.urule.parse.deserializer.*;
 import com.bstek.urule.parse.flow.FlowDefinitionParser;
 import com.bstek.urule.runtime.BuiltInActionLibraryBuilder;
@@ -59,6 +63,56 @@ public class CommonServletHandler extends RenderPageServletHandler {
         } else {
             throw new ServletException("Unsupport this operation.");
         }
+    }
+
+    public void findRuleByKey(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        List<Rule> ruleList = new ArrayList<>();
+
+        String ruleKey = req.getParameter("ruleKey");
+        String projectName = req.getParameter("projectName");
+        User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
+        FileType[] types = new FileType[]{FileType.RulesetLib};
+
+        Repository repo = repositoryService.loadRepository(projectName, user, false, types, "");
+
+        List<RepositoryFile> repositoryFileList = fetchRsl(repo.getRootFile());
+        // 遍历文件
+        for (RepositoryFile repositoryFile : repositoryFileList) {
+            try {
+                InputStream inputStream = null;
+                inputStream = repositoryService.readFile(repositoryFile.getFullPath(), null);
+                Element element = parseXml(inputStream);
+
+                // 编译文件
+                RuleSetDeserializer ruleSetDeserializer = (RuleSetDeserializer) applicationContext.getBean(RuleSetDeserializer.BEAN_ID);
+                RuleSet ruleSet = ruleSetDeserializer.deserialize(element);
+                inputStream.close();
+
+                // 遍历规则
+                for (Rule rule : ruleSet.getRules()) {
+                    if (ruleKey.equals(rule.getName())) {
+                        ruleList.add(rule);
+                    }
+                }
+            } catch (Exception ex) {
+                throw new RuleException(ex);
+            }
+        }
+        writeObjectToJson(resp, ruleList);
+    }
+
+    private List<RepositoryFile> fetchRsl(RepositoryFile repositoryFile) {
+        List<RepositoryFile> repositoryFileList = new ArrayList<>();
+        // 判断文件类型
+        if (Type.rule == repositoryFile.getType()) {
+            repositoryFileList.add(repositoryFile);
+        } else if (repositoryFile.getChildren() != null) {
+            for (RepositoryFile repositoryFile1 : repositoryFile.getChildren()) {
+                repositoryFileList.addAll(fetchRsl(repositoryFile1));
+            }
+        }
+
+        return repositoryFileList;
     }
 
     public void saveFile(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

@@ -10935,6 +10935,8 @@
                         }), i.eventEmitter.emit(i.EXPAND_TREE_NODE, n), i.eventEmitter.emit(i.CLOSE_CREATE_FILE_DIALOG)
                     },
                     error: function (t) {
+                        A.eventEmitter.emit(A.HIDE_LOADING);
+
                         401 === t.status ? bootbox.alert("权限不足，不能进行此操作.") : t && t.responseText ? bootbox.alert("<span style='color: red'>服务端错误：" + t.responseText + "</span>") : bootbox.alert("<span style='color: red'>服务端出错</span>")
                     }
                 })
@@ -10975,6 +10977,8 @@
                             parentNodeData: e
                         }), i.eventEmitter.emit(i.CLOSE_NEW_PROJECT_DIALOG), A.eventEmitter.emit(A.HIDE_LOADING)
                     }, error: function (t) {
+                        A.eventEmitter.emit(A.HIDE_LOADING);
+
                         401 === t.status ? bootbox.alert("权限不足，不能进行此操作.") : t && t.responseText ? bootbox.alert("<span style='color: red'>服务端错误：" + t.responseText + "</span>") : bootbox.alert("<span style='color: red'>服务端出错</span>")
                     }
                 })
@@ -11000,6 +11004,8 @@
                         }), i.eventEmitter.emit(i.CLOSE_CREATE_FOLDER_DIALOG), A.eventEmitter.emit(A.HIDE_LOADING)
                     },
                     error: function (t) {
+                        A.eventEmitter.emit(A.HIDE_LOADING);
+
                         401 === t.status ? bootbox.alert("权限不足，不能进行此操作.") : t && t.responseText ? bootbox.alert("<span style='color: red'>服务端错误：" + t.responseText + "</span>") : bootbox.alert("<span style='color: red'>服务端出错</span>")
                     }
                 })
@@ -11036,19 +11042,31 @@
             return {index: t, type: c}
         }, e.update = function (t, e) {
             return {index: t, data: e, type: s}
-        }, e.loadData = function (t, e, n, o) {
+        }, e.loadData = function (t, e, n, searchFileName) {
             return null !== t && "undefined" !== t || (t = !0), function (r) {
                 var a = window._server + "/frame/loadProjects";
                 $.ajax({
                     url: a,
                     type: "POST",
-                    data: {classify: t, projectName: e, types: n, searchFileName: o},
+                    data: {classify: t, projectName: e, types: n, searchFileName: searchFileName},
                     success: function (t) {
                         var e = t.classify, n = t.repo, o = n.rootFile, a = n.projectNames;
                         i.eventEmitter.emit(i.CHANGE_CLASSIFY, e), a && a.length > 0 && i.eventEmitter.emit(i.PROJECT_LIST_CHANGE, a), p(o, 1), r({
                             data: o,
                             type: u
-                        }), A.eventEmitter.emit(A.HIDE_LOADING)
+                        }), A.eventEmitter.emit(A.HIDE_LOADING);
+
+                        // 控制所有节点显示
+                        var $span = $('#node-' + o.id).parent("li");
+                        if (searchFileName == null || searchFileName === '') {
+                            var $liChildren = $span.find('ul > li > ul > li');
+                            $liChildren.hide('fast');
+                            $span.find('ul > li').find('i:first').addClass('rf-plus').removeClass('rf-minus');
+                        } else {
+                            var $liChildren = $span.find('li');
+                            $liChildren.show('fast');
+                            $span.find('ul > li').find('i:first').addClass('rf-minus').removeClass('rf-plus');
+                        }
                     },
                     error: function (t) {
                         A.eventEmitter.emit(A.HIDE_LOADING), t && t.responseText ? bootbox.alert("<span style='color: red'>加载数据失败,服务端错误：" + t.responseText + "</span>") : bootbox.alert("<span style='color: red'>加载数据失败,服务端出错</span>")
@@ -11075,6 +11093,9 @@
                 case"rs.xml":
                     n = "向导式决策集";
                     break;
+                case 'rsl.xml':
+                    n = '向导式决策库';
+                    break;
                 case"ul":
                     n = "脚本式决策集";
                     break;
@@ -11092,6 +11113,7 @@
                     break;
                 case"sc":
                     n = "评分卡";
+                    break;
                 case"scc":
                     n = "复杂评分卡";
                     break;
@@ -11246,6 +11268,10 @@
                         name: "添加脚本式决策集", icon: r.default.frameStyle.getUlIcon(), click: function () {
                             i.eventEmitter.emit(i.OPEN_CREATE_FILE_DIALOG, {fileType: "ul", nodeData: t})
                         }
+                    }, {
+                        name: "添加向导式决策库", icon: r.default.frameStyle.getRuleIcon(), click: function () {
+                            i.eventEmitter.emit(i.OPEN_CREATE_FILE_DIALOG, {fileType: "rsl.xml", nodeData: t})
+                        }
                     }];
                     break;
                 case"decisionTableLib":
@@ -11366,6 +11392,10 @@
             }, {
                 name: "添加脚本式决策集", icon: r.default.frameStyle.getUlIcon(), click: function (t, e) {
                     i.eventEmitter.emit(i.OPEN_CREATE_FILE_DIALOG, {fileType: "ul", nodeData: t})
+                }
+            }, {
+                name: "添加向导式决策库", icon: r.default.frameStyle.getRuleIcon(), click: function (t, e) {
+                    i.eventEmitter.emit(i.OPEN_CREATE_FILE_DIALOG, {fileType: "rsl.xml", nodeData: t})
                 }
             }), o || (n.push(T()), o = !0)), e && "all" !== e && "decisionTableLib" !== e || (n.push.apply(n, [{
                 name: "添加决策表",
@@ -13230,16 +13260,7 @@
                             fontFamily: "Microsoft YaHei UI, Microsoft YaHei",
                             margin: "10px"
                         }
-                    }, A.default.createElement("h1", {style: {textAlign: "center"}}, "欢迎您使用URULE开源免费版本"), A.default.createElement("div", {style: {marginTop: "20px"}}, "您当前正在使用的是URULE开源免费版本，Github地址为：", A.default.createElement("a", {
-                        href: "https://github.com/youseries/urule",
-                        target: "_blank"
-                    }, "https://github.com/youseries/urule"), "。", A.default.createElement("div", {style: {marginTop: "10px"}}, "如果您需要更多功能，更完善的技术支持，可以选择", A.default.createElement("a", {
-                        href: "http://www.bstek.com/products/urule",
-                        target: "_blank"
-                    }, A.default.createElement("strong", null, "URULE PRO")), "版，点击", A.default.createElement("a", {
-                        href: "http://www.bstek.com/products/urule",
-                        target: "_blank"
-                    }, "此处"), "了解更多URULE PRO版信息")), A.default.createElement("table", {
+                    }, A.default.createElement("h1", {style: {textAlign: "center"}}, "欢迎使用决策系统"), A.default.createElement("table", {
                         className: "table table-bordered",
                         style: {marginTop: "20px"}
                     }, A.default.createElement("thead", null, A.default.createElement("tr", {
@@ -13250,102 +13271,30 @@
                             fontSize: "18px",
                             color: "#7b7a7a"
                         }
-                    }, A.default.createElement("td", {colSpan: "3"}, "URULE PRO版与开源版主要功能比较"))), A.default.createElement("tbody", null, A.default.createElement("tr", {
+                    }, A.default.createElement("td", {colSpan: "2"}, "主要功能"))), A.default.createElement("tbody", null, A.default.createElement("tr", {
                         style: {
                             fontSize: "14pt",
                             background: "#98908d",
                             color: "#fff"
                         }
-                    }, A.default.createElement("td", {style: {width: "200px"}}, "特性"), A.default.createElement("td", null, "URULE PRO版"), A.default.createElement("td", null, "URULE开源版")), A.default.createElement("tr", null, A.default.createElement("td", null, "向导式决策集"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
+                    }, A.default.createElement("td", null, "特性"), A.default.createElement("td", null, "当前版本")), A.default.createElement("tr", null, A.default.createElement("td", null, "向导式决策集"), A.default.createElement("td", null, A.default.createElement("i", {
                         className: "glyphicon glyphicon-ok",
                         style: {fontSize: "20px", color: "green"}
                     }))), A.default.createElement("tr", null, A.default.createElement("td", null, "脚本式决策集"), A.default.createElement("td", null, A.default.createElement("i", {
                         className: "glyphicon glyphicon-ok",
                         style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
                     }))), A.default.createElement("tr", null, A.default.createElement("td", null, "决策树"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
                         className: "glyphicon glyphicon-ok",
                         style: {fontSize: "20px", color: "green"}
                     }))), A.default.createElement("tr", null, A.default.createElement("td", null, "决策流"), A.default.createElement("td", null, A.default.createElement("i", {
                         className: "glyphicon glyphicon-ok",
                         style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
                     }))), A.default.createElement("tr", null, A.default.createElement("td", null, "决策表"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
                         className: "glyphicon glyphicon-ok",
                         style: {fontSize: "20px", color: "green"}
                     }))), A.default.createElement("tr", null, A.default.createElement("td", null, "交叉决策表"), A.default.createElement("td", null, A.default.createElement("i", {
                         className: "glyphicon glyphicon-ok",
                         style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "文件名、项目名重构"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "参数名、变量常量名重构"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "Excel决策表导入"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "规则集模版保存与加载"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "循环规则多循环单元支持"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "导入项目自动重命名功能"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "性能调优"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "更为完善的文件读写权限控制"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
-                    }))), A.default.createElement("tr", null, A.default.createElement("td", null, "技术支持"), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-ok",
-                        style: {fontSize: "20px", color: "green"}
-                    })), A.default.createElement("td", null, A.default.createElement("i", {
-                        className: "glyphicon glyphicon-remove",
-                        style: {fontSize: "20px", color: "red"}
                     }))))))
                 }
             }]), e

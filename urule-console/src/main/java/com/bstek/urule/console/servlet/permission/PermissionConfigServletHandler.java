@@ -56,8 +56,8 @@ public class PermissionConfigServletHandler extends RenderPageServletHandler {
         try {
             List<UserPermission> permissions = repositoryService.loadResourceSecurityConfigs(companyId);
             List<User> users = EnvironmentUtils.getEnvironmentProvider().getUsers();
-            if (users == null) users = new ArrayList<User>();
-            List<UserPermission> result = new ArrayList<UserPermission>();
+            if (users == null) users = new ArrayList<>();
+            List<UserPermission> result = new ArrayList<>();
             for (User user : users) {
                 if (user.isAdmin()) {
                     continue;
@@ -99,7 +99,7 @@ public class PermissionConfigServletHandler extends RenderPageServletHandler {
     private void buildProjectConfigs(List<RepositoryFile> projects, UserPermission p) {
         List<ProjectConfig> configs = p.getProjectConfigs();
         if (configs == null) {
-            configs = new ArrayList<ProjectConfig>();
+            configs = new ArrayList<>();
             p.setProjectConfigs(configs);
         }
         for (RepositoryFile project : projects) {
