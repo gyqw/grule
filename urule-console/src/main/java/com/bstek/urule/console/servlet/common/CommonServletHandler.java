@@ -120,6 +120,8 @@ public class CommonServletHandler extends RenderPageServletHandler {
         String content = req.getParameter("content");
         content = Utils.decodeContent(content);
         String versionComment = req.getParameter("versionComment");
+        String beforeComment = req.getParameter("beforeComment");
+        String afterComment = req.getParameter("afterComment");
         boolean newVersion = Boolean.parseBoolean(req.getParameter("newVersion"));
         User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
 
@@ -161,7 +163,7 @@ public class CommonServletHandler extends RenderPageServletHandler {
 
         // 保存文件
         try {
-            repositoryService.saveFile(file, content, newVersion, versionComment, user);
+            repositoryService.saveFile(file, content, newVersion, versionComment, beforeComment, afterComment, user);
         } catch (Exception ex) {
             throw new RuleException(ex);
         }

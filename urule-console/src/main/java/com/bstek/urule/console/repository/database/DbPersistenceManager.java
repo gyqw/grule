@@ -1,37 +1,6 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.repository.database;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.jcr.RepositoryException;
-import javax.sql.DataSource;
-
+import com.bstek.urule.console.repository.RepositoryBuilder;
 import org.apache.commons.io.IOUtils;
 import org.apache.jackrabbit.core.fs.FileSystem;
 import org.apache.jackrabbit.core.fs.FileSystemResource;
@@ -42,28 +11,26 @@ import org.apache.jackrabbit.core.persistence.PMContext;
 import org.apache.jackrabbit.core.persistence.bundle.AbstractBundlePersistenceManager;
 import org.apache.jackrabbit.core.persistence.pool.BundleDbPersistenceManager;
 import org.apache.jackrabbit.core.persistence.pool.DbNameIndex;
-import org.apache.jackrabbit.core.persistence.util.BLOBStore;
-import org.apache.jackrabbit.core.persistence.util.BundleBinding;
-import org.apache.jackrabbit.core.persistence.util.ErrorHandling;
-import org.apache.jackrabbit.core.persistence.util.FileSystemBLOBStore;
-import org.apache.jackrabbit.core.persistence.util.NodeInfo;
-import org.apache.jackrabbit.core.persistence.util.NodePropBundle;
-import org.apache.jackrabbit.core.persistence.util.Serializer;
+import org.apache.jackrabbit.core.persistence.util.*;
 import org.apache.jackrabbit.core.state.ChangeLog;
 import org.apache.jackrabbit.core.state.ItemStateException;
 import org.apache.jackrabbit.core.state.NoSuchItemStateException;
 import org.apache.jackrabbit.core.state.NodeReferences;
 import org.apache.jackrabbit.core.util.StringIndex;
-import org.apache.jackrabbit.core.util.db.CheckSchemaOperation;
-import org.apache.jackrabbit.core.util.db.ConnectionFactory;
-import org.apache.jackrabbit.core.util.db.ConnectionHelper;
-import org.apache.jackrabbit.core.util.db.DatabaseAware;
-import org.apache.jackrabbit.core.util.db.DbUtility;
-import org.apache.jackrabbit.core.util.db.StreamWrapper;
+import org.apache.jackrabbit.core.util.db.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bstek.urule.console.repository.RepositoryBuilder;
+import javax.jcr.RepositoryException;
+import javax.sql.DataSource;
+import java.io.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao

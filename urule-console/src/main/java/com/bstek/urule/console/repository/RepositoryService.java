@@ -1,29 +1,14 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.repository;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
 
 import com.bstek.urule.console.User;
 import com.bstek.urule.console.repository.model.FileType;
 import com.bstek.urule.console.repository.model.RepositoryFile;
 import com.bstek.urule.console.repository.model.VersionFile;
 import com.bstek.urule.console.servlet.permission.UserPermission;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
 
 /**
  * @author Jacky.gao
@@ -41,6 +26,20 @@ public interface RepositoryService extends RepositoryReader {
     void createFile(String path, String content, User user) throws Exception;
 
     void saveFile(String path, String content, boolean newVersion, String versionComment, User user) throws Exception;
+
+    /**
+     * 保存文件
+     *
+     * @param path           文件路径
+     * @param content        文件内容
+     * @param newVersion     新版本
+     * @param versionComment 版本描述
+     * @param beforeComment  变更前描述
+     * @param afterComment   变更后描述
+     * @param user           更新用户
+     * @throws Exception 异常
+     */
+    void saveFile(String path, String content, boolean newVersion, String versionComment, String beforeComment, String afterComment, User user) throws Exception;
 
     void deleteFile(String path, User user) throws Exception;
 

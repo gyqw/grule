@@ -45,6 +45,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -92,7 +93,7 @@ public class FrameServletHandler extends RenderPageServletHandler {
         String path = req.getParameter("path");
         path = Utils.decodeURL(path);
         InputStream inputStream = repositoryService.readFile(path, null);
-        String content = IOUtils.toString(inputStream, "utf-8");
+        String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         inputStream.close();
         String xml = null;
         try {

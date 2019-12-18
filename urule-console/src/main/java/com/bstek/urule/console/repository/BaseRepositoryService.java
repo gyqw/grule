@@ -1,38 +1,9 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.repository;
 
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.jcr.Binary;
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.Property;
-import javax.jcr.Session;
-import javax.jcr.SimpleCredentials;
-import javax.jcr.lock.LockManager;
-import javax.jcr.version.Version;
-import javax.jcr.version.VersionHistory;
-import javax.jcr.version.VersionIterator;
-import javax.jcr.version.VersionManager;
-
+import com.bstek.urule.console.DefaultRepositoryInteceptor;
+import com.bstek.urule.console.RepositoryInteceptor;
+import com.bstek.urule.console.repository.model.*;
+import com.bstek.urule.exception.RuleException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.core.RepositoryImpl;
@@ -43,14 +14,18 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.bstek.urule.exception.RuleException;
-import com.bstek.urule.console.DefaultRepositoryInteceptor;
-import com.bstek.urule.console.RepositoryInteceptor;
-import com.bstek.urule.console.repository.model.RepositoryFile;
-import com.bstek.urule.console.repository.model.ResourceItem;
-import com.bstek.urule.console.repository.model.ResourcePackage;
-import com.bstek.urule.console.repository.model.Type;
-import com.bstek.urule.console.repository.model.VersionFile;
+import javax.jcr.*;
+import javax.jcr.lock.LockManager;
+import javax.jcr.version.Version;
+import javax.jcr.version.VersionHistory;
+import javax.jcr.version.VersionIterator;
+import javax.jcr.version.VersionManager;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Jacky.gao
@@ -67,6 +42,8 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
     protected final String CRATE_USER = "_create_user";
     protected final String CRATE_DATE = "_create_date";
     protected final String VERSION_COMMENT = "_version_comment";
+    protected final String BEFORE_COMMENT = "_before_comment";
+    protected final String AFTER_COMMENT = "_after_comment";
     protected final String COMPANY_ID = "_company_id";
 
     protected RepositoryBuilder repositoryBuilder;
@@ -95,7 +72,7 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
                     }
                 }
             }
-            if (projectNode.getName().indexOf(RESOURCE_SECURITY_CONFIG_FILE) > -1) {
+            if (projectNode.getName().contains(RESOURCE_SECURITY_CONFIG_FILE)) {
                 continue;
             }
             RepositoryFile projectFile = new RepositoryFile();
@@ -117,12 +94,14 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
         List<VersionFile> files = new ArrayList<>();
         Node fileNode = rootNode.getNode(path);
         VersionHistory versionHistory = versionManager.getVersionHistory(fileNode.getPath());
+
         VersionIterator iterator = versionHistory.getAllVersions();
         while (iterator.hasNext()) {
             Version version = iterator.nextVersion();
             String versionName = version.getName();
             if (versionName.startsWith("jcr:")) {
-                continue; // skip root version
+                // skip root version
+                continue;
             }
             Node fnode = version.getFrozenNode();
             VersionFile file = new VersionFile();
@@ -135,6 +114,14 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
             if (fnode.hasProperty(VERSION_COMMENT)) {
                 prop = fnode.getProperty(VERSION_COMMENT);
                 file.setComment(prop.getString());
+            }
+            if (fnode.hasProperty(BEFORE_COMMENT)) {
+                prop = fnode.getProperty(BEFORE_COMMENT);
+                file.setBeforeComment(prop.getString());
+            }
+            if (fnode.hasProperty(AFTER_COMMENT)) {
+                prop = fnode.getProperty(AFTER_COMMENT);
+                file.setAfterComment(prop.getString());
             }
             files.add(file);
         }
@@ -196,7 +183,7 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
         Property property = fileNode.getProperty(DATA);
         Binary fileBinary = property.getBinary();
         InputStream inputStream = fileBinary.getStream();
-        String content = IOUtils.toString(inputStream, "utf-8");
+        String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         inputStream.close();
         Document document = DocumentHelper.parseText(content);
         Element rootElement = document.getRootElement();
