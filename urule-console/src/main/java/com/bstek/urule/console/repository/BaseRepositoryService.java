@@ -34,6 +34,7 @@ import java.util.List;
  */
 public abstract class BaseRepositoryService implements RepositoryReader, ApplicationContextAware {
     public static final String RES_PACKGE_FILE = "___res__package__file__";
+    public static final String PACKAGE_CONFIG_FILE = "___package_config__file__";
     public static final String CLIENT_CONFIG_FILE = "___client_config__file__";
     public static final String RESOURCE_SECURITY_CONFIG_FILE = "___resource_security_config__file__";
     protected final String DATA = "_data";
@@ -176,17 +177,21 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
 
     @Override
     public List<ResourcePackage> loadProjectResourcePackages(String project) throws Exception {
-        Node rootNode = getRootNode();
+        String[] projectArray = project.split(":");
+        String version = null;
+        if (projectArray.length > 1) {
+            project = projectArray[0];
+            version = projectArray[1];
+        }
+
         String filePath = processPath(project) + "/" + RES_PACKGE_FILE;
-        SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Node fileNode = rootNode.getNode(filePath);
-        Property property = fileNode.getProperty(DATA);
-        Binary fileBinary = property.getBinary();
-        InputStream inputStream = fileBinary.getStream();
+        InputStream inputStream = readFile(filePath, version);
         String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         inputStream.close();
+
         Document document = DocumentHelper.parseText(content);
         Element rootElement = document.getRootElement();
+        SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<ResourcePackage> packages = new ArrayList<>();
         for (Object obj : rootElement.elements()) {
             if (!(obj instanceof Element)) {

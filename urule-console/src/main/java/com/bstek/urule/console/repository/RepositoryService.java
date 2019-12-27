@@ -12,7 +12,8 @@ import java.util.List;
 
 /**
  * @author Jacky.gao
- * @since 2015年3月24日
+ * @author fred
+ * 2015年3月24日
  */
 public interface RepositoryService extends RepositoryReader {
     public static final String BEAN_ID = "urule.repositoryService";
@@ -64,6 +65,10 @@ public interface RepositoryService extends RepositoryReader {
     List<RepositoryFile> getDirectories(String project) throws Exception;
 
     List<ClientConfig> loadClientConfigs(String project) throws Exception;
+
+    PackageConfig loadPackageConfigs(String project) throws Exception;
+
+    void updatePackageConfigs(String project, PackageConfig packageConfig) throws Exception;
 
     List<UserPermission> loadResourceSecurityConfigs(String companyId) throws Exception;
 

@@ -32,4 +32,13 @@ public class ClientConfig {
     public void setProject(String project) {
         this.project = project;
     }
+
+    @Override
+    public String toString() {
+        return "ClientConfig{" +
+                "name='" + name + '\'' +
+                ", client='" + client + '\'' +
+                ", project='" + project + '\'' +
+                '}';
+    }
 }

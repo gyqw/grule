@@ -80,7 +80,6 @@ public class PackageServletHandler extends RenderPageServletHandler {
     public static final String EXPORT_EXCEL_TEST_DATA = "_export_excel_test_data";
 
     private RepositoryService repositoryService;
-    private ExternalRepository externalRepository;
     private KnowledgeBuilder knowledgeBuilder;
     private HttpSessionKnowledgeCache httpSessionKnowledgeCache;
 
@@ -103,6 +102,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
     public void loadPackages(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String project = req.getParameter("project");
+        project = project.replace(".rp", "");
         project = Utils.decodeURL(project);
         List<ResourcePackage> packages = repositoryService.loadProjectResourcePackages(project);
         writeObjectToJson(resp, packages);
@@ -427,7 +427,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
         project = Utils.decodeURL(project);
         String packageId = project + "/" + Utils.decodeURL(req.getParameter("packageId"));
         if (packageId.startsWith("/")) {
-            packageId = packageId.substring(1, packageId.length());
+            packageId = packageId.substring(1);
         }
         KnowledgePackage knowledgePackage = CacheUtils.getKnowledgeCache().getKnowledge(packageId);
 
@@ -559,12 +559,17 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
     public void saveResourcePackages(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String project = req.getParameter("project");
+        project = project.replace(".rp", "");
+        String versionComment = req.getParameter("versionComment");
+        String beforeComment = req.getParameter("beforeComment");
+        String afterComment = req.getParameter("afterComment");
+
         project = Utils.decodeURL(project);
         String path = project + "/" + RepositoryServiceImpl.RES_PACKGE_FILE;
         String xml = req.getParameter("xml");
         xml = Utils.decodeURL(xml);
         User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
-        repositoryService.saveFile(path, xml, false, null, user);
+        repositoryService.saveFile(path, xml, true, versionComment, beforeComment, afterComment, user);
     }
 
     @SuppressWarnings("unchecked")
@@ -574,29 +579,38 @@ public class PackageServletHandler extends RenderPageServletHandler {
             VariableCategory category = new VariableCategory();
             list.add(category);
             for (String key : map.keySet()) {
-                if (key.equals("name")) {
-                    category.setName((String) map.get(key));
-                } else if (key.equals("clazz")) {
-                    category.setClazz((String) map.get(key));
-                } else if (key.equals("variables")) {
-                    List<Map<String, Object>> variables = (List<Map<String, Object>>) map.get(key);
-                    if (variables != null) {
-                        for (Map<String, Object> m : variables) {
-                            Variable var = new Variable();
-                            category.addVariable(var);
-                            for (String varName : m.keySet()) {
-                                if (varName.equals("name")) {
-                                    var.setName((String) m.get(varName));
-                                } else if (varName.equals("label")) {
-                                    var.setLabel((String) m.get(varName));
-                                } else if (varName.equals("type")) {
-                                    var.setType(Datatype.valueOf((String) m.get(varName)));
-                                } else if (varName.equals("defaultValue")) {
-                                    var.setDefaultValue((String) m.get(varName));
+                switch (key) {
+                    case "name":
+                        category.setName((String) map.get(key));
+                        break;
+                    case "clazz":
+                        category.setClazz((String) map.get(key));
+                        break;
+                    case "variables":
+                        List<Map<String, Object>> variables = (List<Map<String, Object>>) map.get(key);
+                        if (variables != null) {
+                            for (Map<String, Object> m : variables) {
+                                Variable var = new Variable();
+                                category.addVariable(var);
+                                for (String varName : m.keySet()) {
+                                    switch (varName) {
+                                        case "name":
+                                            var.setName((String) m.get(varName));
+                                            break;
+                                        case "label":
+                                            var.setLabel((String) m.get(varName));
+                                            break;
+                                        case "type":
+                                            var.setType(Datatype.valueOf((String) m.get(varName)));
+                                            break;
+                                        case "defaultValue":
+                                            var.setDefaultValue((String) m.get(varName));
+                                            break;
+                                    }
                                 }
                             }
                         }
-                    }
+                        break;
                 }
             }
         }
@@ -1028,10 +1042,6 @@ public class PackageServletHandler extends RenderPageServletHandler {
     public void setHttpSessionKnowledgeCache(
             HttpSessionKnowledgeCache httpSessionKnowledgeCache) {
         this.httpSessionKnowledgeCache = httpSessionKnowledgeCache;
-    }
-
-    public void setExternalRepository(ExternalRepository externalRepository) {
-        this.externalRepository = externalRepository;
     }
 
     @Override

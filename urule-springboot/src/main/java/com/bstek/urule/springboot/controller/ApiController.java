@@ -26,7 +26,7 @@ public class ApiController {
     public void test() {
         try {
             KnowledgeService service = (KnowledgeService) Utils.getApplicationContext().getBean(KnowledgeService.BEAN_ID);
-            KnowledgePackage knowledgePackage = service.getKnowledge("geexRule/highPass");
+            KnowledgePackage knowledgePackage = service.getKnowledge("geexRule/test");
             KnowledgeSession session = KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
 
             OrderModel orderModel = new OrderModel();

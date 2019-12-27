@@ -3,6 +3,7 @@ package com.bstek.urule.console;
 import com.bstek.urule.builder.KnowledgeBase;
 import com.bstek.urule.builder.KnowledgeBuilder;
 import com.bstek.urule.builder.ResourceBase;
+import com.bstek.urule.console.repository.PackageConfig;
 import com.bstek.urule.console.repository.RepositoryService;
 import com.bstek.urule.console.repository.model.ResourceItem;
 import com.bstek.urule.console.repository.model.ResourcePackage;
@@ -26,6 +27,13 @@ public class DefaultKnowledgePackageService implements KnowledgePackageService {
             }
             String project = info[0];
             String packageId = info[1];
+
+            // 加载版本配置
+            PackageConfig packageConfig = this.repositoryService.loadPackageConfigs(project);
+            if (packageConfig.getVersion() != null) {
+                project += ":" + packageConfig.getVersion();
+            }
+
             List<ResourcePackage> packages = repositoryService.loadProjectResourcePackages(project);
             List<ResourceItem> list = null;
             for (ResourcePackage p : packages) {

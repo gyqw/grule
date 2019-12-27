@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.servlet.frame;
 
 import com.bstek.urule.Utils;
@@ -95,7 +80,7 @@ public class FrameServletHandler extends RenderPageServletHandler {
         InputStream inputStream = repositoryService.readFile(path, null);
         String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         inputStream.close();
-        String xml = null;
+        String xml;
         try {
             Document doc = DocumentHelper.parseText(content);
             OutputFormat format = OutputFormat.createPrettyPrint();
@@ -127,7 +112,7 @@ public class FrameServletHandler extends RenderPageServletHandler {
             String name = item.getFieldName();
             if (name.equals("overwriteProject")) {
                 String overwriteProjectStr = new String(item.get());
-                overwriteProject = Boolean.valueOf(overwriteProjectStr);
+                overwriteProject = Boolean.parseBoolean(overwriteProjectStr);
             } else if (name.equals("file")) {
                 inputStream = item.getInputStream();
             }
@@ -159,7 +144,7 @@ public class FrameServletHandler extends RenderPageServletHandler {
         oldFullPath = Utils.decodeURL(oldFullPath);
         try {
             InputStream inputStream = repositoryService.readFile(oldFullPath, null);
-            String content = IOUtils.toString(inputStream, "utf-8");
+            String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             inputStream.close();
             User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
             repositoryService.createFile(newFullPath, content, user);
@@ -346,7 +331,7 @@ public class FrameServletHandler extends RenderPageServletHandler {
         }
         projectName = Utils.decodeURL(projectName);
         projectName = projectName.trim();
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
         try {
             result.put("valid", !repositoryService.fileExistCheck(projectName));
             writeObjectToJson(resp, result);
@@ -362,7 +347,7 @@ public class FrameServletHandler extends RenderPageServletHandler {
         }
         fullFileName = Utils.decodeURL(fullFileName);
         fullFileName = fullFileName.trim();
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
         try {
             result.put("valid", !repositoryService.fileExistCheck(fullFileName));
             writeObjectToJson(resp, result);
@@ -406,7 +391,7 @@ public class FrameServletHandler extends RenderPageServletHandler {
         String projectName = projectPath.substring(1, projectPath.length());
         String filename = projectName + "-urule-repo-" + sd.format(new Date()) + ".bak";
         resp.setContentType("application/octet-stream");
-        resp.setHeader("Content-Disposition", "attachment; filename=\"" + new String(filename.getBytes("utf-8"), "iso-8859-1") + "\"");
+        resp.setHeader("Content-Disposition", "attachment; filename=\"" + new String(filename.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1) + "\"");
         resp.setHeader("content-type", "application/octet-stream");
         OutputStream outputStream = resp.getOutputStream();
         repositoryService.exportXml(projectPath, outputStream);
@@ -422,7 +407,6 @@ public class FrameServletHandler extends RenderPageServletHandler {
         RepositoryFile projectFileInfo = repositoryService.createProject(projectName, user, classify);
         writeObjectToJson(resp, projectFileInfo);
     }
-
 
     public void loadProjects(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
@@ -451,6 +435,7 @@ public class FrameServletHandler extends RenderPageServletHandler {
                     break;
             }
         }
+
         Repository repo = repositoryService.loadRepository(projectName, user, classify, types, searchFileName);
         Map<String, Object> map = new HashMap<>();
         map.put("repo", repo);
@@ -477,7 +462,7 @@ public class FrameServletHandler extends RenderPageServletHandler {
         }
         boolean classify = true;
         if (StringUtils.isNotBlank(classifyValue)) {
-            classify = Boolean.valueOf(classifyValue);
+            classify = Boolean.parseBoolean(classifyValue);
         }
         return classify;
     }
