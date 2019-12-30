@@ -1,21 +1,7 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.repository;
 
 import com.bstek.urule.Utils;
+import com.bstek.urule.console.DefaultUser;
 import com.bstek.urule.console.User;
 import com.bstek.urule.console.exception.NoPermissionException;
 import com.bstek.urule.console.repository.model.FileType;
@@ -46,6 +32,7 @@ import javax.jcr.nodetype.NodeType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -68,7 +55,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         Property property = fileNode.getProperty(DATA);
         Binary fileBinary = property.getBinary();
         InputStream inputStream = fileBinary.getStream();
-        String content = IOUtils.toString(inputStream, "utf-8");
+        String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         inputStream.close();
         Document document = DocumentHelper.parseText(content);
         Element rootElement = document.getRootElement();
@@ -138,7 +125,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
 
     private boolean parseBooleanValue(Element element, String attributeName) {
         if (element.attributeValue(attributeName) != null) {
-            return Boolean.valueOf(element.attributeValue(attributeName));
+            return Boolean.parseBoolean(element.attributeValue(attributeName));
         }
         return false;
     }
@@ -151,7 +138,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
             throw new RuleException("File [" + path + "] not exist.");
         } else {
             Node fileNode = rootNode.getNode(path);
-            Binary fileBinary = new BinaryImpl(content.getBytes("utf-8"));
+            Binary fileBinary = new BinaryImpl(content.getBytes(StandardCharsets.UTF_8));
             fileNode.setProperty("_data", fileBinary);
             fileNode.setProperty("_file", true);
             this.session.save();
@@ -185,7 +172,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
             fileNode = rootNode.getNode(path);
         }
 
-        List<RepositoryFile> files = new ArrayList();
+        List<RepositoryFile> files = new ArrayList<>();
         NodeIterator nodeIterator = fileNode.getNodes();
 
         while (nodeIterator.hasNext()) {
@@ -203,7 +190,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
     }
 
     private List<RepositoryFile> loadTemplateFiles(Node categoryNode) throws Exception {
-        List<RepositoryFile> list = new ArrayList();
+        List<RepositoryFile> list = new ArrayList<>();
         NodeIterator nodeIterator = categoryNode.getNodes();
 
         while (nodeIterator.hasNext()) {
@@ -224,20 +211,19 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         return list;
     }
 
-
     @Override
     public List<ClientConfig> loadClientConfigs(String project) throws Exception {
         if (!permissionService.isAdmin()) {
             throw new NoPermissionException();
         }
-        List<ClientConfig> clients = new ArrayList<ClientConfig>();
+        List<ClientConfig> clients = new ArrayList<>();
         Node rootNode = getRootNode();
         String filePath = processPath(project) + "/" + CLIENT_CONFIG_FILE;
         Node fileNode = rootNode.getNode(filePath);
         Property property = fileNode.getProperty(DATA);
         Binary fileBinary = property.getBinary();
         InputStream inputStream = fileBinary.getStream();
-        String content = IOUtils.toString(inputStream, "utf-8");
+        String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         inputStream.close();
         Document document = DocumentHelper.parseText(content);
         Element rootElement = document.getRootElement();
@@ -256,6 +242,58 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
             clients.add(client);
         }
         return clients;
+    }
+
+    @Override
+    public PackageConfig loadPackageConfigs(String project) throws Exception {
+        Node rootNode = getRootNode();
+        String filePath = processPath(project) + "/" + PACKAGE_CONFIG_FILE;
+
+        // 判断文件是否存在
+        if (!fileExist(filePath)) {
+            DefaultUser defaultUser = new DefaultUser();
+            defaultUser.setUsername("system");
+            defaultUser.setAdmin(true);
+            createPackageConfigFile(project, defaultUser);
+        }
+
+        Node fileNode = rootNode.getNode(filePath);
+        Property property = fileNode.getProperty(DATA);
+        Binary fileBinary = property.getBinary();
+        InputStream inputStream = fileBinary.getStream();
+        String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        inputStream.close();
+
+        Document document = DocumentHelper.parseText(content);
+        Element rootElement = document.getRootElement();
+
+        PackageConfig packageConfig = new PackageConfig();
+        packageConfig.setVersion(rootElement.attributeValue("version"));
+        packageConfig.setLock(Boolean.parseBoolean(rootElement.attributeValue("lock")));
+        return packageConfig;
+    }
+
+    @Override
+    public void updatePackageConfigs(String project, PackageConfig packageConfig) throws Exception {
+        Node rootNode = getRootNode();
+        String filePath = processPath(project) + "/" + PACKAGE_CONFIG_FILE;
+
+        Node fileNode = rootNode.getNode(filePath);
+        Property property = fileNode.getProperty(DATA);
+        Binary fileBinary = property.getBinary();
+        InputStream inputStream = fileBinary.getStream();
+        String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        inputStream.close();
+
+        Document document = DocumentHelper.parseText(content);
+        Element rootElement = document.getRootElement();
+        rootElement.setAttributeValue("version", packageConfig.getVersion());
+        rootElement.setAttributeValue("lock", packageConfig.getLock().toString());
+
+        DefaultUser defaultUser = new DefaultUser();
+        defaultUser.setUsername("system");
+        defaultUser.setAdmin(true);
+        saveFile(filePath, document.asXML(), false, null, defaultUser);
     }
 
     @Override
@@ -376,9 +414,9 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         resDir.setName("资源");
         if ((types == null || types.length == 0) && permissionService.projectPackageHasReadPermission(projectNode.getPath())) {
             RepositoryFile packageFile = new RepositoryFile();
-            packageFile.setName("知识包");
+            packageFile.setName("知识包.rp");
             packageFile.setType(Type.resourcePackage);
-            packageFile.setFullPath(projectFile.getFullPath());
+            packageFile.setFullPath(projectFile.getFullPath() + "/" + RES_PACKGE_FILE);
             projectFile.addChild(packageFile, false);
         }
         if (classify) {
@@ -491,7 +529,10 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
             RepositoryFile file = new RepositoryFile();
             file.setLibType(libType);
             String name = fileNode.getName();
-            if (name.toLowerCase().contains(RES_PACKGE_FILE) || name.toLowerCase().contains(CLIENT_CONFIG_FILE) || name.toLowerCase().contains(RESOURCE_SECURITY_CONFIG_FILE)) {
+            if (name.toLowerCase().contains(RES_PACKGE_FILE)
+                    || name.toLowerCase().contains(PACKAGE_CONFIG_FILE)
+                    || name.toLowerCase().contains(CLIENT_CONFIG_FILE)
+                    || name.toLowerCase().contains(RESOURCE_SECURITY_CONFIG_FILE)) {
                 continue;
             }
             if (!fileNode.hasProperty(DIR_TAG)) {
@@ -749,6 +790,11 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
 
     @Override
     public void saveFile(String path, String content, boolean newVersion, String versionComment, User user) throws Exception {
+        saveFile(path, content, newVersion, versionComment, null, null, user);
+    }
+
+    @Override
+    public void saveFile(String path, String content, boolean newVersion, String versionComment, String beforeComment, String afterComment, User user) throws Exception {
         path = Utils.decodeURL(path);
         if (path.contains(RES_PACKGE_FILE)) {
             if (!permissionService.projectPackageHasWritePermission(path)) {
@@ -772,7 +818,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         Node fileNode = rootNode.getNode(path);
         lockCheck(fileNode, user);
         versionManager.checkout(fileNode.getPath());
-        Binary fileBinary = new BinaryImpl(content.getBytes("utf-8"));
+        Binary fileBinary = new BinaryImpl(content.getBytes(StandardCharsets.UTF_8));
         fileNode.setProperty(DATA, fileBinary);
         fileNode.setProperty(FILE, true);
         fileNode.setProperty(CRATE_USER, user.getUsername());
@@ -782,6 +828,12 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         fileNode.setProperty(CRATE_DATE, dateValue);
         if (newVersion && StringUtils.isNotBlank(versionComment)) {
             fileNode.setProperty(VERSION_COMMENT, versionComment);
+            if (StringUtils.isNotBlank(beforeComment)) {
+                fileNode.setProperty(BEFORE_COMMENT, beforeComment);
+            }
+            if (StringUtils.isNotBlank(afterComment)) {
+                fileNode.setProperty(AFTER_COMMENT, afterComment);
+            }
         }
         session.save();
         if (newVersion) {
@@ -797,7 +849,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         for (String nodePath : files) {
             InputStream inputStream = readFile(nodePath, null);
             try {
-                String content = IOUtils.toString(inputStream, "UTF-8");
+                String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
                 inputStream.close();
                 boolean containPath = content.contains(path);
                 boolean containText = content.contains(searchText);
@@ -813,7 +865,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
 
     private List<String> getFiles(Node rootNode, String path) throws Exception {
         String project = getProjects(path);
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         Node projectNode = rootNode.getNode(project);
         buildPath(list, projectNode);
         return list;
@@ -884,9 +936,9 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         projectNode.setProperty(CRATE_DATE, dateValue);
         session.save();
         createResourcePackageFile(projectName, user);
+        createPackageConfigFile(projectName, user);
         createClientConfigFile(projectName, user);
-        RepositoryFile projectFileInfo = buildProjectFile(projectNode, null, classify, null);
-        return projectFileInfo;
+        return buildProjectFile(projectNode, null, classify, null);
     }
 
     @Override
@@ -993,6 +1045,14 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         Node rootNode = getRootNode();
         if (!rootNode.hasNode(filePath)) {
             createFile(filePath, "<?xml version=\"1.0\" encoding=\"utf-8\"?><res-packages></res-packages>", user);
+        }
+    }
+
+    private void createPackageConfigFile(String project, User user) throws Exception {
+        String filePath = processPath(project) + "/" + PACKAGE_CONFIG_FILE;
+        Node rootNode = getRootNode();
+        if (!rootNode.hasNode(filePath)) {
+            createFile(filePath, "<?xml version=\"1.0\" encoding=\"utf-8\"?><package-config></package-config>", user);
         }
     }
 

@@ -1,8 +1,11 @@
 package com.bstek.urule.console.servlet.common;
 
+import com.alibaba.fastjson.JSON;
 import com.bstek.urule.Utils;
 import com.bstek.urule.console.EnvironmentUtils;
+import com.bstek.urule.console.ExternalProcessService;
 import com.bstek.urule.console.User;
+import com.bstek.urule.console.repository.PackageConfig;
 import com.bstek.urule.console.repository.Repository;
 import com.bstek.urule.console.repository.RepositoryResourceProvider;
 import com.bstek.urule.console.repository.RepositoryService;
@@ -30,19 +33,20 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Jacky.gao
@@ -50,6 +54,8 @@ import java.util.List;
  * 2016年7月25日
  */
 public class CommonServletHandler extends RenderPageServletHandler {
+    private Logger logger = LoggerFactory.getLogger(CommonServletHandler.class);
+
     private RepositoryService repositoryService;
     private BuiltInActionLibraryBuilder builtInActionLibraryBuilder;
     private List<Deserializer<?>> deserializers = new ArrayList<>();
@@ -120,6 +126,8 @@ public class CommonServletHandler extends RenderPageServletHandler {
         String content = req.getParameter("content");
         content = Utils.decodeContent(content);
         String versionComment = req.getParameter("versionComment");
+        String beforeComment = req.getParameter("beforeComment");
+        String afterComment = req.getParameter("afterComment");
         boolean newVersion = Boolean.parseBoolean(req.getParameter("newVersion"));
         User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
 
@@ -161,7 +169,7 @@ public class CommonServletHandler extends RenderPageServletHandler {
 
         // 保存文件
         try {
-            repositoryService.saveFile(file, content, newVersion, versionComment, user);
+            repositoryService.saveFile(file, content, newVersion, versionComment, beforeComment, afterComment, user);
         } catch (Exception ex) {
             throw new RuleException(ex);
         }
@@ -381,6 +389,62 @@ public class CommonServletHandler extends RenderPageServletHandler {
             }
         }
         writeObjectToJson(resp, result);
+    }
+
+    public void updateFileInUseVersion(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            try (BufferedReader reader = req.getReader()) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line).append('\n');
+                }
+            }
+            logger.info("updateFileInUseVersion params: " + sb.toString());
+
+            Map<String, Object> map = (Map<String, Object>) JSON.parse(sb.toString());
+            Map<String, String> params = (Map<String, String>) map.get("params");
+            String project = params.get("projectName");
+            String version = params.get("versionCode");
+
+            // 加载知识包版本配置
+            PackageConfig packageConfig = this.repositoryService.loadPackageConfigs(project);
+            // 更新配置
+            packageConfig.setVersion(version);
+            packageConfig.setLock(false);
+            this.repositoryService.updatePackageConfigs(project, packageConfig);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("status", true);
+            writeObjectToJson(resp, result);
+        } catch (Exception e) {
+            logger.error("updateFileInUseVersion error", e);
+        }
+    }
+
+    public void startApprovalProcess(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            Map<String, Object> result = new HashMap<>();
+            String project = req.getParameter("project");
+            project = project.replace(".rp", "");
+            String version = req.getParameter("version");
+
+            // 加载知识包版本配置
+            PackageConfig packageConfig = this.repositoryService.loadPackageConfigs(project);
+            if (!packageConfig.getLock()) {
+                packageConfig.setLock(true);
+                this.repositoryService.updatePackageConfigs(project, packageConfig);
+                String processId = applicationContext.getBean(ExternalProcessService.class).start(project, version);
+                result.put("processId", processId);
+                result.put("status", true);
+            } else {
+                result.put("status", false);
+            }
+
+            writeObjectToJson(resp, result);
+        } catch (Exception e) {
+            logger.error("startApprovalProcess error", e);
+        }
     }
 
     protected Element parseXml(InputStream stream) {
