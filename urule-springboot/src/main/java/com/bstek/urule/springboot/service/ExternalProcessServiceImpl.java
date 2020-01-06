@@ -1,6 +1,8 @@
 package com.bstek.urule.springboot.service;
 
 import com.bstek.urule.console.ExternalProcessService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -9,8 +11,11 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ExternalProcessServiceImpl implements ExternalProcessService {
+    private Logger logger = LoggerFactory.getLogger(ExternalProcessServiceImpl.class);
+
     @Override
-    public String start(String project, String version) {
+    public String start(String project, String version, String explain) {
+        logger.info(explain);
         return "processId01";
     }
 }

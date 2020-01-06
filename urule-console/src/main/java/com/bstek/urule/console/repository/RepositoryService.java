@@ -56,6 +56,8 @@ public interface RepositoryService extends RepositoryReader {
 
     InputStream readFile(String path, String version) throws Exception;
 
+    VersionFile loadFileProperty(String path, String version) throws Exception;
+
     List<VersionFile> getVersionFiles(String path) throws Exception;
 
     void exportXml(String projectPath, OutputStream outputStream) throws Exception;

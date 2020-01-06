@@ -12,6 +12,7 @@ import com.bstek.urule.console.repository.RepositoryService;
 import com.bstek.urule.console.repository.model.FileType;
 import com.bstek.urule.console.repository.model.RepositoryFile;
 import com.bstek.urule.console.repository.model.Type;
+import com.bstek.urule.console.repository.model.VersionFile;
 import com.bstek.urule.console.servlet.RenderPageServletHandler;
 import com.bstek.urule.console.servlet.RequestContext;
 import com.bstek.urule.dsl.RuleParserLexer;
@@ -47,6 +48,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static com.bstek.urule.console.repository.BaseRepositoryService.RES_PACKGE_FILE;
 
 /**
  * @author Jacky.gao
@@ -425,20 +428,34 @@ public class CommonServletHandler extends RenderPageServletHandler {
     public void startApprovalProcess(HttpServletRequest req, HttpServletResponse resp) {
         try {
             Map<String, Object> result = new HashMap<>();
+            result.put("status", false);
+
             String project = req.getParameter("project");
             project = project.replace(".rp", "");
             String version = req.getParameter("version");
 
+            // 获取文件信息
+            VersionFile versionFile = this.repositoryService.loadFileProperty(project + "/" + RES_PACKGE_FILE, version);
+            String explain = "描述：\n"
+                    + versionFile.getComment() + "\n\n"
+                    + "修改前：\n"
+                    + versionFile.getBeforeComment() + "\n\n"
+                    + "修改后：\n"
+                    + versionFile.getAfterComment();
+
             // 加载知识包版本配置
             PackageConfig packageConfig = this.repositoryService.loadPackageConfigs(project);
             if (!packageConfig.getLock()) {
-                packageConfig.setLock(true);
-                this.repositoryService.updatePackageConfigs(project, packageConfig);
-                String processId = applicationContext.getBean(ExternalProcessService.class).start(project, version);
-                result.put("processId", processId);
-                result.put("status", true);
-            } else {
-                result.put("status", false);
+                try {
+                    packageConfig.setLock(true);
+                    this.repositoryService.updatePackageConfigs(project, packageConfig);
+                    String processId = applicationContext.getBean(ExternalProcessService.class).start(project, version, explain);
+
+                    result.put("processId", processId);
+                    result.put("status", true);
+                } catch (Exception e) {
+                    logger.error("start error", e);
+                }
             }
 
             writeObjectToJson(resp, result);

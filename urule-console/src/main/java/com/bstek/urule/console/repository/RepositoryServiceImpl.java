@@ -4,10 +4,7 @@ import com.bstek.urule.Utils;
 import com.bstek.urule.console.DefaultUser;
 import com.bstek.urule.console.User;
 import com.bstek.urule.console.exception.NoPermissionException;
-import com.bstek.urule.console.repository.model.FileType;
-import com.bstek.urule.console.repository.model.LibType;
-import com.bstek.urule.console.repository.model.RepositoryFile;
-import com.bstek.urule.console.repository.model.Type;
+import com.bstek.urule.console.repository.model.*;
 import com.bstek.urule.console.repository.permission.PermissionService;
 import com.bstek.urule.console.repository.refactor.RefactorService;
 import com.bstek.urule.console.repository.refactor.RefactorServiceImpl;
@@ -29,6 +26,8 @@ import org.springframework.context.ApplicationContextAware;
 import javax.jcr.*;
 import javax.jcr.lock.Lock;
 import javax.jcr.nodetype.NodeType;
+import javax.jcr.version.Version;
+import javax.jcr.version.VersionHistory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -861,6 +860,36 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
             }
         }
         return referenceFiles;
+    }
+
+    @Override
+    public VersionFile loadFileProperty(String path, String version) throws Exception {
+        path = processPath(path);
+        Node rootNode = getRootNode();
+        if (!rootNode.hasNode(path)) {
+            throw new RuleException("File [" + path + "] not exist.");
+        }
+        Node fileNode = rootNode.getNode(path);
+        VersionHistory versionHistory = versionManager.getVersionHistory(fileNode.getPath());
+        Version v = versionHistory.getVersion(version);
+        Node fnode = v.getFrozenNode();
+
+        VersionFile file = new VersionFile();
+        Property prop;
+        if (fnode.hasProperty(VERSION_COMMENT)) {
+            prop = fnode.getProperty(VERSION_COMMENT);
+            file.setComment(prop.getString());
+        }
+        if (fnode.hasProperty(BEFORE_COMMENT)) {
+            prop = fnode.getProperty(BEFORE_COMMENT);
+            file.setBeforeComment(prop.getString());
+        }
+        if (fnode.hasProperty(AFTER_COMMENT)) {
+            prop = fnode.getProperty(AFTER_COMMENT);
+            file.setAfterComment(prop.getString());
+        }
+
+        return file;
     }
 
     private List<String> getFiles(Node rootNode, String path) throws Exception {
