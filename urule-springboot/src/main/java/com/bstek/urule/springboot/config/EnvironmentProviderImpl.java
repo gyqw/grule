@@ -20,7 +20,7 @@ public class EnvironmentProviderImpl implements EnvironmentProvider {
         DefaultUser user = new DefaultUser();
         user.setUsername("user1");
         user.setCompanyId("bstek");
-        user.setAdmin(false);
+        user.setAdmin(true);
         return user;
     }
 

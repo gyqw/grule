@@ -12,8 +12,8 @@ import com.bstek.urule.console.EnvironmentUtils;
 import com.bstek.urule.console.User;
 import com.bstek.urule.console.repository.ClientConfig;
 import com.bstek.urule.console.repository.ExternalRepository;
+import com.bstek.urule.console.repository.PackageConfig;
 import com.bstek.urule.console.repository.RepositoryService;
-import com.bstek.urule.console.repository.RepositoryServiceImpl;
 import com.bstek.urule.console.repository.model.ResourcePackage;
 import com.bstek.urule.console.servlet.RenderPageServletHandler;
 import com.bstek.urule.console.servlet.RequestContext;
@@ -66,6 +66,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
 
+import static com.bstek.urule.console.repository.BaseRepositoryService.RES_PACKGE_FILE;
+
 /**
  * @author Jacky.gao
  * @author fred
@@ -106,6 +108,15 @@ public class PackageServletHandler extends RenderPageServletHandler {
         project = Utils.decodeURL(project);
         List<ResourcePackage> packages = repositoryService.loadProjectResourcePackages(project);
         writeObjectToJson(resp, packages);
+    }
+
+    public void loadPackageConfig(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        String project = req.getParameter("project");
+        project = project.split(":")[0];
+        project = project.replace(".rp", "");
+        project = Utils.decodeURL(project);
+        PackageConfig packageConfig = repositoryService.loadPackageConfigs(project);
+        writeObjectToJson(resp, packageConfig);
     }
 
     @SuppressWarnings("unchecked")
@@ -559,13 +570,14 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
     public void saveResourcePackages(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String project = req.getParameter("project");
+        project = project.split(":")[0];
         project = project.replace(".rp", "");
         String versionComment = req.getParameter("versionComment");
         String beforeComment = req.getParameter("beforeComment");
         String afterComment = req.getParameter("afterComment");
 
         project = Utils.decodeURL(project);
-        String path = project + "/" + RepositoryServiceImpl.RES_PACKGE_FILE;
+        String path = project + "/" + RES_PACKGE_FILE;
         String xml = req.getParameter("xml");
         xml = Utils.decodeURL(xml);
         User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));

@@ -56,8 +56,23 @@ public interface RepositoryService extends RepositoryReader {
 
     InputStream readFile(String path, String version) throws Exception;
 
+    /**
+     * 加载文件配置
+     *
+     * @param path    文件路径
+     * @param version 版本
+     * @return 文件配置信息
+     * @throws Exception 异常
+     */
     VersionFile loadFileProperty(String path, String version) throws Exception;
 
+    /**
+     * 获取文件版本信息
+     *
+     * @param path 文件路径
+     * @return 文件版本列表
+     * @throws Exception 异常
+     */
     List<VersionFile> getVersionFiles(String path) throws Exception;
 
     void exportXml(String projectPath, OutputStream outputStream) throws Exception;

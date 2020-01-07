@@ -414,10 +414,17 @@ public class CommonServletHandler extends RenderPageServletHandler {
             // 加载知识包版本配置
             PackageConfig packageConfig = this.repositoryService.loadPackageConfigs(project);
             // 更新配置
+            Integer auditStatus = 0;
             if (status == 4) {
                 packageConfig.setVersion(version);
+                auditStatus = 1;
             }
             packageConfig.setLock(false);
+            // 更新审批状态
+            if (packageConfig.getAuditStatusMap() == null) {
+                packageConfig.setAuditStatusMap(new HashMap<>());
+            }
+            packageConfig.getAuditStatusMap().put(version, auditStatus);
             this.repositoryService.updatePackageConfigs(project, packageConfig);
 
             Map<String, Object> result = new HashMap<>();
@@ -451,6 +458,7 @@ public class CommonServletHandler extends RenderPageServletHandler {
             if (!packageConfig.getLock()) {
                 try {
                     packageConfig.setLock(true);
+                    packageConfig.getAuditStatusMap().put(version, 2);
                     this.repositoryService.updatePackageConfigs(project, packageConfig);
                     String processId = applicationContext.getBean(ExternalProcessService.class).start(project, version, explain);
 
@@ -459,6 +467,8 @@ public class CommonServletHandler extends RenderPageServletHandler {
                 } catch (Exception e) {
                     logger.error("start error", e);
                 }
+            } else {
+                result.put("message", "有审批中的流程，请完成后再发起");
             }
 
             writeObjectToJson(resp, result);

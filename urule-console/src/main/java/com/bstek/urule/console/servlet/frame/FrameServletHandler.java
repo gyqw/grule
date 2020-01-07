@@ -3,6 +3,7 @@ package com.bstek.urule.console.servlet.frame;
 import com.bstek.urule.Utils;
 import com.bstek.urule.console.EnvironmentUtils;
 import com.bstek.urule.console.User;
+import com.bstek.urule.console.repository.PackageConfig;
 import com.bstek.urule.console.repository.Repository;
 import com.bstek.urule.console.repository.RepositoryService;
 import com.bstek.urule.console.repository.model.FileType;
@@ -73,8 +74,25 @@ public class FrameServletHandler extends RenderPageServletHandler {
 
     public void fileVersions(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String path = req.getParameter("path");
+        String project = req.getParameter("project");
+
         path = Utils.decodeURL(path);
         List<VersionFile> files = repositoryService.getVersionFiles(path);
+
+        // 获取审批状态
+        if (StringUtils.isNotBlank(project)) {
+            PackageConfig packageConfig = this.repositoryService.loadPackageConfigs(project);
+            Map<String, Integer> auditMap = packageConfig.getAuditStatusMap();
+
+            if (auditMap != null) {
+                for (VersionFile versionFile : files) {
+                    if (auditMap.get(versionFile.getName()) != null) {
+                        versionFile.setAuditStatus(auditMap.get(versionFile.getName()).toString());
+                    }
+                }
+            }
+        }
+
         writeObjectToJson(resp, files);
     }
 

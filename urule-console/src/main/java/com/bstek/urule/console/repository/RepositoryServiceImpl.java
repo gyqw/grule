@@ -1,5 +1,6 @@
 package com.bstek.urule.console.repository;
 
+import com.alibaba.fastjson.JSON;
 import com.bstek.urule.Utils;
 import com.bstek.urule.console.DefaultUser;
 import com.bstek.urule.console.User;
@@ -32,10 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Jacky.gao
@@ -269,6 +267,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         PackageConfig packageConfig = new PackageConfig();
         packageConfig.setVersion(rootElement.attributeValue("version"));
         packageConfig.setLock(Boolean.parseBoolean(rootElement.attributeValue("lock")));
+        packageConfig.setAuditStatusMap((Map<String, Integer>) JSON.parse(rootElement.attributeValue("audit")));
         return packageConfig;
     }
 
@@ -288,6 +287,7 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         Element rootElement = document.getRootElement();
         rootElement.setAttributeValue("version", packageConfig.getVersion());
         rootElement.setAttributeValue("lock", packageConfig.getLock().toString());
+        rootElement.setAttributeValue("audit", JSON.toJSON(packageConfig.getAuditStatusMap()).toString());
 
         DefaultUser defaultUser = new DefaultUser();
         defaultUser.setUsername("system");
@@ -827,12 +827,8 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         fileNode.setProperty(CRATE_DATE, dateValue);
         if (newVersion && StringUtils.isNotBlank(versionComment)) {
             fileNode.setProperty(VERSION_COMMENT, versionComment);
-            if (StringUtils.isNotBlank(beforeComment)) {
-                fileNode.setProperty(BEFORE_COMMENT, beforeComment);
-            }
-            if (StringUtils.isNotBlank(afterComment)) {
-                fileNode.setProperty(AFTER_COMMENT, afterComment);
-            }
+            fileNode.setProperty(BEFORE_COMMENT, beforeComment);
+            fileNode.setProperty(AFTER_COMMENT, afterComment);
         }
         session.save();
         if (newVersion) {

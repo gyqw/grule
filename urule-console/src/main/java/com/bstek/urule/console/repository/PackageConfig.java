@@ -1,5 +1,8 @@
 package com.bstek.urule.console.repository;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author fred
  * 2019-12-27 5:31 PM
@@ -7,6 +10,11 @@ package com.bstek.urule.console.repository;
 public class PackageConfig {
     private String version;
     private Boolean lock;
+    private Map<String, Integer> auditStatusMap;
+
+    public PackageConfig() {
+        this.auditStatusMap = new HashMap<>();
+    }
 
     public String getVersion() {
         return version;
@@ -24,11 +32,20 @@ public class PackageConfig {
         this.lock = lock;
     }
 
+    public Map<String, Integer> getAuditStatusMap() {
+        return auditStatusMap;
+    }
+
+    public void setAuditStatusMap(Map<String, Integer> auditStatusMap) {
+        this.auditStatusMap = auditStatusMap;
+    }
+
     @Override
     public String toString() {
         return "PackageConfig{" +
                 "version='" + version + '\'' +
                 ", lock=" + lock +
+                ", auditStatusMap=" + auditStatusMap +
                 '}';
     }
 }

@@ -14,6 +14,7 @@ public class VersionFile {
     private String comment;
     private String beforeComment;
     private String afterComment;
+    private String auditStatus;
     private Date createDate;
 
     public String getPath() {
@@ -72,6 +73,14 @@ public class VersionFile {
         this.afterComment = afterComment;
     }
 
+    public String getAuditStatus() {
+        return auditStatus;
+    }
+
+    public void setAuditStatus(String auditStatus) {
+        this.auditStatus = auditStatus;
+    }
+
     @Override
     public String toString() {
         return "VersionFile{" +
@@ -81,6 +90,7 @@ public class VersionFile {
                 ", comment='" + comment + '\'' +
                 ", beforeComment='" + beforeComment + '\'' +
                 ", afterComment='" + afterComment + '\'' +
+                ", auditStatus='" + auditStatus + '\'' +
                 ", createDate=" + createDate +
                 '}';
     }

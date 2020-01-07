@@ -37,6 +37,8 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
     public static final String PACKAGE_CONFIG_FILE = "___package_config__file__";
     public static final String CLIENT_CONFIG_FILE = "___client_config__file__";
     public static final String RESOURCE_SECURITY_CONFIG_FILE = "___resource_security_config__file__";
+    public static final String AUDIT_STATUS = "_audit_status";
+
     protected final String DATA = "_data";
     protected final String DIR_TAG = "_dir";
     protected final String FILE = "_file";
@@ -104,10 +106,13 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
                 // skip root version
                 continue;
             }
+
             Node fnode = version.getFrozenNode();
+
             VersionFile file = new VersionFile();
             file.setName(version.getName());
             file.setPath(fileNode.getPath());
+
             Property prop = fnode.getProperty(CRATE_USER);
             file.setCreateUser(prop.getString());
             prop = fnode.getProperty(CRATE_DATE);
