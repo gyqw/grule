@@ -406,6 +406,7 @@ public class CommonServletHandler extends RenderPageServletHandler {
             logger.info("updateFileInUseVersion params: " + sb.toString());
 
             Map<String, Object> map = (Map<String, Object>) JSON.parse(sb.toString());
+            Integer status = (Integer) map.get("status");
             Map<String, String> params = (Map<String, String>) map.get("params");
             String project = params.get("projectName");
             String version = params.get("versionCode");
@@ -413,7 +414,9 @@ public class CommonServletHandler extends RenderPageServletHandler {
             // 加载知识包版本配置
             PackageConfig packageConfig = this.repositoryService.loadPackageConfigs(project);
             // 更新配置
-            packageConfig.setVersion(version);
+            if (status == 4) {
+                packageConfig.setVersion(version);
+            }
             packageConfig.setLock(false);
             this.repositoryService.updatePackageConfigs(project, packageConfig);
 

@@ -23,6 +23,8 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -43,6 +45,8 @@ import java.util.Map;
  * 2016年6月3日
  */
 public class FrameServletHandler extends RenderPageServletHandler {
+    private Logger logger = LoggerFactory.getLogger(FrameServletHandler.class);
+
     private RepositoryService repositoryService;
     private String welcomePage;
     private String title;
@@ -409,38 +413,42 @@ public class FrameServletHandler extends RenderPageServletHandler {
     }
 
     public void loadProjects(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
-        boolean classify = getClassify(req, resp);
-        String projectName = req.getParameter("projectName");
-        String searchFileName = req.getParameter("searchFileName");
-        projectName = Utils.decodeURL(projectName);
-        String typesStr = req.getParameter("types");
-        FileType[] types = null;
-        if (StringUtils.isNotBlank(typesStr) && !typesStr.equals("all")) {
-            switch (typesStr) {
-                case "lib":
-                    types = new FileType[]{FileType.VariableLibrary, FileType.ConstantLibrary, FileType.ParameterLibrary, FileType.ActionLibrary};
-                    break;
-                case "rule":
-                    types = new FileType[]{FileType.Ruleset, FileType.UL, FileType.RulesetLib};
-                    break;
-                case "table":
-                    types = new FileType[]{FileType.DecisionTable, FileType.ScriptDecisionTable, FileType.ComplexScorecard};
-                    break;
-                case "tree":
-                    types = new FileType[]{FileType.DecisionTree};
-                    break;
-                case "flow":
-                    types = new FileType[]{FileType.RuleFlow};
-                    break;
+        try {
+            User user = EnvironmentUtils.getLoginUser(new RequestContext(req, resp));
+            boolean classify = getClassify(req, resp);
+            String projectName = req.getParameter("projectName");
+            String searchFileName = req.getParameter("searchFileName");
+            projectName = Utils.decodeURL(projectName);
+            String typesStr = req.getParameter("types");
+            FileType[] types = null;
+            if (StringUtils.isNotBlank(typesStr) && !typesStr.equals("all")) {
+                switch (typesStr) {
+                    case "lib":
+                        types = new FileType[]{FileType.VariableLibrary, FileType.ConstantLibrary, FileType.ParameterLibrary, FileType.ActionLibrary};
+                        break;
+                    case "rule":
+                        types = new FileType[]{FileType.Ruleset, FileType.UL, FileType.RulesetLib};
+                        break;
+                    case "table":
+                        types = new FileType[]{FileType.DecisionTable, FileType.ScriptDecisionTable, FileType.ComplexScorecard};
+                        break;
+                    case "tree":
+                        types = new FileType[]{FileType.DecisionTree};
+                        break;
+                    case "flow":
+                        types = new FileType[]{FileType.RuleFlow};
+                        break;
+                }
             }
-        }
 
-        Repository repo = repositoryService.loadRepository(projectName, user, classify, types, searchFileName);
-        Map<String, Object> map = new HashMap<>();
-        map.put("repo", repo);
-        map.put("classify", classify);
-        writeObjectToJson(resp, map);
+            Repository repo = repositoryService.loadRepository(projectName, user, classify, types, searchFileName);
+            Map<String, Object> map = new HashMap<>();
+            map.put("repo", repo);
+            map.put("classify", classify);
+            writeObjectToJson(resp, map);
+        } catch (Exception e) {
+            logger.error("loadProjects error", e);
+        }
     }
 
     private boolean getClassify(HttpServletRequest req, HttpServletResponse resp) {
