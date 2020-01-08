@@ -267,7 +267,11 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         PackageConfig packageConfig = new PackageConfig();
         packageConfig.setVersion(rootElement.attributeValue("version"));
         packageConfig.setLock(Boolean.parseBoolean(rootElement.attributeValue("lock")));
-        packageConfig.setAuditStatusMap((Map<String, Integer>) JSON.parse(rootElement.attributeValue("audit")));
+        Map<String, Integer> auditStatusMap = (Map<String, Integer>) JSON.parse(rootElement.attributeValue("audit"));
+        if (auditStatusMap == null) {
+            auditStatusMap = new HashMap<>();
+        }
+        packageConfig.setAuditStatusMap(auditStatusMap);
         return packageConfig;
     }
 

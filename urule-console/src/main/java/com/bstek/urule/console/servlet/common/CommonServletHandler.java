@@ -458,7 +458,6 @@ public class CommonServletHandler extends RenderPageServletHandler {
             if (!packageConfig.getLock()) {
                 try {
                     packageConfig.setLock(true);
-                    packageConfig.getAuditStatusMap().put(version, 2);
                     this.repositoryService.updatePackageConfigs(project, packageConfig);
                     String processId = applicationContext.getBean(ExternalProcessService.class).start(project, version, explain);
 
