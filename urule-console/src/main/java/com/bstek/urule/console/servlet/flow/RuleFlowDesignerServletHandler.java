@@ -1,29 +1,12 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.servlet.flow;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.bstek.urule.Utils;
+import com.bstek.urule.console.repository.RepositoryService;
+import com.bstek.urule.console.repository.model.ResourcePackage;
+import com.bstek.urule.console.servlet.RenderPageServletHandler;
+import com.bstek.urule.exception.RuleException;
+import com.bstek.urule.model.flow.FlowDefinition;
+import com.bstek.urule.parse.deserializer.FlowDeserializer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -32,13 +15,13 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import com.bstek.urule.exception.RuleException;
-import com.bstek.urule.Utils;
-import com.bstek.urule.console.repository.RepositoryService;
-import com.bstek.urule.console.repository.model.ResourcePackage;
-import com.bstek.urule.console.servlet.RenderPageServletHandler;
-import com.bstek.urule.model.flow.FlowDefinition;
-import com.bstek.urule.parse.deserializer.FlowDeserializer;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.List;
 
 /**
  * @author Jacky.gao
@@ -95,8 +78,7 @@ public class RuleFlowDesignerServletHandler extends RenderPageServletHandler {
         Document document;
         try {
             document = reader.read(stream);
-            Element root = document.getRootElement();
-            return root;
+            return document.getRootElement();
         } catch (DocumentException e) {
             throw new RuleException(e);
         }

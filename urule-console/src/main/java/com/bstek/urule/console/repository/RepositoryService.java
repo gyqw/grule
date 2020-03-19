@@ -1,23 +1,4 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.repository;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
 
 import com.bstek.urule.console.User;
 import com.bstek.urule.console.repository.model.FileType;
@@ -25,9 +6,14 @@ import com.bstek.urule.console.repository.model.RepositoryFile;
 import com.bstek.urule.console.repository.model.VersionFile;
 import com.bstek.urule.console.servlet.permission.UserPermission;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
+
 /**
  * @author Jacky.gao
- * @since 2015年3月24日
+ * @author fred
+ * 2015年3月24日
  */
 public interface RepositoryService extends RepositoryReader {
     public static final String BEAN_ID = "urule.repositoryService";
@@ -41,6 +27,20 @@ public interface RepositoryService extends RepositoryReader {
     void createFile(String path, String content, User user) throws Exception;
 
     void saveFile(String path, String content, boolean newVersion, String versionComment, User user) throws Exception;
+
+    /**
+     * 保存文件
+     *
+     * @param path           文件路径
+     * @param content        文件内容
+     * @param newVersion     新版本
+     * @param versionComment 版本描述
+     * @param beforeComment  变更前描述
+     * @param afterComment   变更后描述
+     * @param user           更新用户
+     * @throws Exception 异常
+     */
+    void saveFile(String path, String content, boolean newVersion, String versionComment, String beforeComment, String afterComment, User user) throws Exception;
 
     void deleteFile(String path, User user) throws Exception;
 
@@ -56,6 +56,23 @@ public interface RepositoryService extends RepositoryReader {
 
     InputStream readFile(String path, String version) throws Exception;
 
+    /**
+     * 加载文件配置
+     *
+     * @param path    文件路径
+     * @param version 版本
+     * @return 文件配置信息
+     * @throws Exception 异常
+     */
+    VersionFile loadFileProperty(String path, String version) throws Exception;
+
+    /**
+     * 获取文件版本信息
+     *
+     * @param path 文件路径
+     * @return 文件版本列表
+     * @throws Exception 异常
+     */
     List<VersionFile> getVersionFiles(String path) throws Exception;
 
     void exportXml(String projectPath, OutputStream outputStream) throws Exception;
@@ -65,6 +82,10 @@ public interface RepositoryService extends RepositoryReader {
     List<RepositoryFile> getDirectories(String project) throws Exception;
 
     List<ClientConfig> loadClientConfigs(String project) throws Exception;
+
+    PackageConfig loadPackageConfigs(String project) throws Exception;
+
+    void updatePackageConfigs(String project, PackageConfig packageConfig) throws Exception;
 
     List<UserPermission> loadResourceSecurityConfigs(String companyId) throws Exception;
 

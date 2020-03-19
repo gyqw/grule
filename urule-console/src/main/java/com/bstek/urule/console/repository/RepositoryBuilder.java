@@ -1,45 +1,10 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.console.repository;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.Properties;
-import java.util.logging.Logger;
-
-import javax.jcr.RepositoryException;
-import javax.servlet.ServletContext;
-import javax.sql.DataSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import com.bstek.urule.exception.RuleException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.core.RepositoryImpl;
-import org.apache.jackrabbit.core.config.AccessManagerConfig;
-import org.apache.jackrabbit.core.config.BeanConfig;
-import org.apache.jackrabbit.core.config.ClusterConfig;
-import org.apache.jackrabbit.core.config.DataSourceConfig;
-import org.apache.jackrabbit.core.config.LoginModuleConfig;
-import org.apache.jackrabbit.core.config.PersistenceManagerConfig;
-import org.apache.jackrabbit.core.config.RepositoryConfig;
-import org.apache.jackrabbit.core.config.RepositoryConfigurationParser;
-import org.apache.jackrabbit.core.config.SecurityConfig;
-import org.apache.jackrabbit.core.config.SecurityManagerConfig;
-import org.apache.jackrabbit.core.config.VersioningConfig;
+import org.apache.jackrabbit.core.config.*;
 import org.apache.jackrabbit.core.data.DataStore;
 import org.apache.jackrabbit.core.data.DataStoreFactory;
 import org.apache.jackrabbit.core.data.FileDataStore;
@@ -63,7 +28,15 @@ import org.springframework.web.context.WebApplicationContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.bstek.urule.exception.RuleException;
+import javax.jcr.RepositoryException;
+import javax.servlet.ServletContext;
+import javax.sql.DataSource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
+import java.io.InputStream;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * @author Jacky.gao
@@ -85,8 +58,7 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
     }
 
     private SecurityConfig buildSecurityConfig() {
-        SecurityConfig securityConfig = new SecurityConfig("uruleRepoSecurity", buildSecurityManagerConfig(), buildAccessManagerConfig(), buildLoginModuleConfig());
-        return securityConfig;
+        return new SecurityConfig("uruleRepoSecurity", buildSecurityManagerConfig(), buildAccessManagerConfig(), buildLoginModuleConfig());
     }
 
     private RepositoryLockMechanismFactory buildRepositoryLockMechanismFactory() {
@@ -128,8 +100,7 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
         FileSystemFactory fileSystemFactory = buildFileSystemFactory("version");
         PersistenceManagerConfig persistenceManagerConfig = buildPersistenceManagerConfig();
         ISMLockingFactory ismLockingFactory = buildISMLockingFactory();
-        VersioningConfig versioningConfig = new VersioningConfig(homeDir, fileSystemFactory, persistenceManagerConfig, ismLockingFactory);
-        return versioningConfig;
+        return new VersioningConfig(homeDir, fileSystemFactory, persistenceManagerConfig, ismLockingFactory);
     }
 
     private ISMLockingFactory buildISMLockingFactory() {
@@ -143,22 +114,19 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
     private PersistenceManagerConfig buildPersistenceManagerConfig() {
         Properties prop = new Properties();
         BeanConfig beanConfig = new BeanConfig("org.apache.jackrabbit.core.persistence.bundle.BundleFsPersistenceManager", prop);
-        PersistenceManagerConfig persistenceManagerConfig = new PersistenceManagerConfig(beanConfig);
-        return persistenceManagerConfig;
+        return new PersistenceManagerConfig(beanConfig);
     }
 
     private SecurityManagerConfig buildSecurityManagerConfig() {
         Properties prop = new Properties();
         BeanConfig beanConfig = new BeanConfig("org.apache.jackrabbit.core.security.simple.SimpleSecurityManager", prop);
-        SecurityManagerConfig securityManagerConfig = new SecurityManagerConfig(beanConfig, "default", null);
-        return securityManagerConfig;
+        return new SecurityManagerConfig(beanConfig, "default", null);
     }
 
     private AccessManagerConfig buildAccessManagerConfig() {
         Properties prop = new Properties();
         BeanConfig beanConfig = new BeanConfig("org.apache.jackrabbit.core.security.simple.SimpleAccessManager", prop);
-        AccessManagerConfig accessManagerConfig = new AccessManagerConfig(beanConfig);
-        return accessManagerConfig;
+        return new AccessManagerConfig(beanConfig);
     }
 
     private LoginModuleConfig buildLoginModuleConfig() {
@@ -166,8 +134,7 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
         prop.put("anonymousId", "anonymous");
         prop.put("adminId", "admin");
         BeanConfig beanConfig = new BeanConfig("org.apache.jackrabbit.core.security.simple.SimpleLoginModule", prop);
-        LoginModuleConfig loginModuleConfig = new LoginModuleConfig(beanConfig);
-        return loginModuleConfig;
+        return new LoginModuleConfig(beanConfig);
     }
 
     private void initRepositoryByXml(String xml) throws Exception {

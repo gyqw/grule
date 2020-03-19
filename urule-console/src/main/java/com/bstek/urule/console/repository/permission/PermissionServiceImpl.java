@@ -8,6 +8,8 @@ import com.bstek.urule.console.servlet.RequestHolder;
 import com.bstek.urule.console.servlet.permission.ProjectConfig;
 import com.bstek.urule.console.servlet.permission.UserPermission;
 import com.bstek.urule.exception.RuleException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -16,6 +18,7 @@ import java.util.List;
  * 2016年9月1日
  */
 public class PermissionServiceImpl implements PermissionStore, PermissionService {
+    private Logger logger = LoggerFactory.getLogger(PermissionServiceImpl.class);
     private RepositoryService repositoryService;
 
     @Override
@@ -82,6 +85,7 @@ public class PermissionServiceImpl implements PermissionStore, PermissionService
         if (isAdmin()) {
             return true;
         }
+        logger.info("fileHasPermission path: {}", path);
         path = processPath(path);
         int slashPos = path.indexOf("/");
         if (slashPos == -1) {
