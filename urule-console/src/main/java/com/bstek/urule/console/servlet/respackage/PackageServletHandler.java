@@ -12,7 +12,7 @@ import com.bstek.urule.console.EnvironmentUtils;
 import com.bstek.urule.console.User;
 import com.bstek.urule.console.repository.ClientConfig;
 import com.bstek.urule.console.repository.ExternalRepository;
-import com.bstek.urule.console.repository.PackageConfig;
+import com.bstek.urule.console.PackageConfig;
 import com.bstek.urule.console.repository.RepositoryService;
 import com.bstek.urule.console.repository.model.ResourcePackage;
 import com.bstek.urule.console.servlet.RenderPageServletHandler;

@@ -1,5 +1,6 @@
 package com.bstek.urule.console.repository;
 
+import com.bstek.urule.console.PackageConfig;
 import com.bstek.urule.console.User;
 import com.bstek.urule.console.repository.model.FileType;
 import com.bstek.urule.console.repository.model.RepositoryFile;

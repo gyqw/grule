@@ -6,7 +6,6 @@ import com.bstek.urule.console.repository.model.*;
 import com.bstek.urule.exception.RuleException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.jackrabbit.core.RepositoryImpl;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -14,6 +13,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import javax.jcr.Repository;
 import javax.jcr.*;
 import javax.jcr.lock.LockManager;
 import javax.jcr.version.Version;
@@ -50,7 +50,7 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
     protected final String COMPANY_ID = "_company_id";
 
     protected RepositoryBuilder repositoryBuilder;
-    protected RepositoryImpl repository;
+    protected Repository repository;
     protected Session session;
     protected VersionManager versionManager;
     protected LockManager lockManager;

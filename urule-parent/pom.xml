@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Geex Rule Parent Project</name>
+    <name>URule Parent Project</name>
     <groupId>geex-architecture</groupId>
     <artifactId>urule-parent</artifactId>
     <version>${revision}</version>
@@ -10,7 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <revision>2.3.5</revision>
+        <revision>2.3.6-SNAPSHOT</revision>
     </properties>
 
     <dependencies>
@@ -23,60 +23,60 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                    <include>**/*.xsd</include>
-                    <include>**/*.schemas</include>
-                    <include>**/*.handlers</include>
-                    <include>**/*.properties</include>
-                    <include>**/*.png</include>
-                    <include>**/*.jpg</include>
-                    <include>**/*.gif</include>
-                    <include>**/*.css</include>
-                    <include>**/*.map</include>
-                    <include>**/*.js</include>
-                    <include>**/*.swf</include>
-                    <include>**/*.swz</include>
-                    <include>**/*.html</include>
-                    <include>**/*.jsp</include>
-                    <include>**/*.txt</include>
-                    <include>**/*.eot</include>
-                    <include>**/*.svg</include>
-                    <include>**/*.ttf</include>
-                    <include>**/*.woff</include>
-                    <include>**/*.woff2</include>
-                    <include>**/*.md</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                    <include>**/*.xsd</include>
-                    <include>**/*.schemas</include>
-                    <include>**/*.handlers</include>
-                    <include>**/*.properties</include>
-                    <include>**/*.png</include>
-                    <include>**/*.jpg</include>
-                    <include>**/*.gif</include>
-                    <include>**/*.css</include>
-                    <include>**/*.map</include>
-                    <include>**/*.js</include>
-                    <include>**/*.html</include>
-                    <include>**/*.jsp</include>
-                    <include>**/*.txt</include>
-                    <include>**/*.eot</include>
-                    <include>**/*.svg</include>
-                    <include>**/*.ttf</include>
-                    <include>**/*.woff</include>
-                    <include>**/*.woff2</include>
-                    <include>**/*.md</include>
-                </includes>
-            </resource>
-        </resources>
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <directory>src/main/resources</directory>-->
+<!--                <includes>-->
+<!--                    <include>**/*.xml</include>-->
+<!--                    <include>**/*.xsd</include>-->
+<!--                    <include>**/*.schemas</include>-->
+<!--                    <include>**/*.handlers</include>-->
+<!--                    <include>**/*.properties</include>-->
+<!--                    <include>**/*.png</include>-->
+<!--                    <include>**/*.jpg</include>-->
+<!--                    <include>**/*.gif</include>-->
+<!--                    <include>**/*.css</include>-->
+<!--                    <include>**/*.map</include>-->
+<!--                    <include>**/*.js</include>-->
+<!--                    <include>**/*.swf</include>-->
+<!--                    <include>**/*.swz</include>-->
+<!--                    <include>**/*.html</include>-->
+<!--                    <include>**/*.jsp</include>-->
+<!--                    <include>**/*.txt</include>-->
+<!--                    <include>**/*.eot</include>-->
+<!--                    <include>**/*.svg</include>-->
+<!--                    <include>**/*.ttf</include>-->
+<!--                    <include>**/*.woff</include>-->
+<!--                    <include>**/*.woff2</include>-->
+<!--                    <include>**/*.md</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+<!--            <resource>-->
+<!--                <directory>src/main/java</directory>-->
+<!--                <includes>-->
+<!--                    <include>**/*.xml</include>-->
+<!--                    <include>**/*.xsd</include>-->
+<!--                    <include>**/*.schemas</include>-->
+<!--                    <include>**/*.handlers</include>-->
+<!--                    <include>**/*.properties</include>-->
+<!--                    <include>**/*.png</include>-->
+<!--                    <include>**/*.jpg</include>-->
+<!--                    <include>**/*.gif</include>-->
+<!--                    <include>**/*.css</include>-->
+<!--                    <include>**/*.map</include>-->
+<!--                    <include>**/*.js</include>-->
+<!--                    <include>**/*.html</include>-->
+<!--                    <include>**/*.jsp</include>-->
+<!--                    <include>**/*.txt</include>-->
+<!--                    <include>**/*.eot</include>-->
+<!--                    <include>**/*.svg</include>-->
+<!--                    <include>**/*.ttf</include>-->
+<!--                    <include>**/*.woff</include>-->
+<!--                    <include>**/*.woff2</include>-->
+<!--                    <include>**/*.md</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+<!--        </resources>-->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

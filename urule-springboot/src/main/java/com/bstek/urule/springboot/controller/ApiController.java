@@ -49,4 +49,9 @@ public class ApiController {
             logger.error("test error", e);
         }
     }
+
+    @RequestMapping("test1")
+    public String test1() {
+        return "test1";
+    }
 }

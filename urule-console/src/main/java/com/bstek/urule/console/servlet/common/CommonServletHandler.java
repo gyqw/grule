@@ -5,7 +5,7 @@ import com.bstek.urule.Utils;
 import com.bstek.urule.console.EnvironmentUtils;
 import com.bstek.urule.console.ExternalProcessService;
 import com.bstek.urule.console.User;
-import com.bstek.urule.console.repository.PackageConfig;
+import com.bstek.urule.console.PackageConfig;
 import com.bstek.urule.console.repository.Repository;
 import com.bstek.urule.console.repository.RepositoryResourceProvider;
 import com.bstek.urule.console.repository.RepositoryService;
