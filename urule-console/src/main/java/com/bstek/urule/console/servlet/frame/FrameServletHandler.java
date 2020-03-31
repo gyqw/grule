@@ -3,7 +3,7 @@ package com.bstek.urule.console.servlet.frame;
 import com.bstek.urule.Utils;
 import com.bstek.urule.console.EnvironmentUtils;
 import com.bstek.urule.console.User;
-import com.bstek.urule.console.PackageConfig;
+import com.bstek.urule.console.repository.PackageConfig;
 import com.bstek.urule.console.repository.Repository;
 import com.bstek.urule.console.repository.RepositoryService;
 import com.bstek.urule.console.repository.model.FileType;

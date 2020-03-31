@@ -3,6 +3,7 @@ package com.bstek.urule.console;
 import com.bstek.urule.builder.KnowledgeBase;
 import com.bstek.urule.builder.KnowledgeBuilder;
 import com.bstek.urule.builder.ResourceBase;
+import com.bstek.urule.console.repository.PackageConfig;
 import com.bstek.urule.console.repository.RepositoryService;
 import com.bstek.urule.console.repository.model.ResourceItem;
 import com.bstek.urule.console.repository.model.ResourcePackage;

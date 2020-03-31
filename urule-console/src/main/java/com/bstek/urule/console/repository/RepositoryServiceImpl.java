@@ -3,7 +3,6 @@ package com.bstek.urule.console.repository;
 import com.alibaba.fastjson.JSON;
 import com.bstek.urule.Utils;
 import com.bstek.urule.console.DefaultUser;
-import com.bstek.urule.console.PackageConfig;
 import com.bstek.urule.console.User;
 import com.bstek.urule.console.exception.NoPermissionException;
 import com.bstek.urule.console.exception.NodeLockException;
