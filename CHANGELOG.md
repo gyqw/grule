@@ -1,7 +1,7 @@
 # 2.3.6-SNAPSHOT (2020-03-23)
 
 ###  改进的功能：
-*  git存储
+*  jackrabbit -> jackrabbit oak
 
 
 # 2.3.4 (2019-12-12)

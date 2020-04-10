@@ -1,24 +1,4 @@
-/*******************************************************************************
- * Copyright 2017 Bstek
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.bstek.urule.model.rule.loop;
-
-import java.util.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.bstek.urule.action.Action;
 import com.bstek.urule.action.ActionValue;
@@ -27,15 +7,22 @@ import com.bstek.urule.model.rule.Rule;
 import com.bstek.urule.runtime.KnowledgePackageWrapper;
 import com.bstek.urule.runtime.KnowledgeSession;
 import com.bstek.urule.runtime.KnowledgeSessionFactory;
-import com.bstek.urule.runtime.builtinaction.LoopAction;
 import com.bstek.urule.runtime.response.RuleExecutionResponse;
 import com.bstek.urule.runtime.rete.Context;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * @author Jacky.gao
- * 2016年5月31日
+ * @author Jacky.gao 2016年5月31日
  */
 public class LoopRule extends Rule {
+
     private LoopStart loopStart;
     private LoopEnd loopEnd;
     private LoopTarget loopTarget;
@@ -48,12 +35,13 @@ public class LoopRule extends Rule {
     }
 
     public List<ActionValue> execute(Context context, Object matchedObject, List<Object> allMatchedObjects) {
-        Object loopTargetObj = context.getValueCompute().complexValueCompute(this.loopTarget.getValue(), matchedObject, context, allMatchedObjects);
+        Object loopTargetObj = context.getValueCompute()
+            .complexValueCompute(this.loopTarget.getValue(), matchedObject, context, allMatchedObjects);
         if (loopTargetObj == null) {
             this.log.warn("Loop rule [" + this.getName() + "] target value is null,cannot be executed.");
             return null;
         } else {
-            List<ActionValue> values = new ArrayList();
+            List<ActionValue> values = new ArrayList<>();
             KnowledgeSession parentSession = (KnowledgeSession) context.getWorkingMemory();
             Map<String, Object> parameters = parentSession.getParameters();
             if (this.loopStart != null) {
@@ -75,7 +63,8 @@ public class LoopRule extends Rule {
                 }
             }
 
-            KnowledgeSession session = KnowledgeSessionFactory.newKnowledgeSession(this.knowledgePackageWrapper, context, parentSession);
+            KnowledgeSession session = KnowledgeSessionFactory
+                .newKnowledgeSession(this.knowledgePackageWrapper, context, parentSession);
             Map<String, Object> parentAllFactsMap = parentSession.getAllFactsMap();
             Object fact;
             if (loopTargetObj instanceof Collection) {
@@ -104,7 +93,7 @@ public class LoopRule extends Rule {
                     }
 
                     session.insert(object);
-                    RuleExecutionResponse response = session.fireRules((Map) parameters);
+                    RuleExecutionResponse response = session.fireRules(parameters);
                     List<ActionValue> list = response.getActionValues();
                     boolean needBreak = false;
                     if (list != null) {
@@ -120,8 +109,8 @@ public class LoopRule extends Rule {
                         }
                     }
 
-                    parameters = new HashMap();
-                    ((Map) parameters).putAll(session.getParameters());
+                    parameters = new HashMap<>();
+                    (parameters).putAll(session.getParameters());
                     if (needBreak) {
                         break;
                     }
@@ -131,7 +120,7 @@ public class LoopRule extends Rule {
                     throw new RuntimeException("Loop rule target variable must be Collection or Object array type.");
                 }
 
-                Object[] objs = (Object[]) ((Object[]) loopTargetObj);
+                Object[] objs = (Object[]) (loopTargetObj);
                 Object[] var27 = objs;
                 int var26 = objs.length;
 
@@ -161,15 +150,15 @@ public class LoopRule extends Rule {
                         }
                     }
 
-                    parameters = new HashMap();
-                    ((Map) parameters).putAll(session.getParameters());
+                    parameters = new HashMap<>();
+                    (parameters).putAll(session.getParameters());
                     if (needBreak) {
                         break;
                     }
                 }
             }
 
-            parentSession.getParameters().putAll((Map) parameters);
+            parentSession.getParameters().putAll(parameters);
             if (this.loopEnd != null) {
                 List<Action> endActions = this.loopEnd.getActions();
                 if (endActions != null) {
