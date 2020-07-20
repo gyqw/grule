@@ -472,6 +472,7 @@ public class CommonServletHandler extends RenderPageServletHandler {
                     // 释放锁
                     packageConfig.setLock(false);
                     this.repositoryService.updatePackageConfigs(project, packageConfig);
+                    result.put("message", "发起失败，请重试");
                 }
             } else {
                 result.put("message", "有审批中的流程，请完成后再发起");

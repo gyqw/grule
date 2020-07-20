@@ -14,8 +14,8 @@ public class ExternalProcessServiceImpl implements ExternalProcessService {
     private Logger logger = LoggerFactory.getLogger(ExternalProcessServiceImpl.class);
 
     @Override
-    public String start(String project, String version, String explain) {
+    public String start(String project, String version, String explain) throws Exception {
         logger.info(explain);
-        return "processId01";
+        throw new Exception();
     }
 }
