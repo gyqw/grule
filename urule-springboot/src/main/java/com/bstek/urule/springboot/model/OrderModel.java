@@ -1,16 +1,18 @@
 package com.bstek.urule.springboot.model;
 
-import java.io.Serializable;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
 /**
- * @author fred 2018-11-02 2:13 PM
+ * @author fred
+ * @since 2018-11-02 2:13 PM
  */
 public class OrderModel implements Serializable {
-
-    private Logger logger = LoggerFactory.getLogger(OrderModel.class);
+    private static final Logger logger = LoggerFactory.getLogger(OrderModel.class);
 
     private String appId;
     private Integer appStatus;
@@ -19,6 +21,7 @@ public class OrderModel implements Serializable {
     private Integer customAge;
     private Integer loanPeriods;
     private List<ItemModel> stringList;
+    private Date createTime;
 
     public Integer getLoanPeriods() {
         return loanPeriods;
@@ -78,16 +81,25 @@ public class OrderModel implements Serializable {
         return stringList;
     }
 
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
     @Override
     public String toString() {
         return "OrderModel{" +
-            "appId='" + appId + '\'' +
-            ", appStatus=" + appStatus +
-            ", ddgStatus=" + ddgStatus +
-            ", storeTag='" + storeTag + '\'' +
-            ", customAge=" + customAge +
-            ", loanPeriods=" + loanPeriods +
-            ", stringList=" + stringList +
-            '}';
+                "appId='" + appId + '\'' +
+                ", appStatus=" + appStatus +
+                ", ddgStatus=" + ddgStatus +
+                ", storeTag='" + storeTag + '\'' +
+                ", customAge=" + customAge +
+                ", loanPeriods=" + loanPeriods +
+                ", stringList=" + stringList +
+                ", createTime=" + createTime +
+                '}';
     }
 }

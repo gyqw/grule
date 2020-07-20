@@ -460,11 +460,18 @@ public class CommonServletHandler extends RenderPageServletHandler {
                     packageConfig.setLock(true);
                     this.repositoryService.updatePackageConfigs(project, packageConfig);
                     String processId = applicationContext.getBean(ExternalProcessService.class).start(project, version, explain);
+                    if (org.springframework.util.StringUtils.isEmpty(processId)) {
+                        throw new Exception("processId is null");
+                    }
 
                     result.put("processId", processId);
                     result.put("status", true);
                 } catch (Exception e) {
                     logger.error("start error", e);
+
+                    // 释放锁
+                    packageConfig.setLock(false);
+                    this.repositoryService.updatePackageConfigs(project, packageConfig);
                 }
             } else {
                 result.put("message", "有审批中的流程，请完成后再发起");
