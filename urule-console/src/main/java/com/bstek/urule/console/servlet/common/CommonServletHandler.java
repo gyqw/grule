@@ -414,7 +414,7 @@ public class CommonServletHandler extends RenderPageServletHandler {
             // 加载知识包版本配置
             PackageConfig packageConfig = this.repositoryService.loadPackageConfigs(project);
             // 更新配置
-            Integer auditStatus = 0;
+            int auditStatus = 0;
             if (status == 4) {
                 packageConfig.setVersion(version);
                 auditStatus = 1;
@@ -463,6 +463,12 @@ public class CommonServletHandler extends RenderPageServletHandler {
                     if (org.springframework.util.StringUtils.isEmpty(processId)) {
                         throw new Exception("processId is null");
                     }
+                    // 更新审批状态
+                    if (packageConfig.getAuditStatusMap() == null) {
+                        packageConfig.setAuditStatusMap(new HashMap<>());
+                    }
+                    packageConfig.getAuditStatusMap().put(version, 2);
+                    this.repositoryService.updatePackageConfigs(project, packageConfig);
 
                     result.put("processId", processId);
                     result.put("status", true);

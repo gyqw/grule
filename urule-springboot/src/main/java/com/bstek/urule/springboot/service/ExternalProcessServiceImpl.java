@@ -16,6 +16,7 @@ public class ExternalProcessServiceImpl implements ExternalProcessService {
     @Override
     public String start(String project, String version, String explain) throws Exception {
         logger.info(explain);
-        throw new Exception();
+//        throw new Exception();
+        return "aaa";
     }
 }
