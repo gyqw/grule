@@ -1,4 +1,4 @@
-package com.bstek.urule.console.repository;
+package com.bstek.urule.console.exception;
 
 import com.bstek.urule.exception.RuleException;
 

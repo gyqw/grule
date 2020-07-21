@@ -414,7 +414,7 @@ public class CommonServletHandler extends RenderPageServletHandler {
             // 加载知识包版本配置
             PackageConfig packageConfig = this.repositoryService.loadPackageConfigs(project);
             // 更新配置
-            Integer auditStatus = 0;
+            int auditStatus = 0;
             if (status == 4) {
                 packageConfig.setVersion(version);
                 auditStatus = 1;
@@ -460,11 +460,25 @@ public class CommonServletHandler extends RenderPageServletHandler {
                     packageConfig.setLock(true);
                     this.repositoryService.updatePackageConfigs(project, packageConfig);
                     String processId = applicationContext.getBean(ExternalProcessService.class).start(project, version, explain);
+                    if (org.springframework.util.StringUtils.isEmpty(processId)) {
+                        throw new Exception("processId is null");
+                    }
+                    // 更新审批状态
+                    if (packageConfig.getAuditStatusMap() == null) {
+                        packageConfig.setAuditStatusMap(new HashMap<>());
+                    }
+                    packageConfig.getAuditStatusMap().put(version, 2);
+                    this.repositoryService.updatePackageConfigs(project, packageConfig);
 
                     result.put("processId", processId);
                     result.put("status", true);
                 } catch (Exception e) {
                     logger.error("start error", e);
+
+                    // 释放锁
+                    packageConfig.setLock(false);
+                    this.repositoryService.updatePackageConfigs(project, packageConfig);
+                    result.put("message", "发起失败，请重试");
                 }
             } else {
                 result.put("message", "有审批中的流程，请完成后再发起");

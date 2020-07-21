@@ -56,6 +56,7 @@ public abstract class AbstractRuleParser<T> implements Parser<T> {
             rule.setAutoFocus(Boolean.valueOf(autoFocus));
         }
         rule.setRuleflowGroup(element.attributeValue("ruleflow-group"));
+
         for (Object obj : element.elements()) {
             if (obj == null || !(obj instanceof Element)) {
                 continue;

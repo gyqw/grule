@@ -9,7 +9,7 @@
         <relativePath>../urule-parent</relativePath>
     </parent>
 
-    <name>Geex Rule Core Project</name>
+    <name>URule Core Project</name>
     <artifactId>urule-core</artifactId>
     <version>${revision}</version>
 
@@ -70,6 +70,7 @@
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
         </dependency>
+
     </dependencies>
 
     <licenses>

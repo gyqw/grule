@@ -9,17 +9,17 @@
         <version>1.5.6.RELEASE</version>
     </parent>
 
-    <name>Sample :: Geex Rule Springboot Project</name>
+    <name>Sample :: URule Springboot Project</name>
     <groupId>geex-architecture</groupId>
     <artifactId>urule-springboot</artifactId>
     <version>1.0.0</version>
 
     <properties>
-        <java.version>1.7</java.version>
+        <java.version>1.8</java.version>
         <tomcat.version>8.5.5</tomcat.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <urule.version>2.3.4-SNAPSHOT</urule.version>
+        <urule.version>2.3.6-SNAPSHOT</urule.version>
         <urule-pro.version>2.1.6</urule-pro.version>
     </properties>
 

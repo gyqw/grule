@@ -6,9 +6,10 @@ import org.dom4j.Element;
 
 /**
  * @author Jacky.gao
- * 2014年12月23日
+ * @since 2014年12月23日
  */
 public class RuleSetDeserializer implements Deserializer<RuleSet> {
+
     public static final String BEAN_ID = "urule.ruleSetDeserializer";
     private RuleSetParser ruleSetParser;
 

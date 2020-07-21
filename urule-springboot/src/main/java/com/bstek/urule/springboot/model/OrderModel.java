@@ -4,13 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author fred
- * 2018-11-02 2:13 PM
+ * @since 2018-11-02 2:13 PM
  */
 public class OrderModel implements Serializable {
-    private Logger logger = LoggerFactory.getLogger(OrderModel.class);
+    private static final Logger logger = LoggerFactory.getLogger(OrderModel.class);
 
     private String appId;
     private Integer appStatus;
@@ -18,6 +20,8 @@ public class OrderModel implements Serializable {
     private String storeTag;
     private Integer customAge;
     private Integer loanPeriods;
+    private List<ItemModel> stringList;
+    private Date createTime;
 
     public Integer getLoanPeriods() {
         return loanPeriods;
@@ -69,6 +73,22 @@ public class OrderModel implements Serializable {
         this.storeTag = storeTag;
     }
 
+    public void setStringList(List<ItemModel> stringList) {
+        this.stringList = stringList;
+    }
+
+    public List<ItemModel> getStringList() {
+        return stringList;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
     @Override
     public String toString() {
         return "OrderModel{" +
@@ -78,6 +98,8 @@ public class OrderModel implements Serializable {
                 ", storeTag='" + storeTag + '\'' +
                 ", customAge=" + customAge +
                 ", loanPeriods=" + loanPeriods +
+                ", stringList=" + stringList +
+                ", createTime=" + createTime +
                 '}';
     }
 }
