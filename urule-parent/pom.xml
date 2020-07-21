@@ -10,7 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <revision>2.3.6-SNAPSHOT</revision>
+        <revision>2.3.6</revision>
     </properties>
 
     <dependencies>
