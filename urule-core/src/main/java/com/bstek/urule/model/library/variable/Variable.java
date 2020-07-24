@@ -53,4 +53,15 @@ public class Variable {
     public void setAct(Act act) {
         this.act = act;
     }
+
+    @Override
+    public String toString() {
+        return "Variable{" +
+                "name='" + name + '\'' +
+                ", label='" + label + '\'' +
+                ", type=" + type +
+                ", defaultValue='" + defaultValue + '\'' +
+                ", act=" + act +
+                '}';
+    }
 }

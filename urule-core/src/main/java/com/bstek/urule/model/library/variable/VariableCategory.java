@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * @author Jacky.gao
- * 2014年12月23日
+ * @since 2014年12月23日
  */
 public class VariableCategory {
     public static final String PARAM_CATEGORY = "参数";

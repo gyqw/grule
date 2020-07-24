@@ -6,45 +6,48 @@ import com.bstek.urule.runtime.KnowledgeSession;
 import com.bstek.urule.runtime.KnowledgeSessionFactory;
 import com.bstek.urule.runtime.response.RuleExecutionResponse;
 import com.bstek.urule.runtime.service.KnowledgeService;
+import com.bstek.urule.springboot.model.DataParam;
 import com.bstek.urule.springboot.model.ItemModel;
 import com.bstek.urule.springboot.model.OrderModel;
 import com.bstek.urule.springboot.model.OutputModel;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author fred 2019-09-25 10:10 AM
  */
 @RestController
-@RequestMapping("api")
+@RequestMapping("/api")
 public class ApiController {
 
-    private Logger logger = LoggerFactory.getLogger(ApiController.class);
+    private final Logger logger = LoggerFactory.getLogger(ApiController.class);
 
-    @RequestMapping("test")
+    @GetMapping("/test")
     public void test() {
         try {
             KnowledgeService service = (KnowledgeService) Utils.getApplicationContext()
-                .getBean(KnowledgeService.BEAN_ID);
-            KnowledgePackage knowledgePackage = service.getKnowledge("test/t1");
+                    .getBean(KnowledgeService.BEAN_ID);
+            KnowledgePackage knowledgePackage = service.getKnowledge("test/t2");
             KnowledgeSession session = KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
 
             OrderModel orderModel = new OrderModel();
             orderModel.setAppStatus(1);
             orderModel.setDdgStatus(1);
             orderModel.setStoreTag("fhp");
-
             ItemModel itemModel = new ItemModel();
             itemModel.setDeviceId("a");
             List<ItemModel> itemModelList = new ArrayList<>();
             itemModelList.add(itemModel);
             orderModel.setStringList(itemModelList);
-
             session.insert(orderModel);
+
             OutputModel outputModel = new OutputModel();
             session.insert(outputModel);
 
@@ -57,8 +60,12 @@ public class ApiController {
         }
     }
 
-    @RequestMapping("test1")
-    public String test1() {
-        return "test1";
+    @PostMapping("/param/dynamic")
+    public void dynamicParam() {
+
+    }
+
+    private void mapToVariableCategories(List<DataParam> paramList) {
+
     }
 }

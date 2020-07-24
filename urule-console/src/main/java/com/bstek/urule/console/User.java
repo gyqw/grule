@@ -2,7 +2,7 @@ package com.bstek.urule.console;
 
 /**
  * @author Jacky.gao
- * 2015年5月7日
+ * @since 2015年5月7日
  */
 public interface User {
     /**
