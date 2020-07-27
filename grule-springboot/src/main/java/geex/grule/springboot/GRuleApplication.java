@@ -1,8 +1,7 @@
-package com.bstek.urule.springboot;
+package geex.grule.springboot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
@@ -10,14 +9,11 @@ import org.springframework.context.annotation.ImportResource;
 
 @SpringBootApplication
 @ImportResource({"classpath:urule-console-context.xml"})
-public class GeexRuleApplication implements CommandLineRunner {
-    private Logger logger = LoggerFactory.getLogger(GeexRuleApplication.class);
+public class GRuleApplication {
+    private final Logger logger = LoggerFactory.getLogger(GRuleApplication.class);
 
     public static void main(String[] args) {
-        SpringApplication.run(GeexRuleApplication.class, args);
+        SpringApplication.run(GRuleApplication.class, args);
     }
 
-    @Override
-    public void run(String... strings) throws Exception {
-    }
 }

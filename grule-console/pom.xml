@@ -9,7 +9,7 @@
         <relativePath>../urule-parent</relativePath>
     </parent>
 
-    <name>Geex Rule Console Project</name>
+    <name>GRule Console Project</name>
     <artifactId>grule-console</artifactId>
     <version>${revision}</version>
 

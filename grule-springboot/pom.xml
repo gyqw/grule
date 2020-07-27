@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.6.RELEASE</version>
+        <version>2.3.1.RELEASE</version>
     </parent>
 
-    <name>Sample :: URule Springboot Project</name>
+    <name>Sample :: GRule Springboot Project</name>
     <groupId>geex-architecture</groupId>
-    <artifactId>urule-springboot</artifactId>
+    <artifactId>grule-springboot</artifactId>
     <version>1.0.0</version>
 
     <properties>
@@ -19,8 +19,7 @@
         <tomcat.version>8.5.5</tomcat.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <urule.version>2.3.7-SNAPSHOT</urule.version>
-        <urule-pro.version>2.1.6</urule-pro.version>
+        <grule.version>2.3.7-SNAPSHOT</grule.version>
     </properties>
 
     <dependencies>
@@ -40,42 +39,19 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
-    </dependencies>
 
-    <profiles>
-        <profile>
-            <id>urule</id>
-            <dependencies>
-                <dependency>
-                    <groupId>geex-architecture</groupId>
-                    <artifactId>urule-console</artifactId>
-                    <version>${urule.version}</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-jdk14</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>urule-pro</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.bstek.urule</groupId>
-                    <artifactId>urule-console-pro</artifactId>
-                    <version>${urule-pro.version}</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-jdk14</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
+        <dependency>
+            <groupId>geex-architecture</groupId>
+            <artifactId>grule-console</artifactId>
+            <version>${grule.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-jdk14</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
 
     <build>
         <finalName>${project.artifactId}</finalName>
