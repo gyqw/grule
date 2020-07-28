@@ -9,7 +9,7 @@
         <relativePath>../urule-parent</relativePath>
     </parent>
 
-    <name>URule Console Project</name>
+    <name>URule Console</name>
     <artifactId>urule-console</artifactId>
     <version>${revision}</version>
 
@@ -69,5 +69,4 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-
 </project>

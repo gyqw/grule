@@ -9,16 +9,16 @@
         <relativePath>../grule-parent</relativePath>
     </parent>
 
-    <name>GRule Console Project</name>
+    <name>GRule Console</name>
     <artifactId>grule-console</artifactId>
-    <version>2.3.7-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>geex-architecture</groupId>
-            <artifactId>urule-core</artifactId>
-            <version>2.3.7-SNAPSHOT</version>
+            <artifactId>grule-core</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.jackrabbit</groupId>

@@ -9,7 +9,7 @@
         <version>1.5.6.RELEASE</version>
     </parent>
 
-    <name>Sample :: URule Springboot Project</name>
+    <name>Sample :: URule Springboot</name>
     <groupId>geex-architecture</groupId>
     <artifactId>urule-springboot</artifactId>
     <version>1.0.0</version>

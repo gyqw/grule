@@ -39,7 +39,7 @@ public class RepositoryBuilder implements InitializingBean {
 
         DefaultWhiteboard whiteboard = new DefaultWhiteboard();
         DocumentNodeStore nodeStore = newMongoDocumentNodeStoreBuilder()
-                .setMongoDB("mongodb://localhost:27017", "test2", 0).build();
+                .setMongoDB("mongodb://192.168.112.21:27017", "test2", 0).build();
         final Oak oak = new Oak(nodeStore)
                 .with(new InitialContent())
                 .with(JcrConflictHandler.createJcrConflictHandler())
@@ -61,7 +61,7 @@ public class RepositoryBuilder implements InitializingBean {
         initDefaultRepository();
     }
 
-    // TODO: 2020-3-24 destory
+    // TODO: 2020-3-24 destroy
     public void destroy() {
         System.out.println("Shutdown repository...");
         repository.shutdown();

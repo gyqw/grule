@@ -9,7 +9,7 @@
         <relativePath>../urule-parent</relativePath>
     </parent>
 
-    <name>URule Core Project</name>
+    <name>URule Core</name>
     <artifactId>urule-core</artifactId>
     <version>${revision}</version>
 
