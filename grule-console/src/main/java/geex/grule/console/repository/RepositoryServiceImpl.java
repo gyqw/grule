@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.bstek.urule.Utils;
 import com.bstek.urule.exception.RuleException;
 import geex.grule.console.DefaultUser;
+import geex.grule.console.GRuleBasePackageClazz;
 import geex.grule.console.User;
 import geex.grule.console.exception.NoPermissionException;
 import geex.grule.console.exception.NodeLockException;
@@ -36,10 +37,10 @@ import java.util.*;
 /**
  * @author Jacky.gao
  * @author fred
- * 2016年5月24日
+ * @since 2016年5月24日
  */
 @Service
-public class RepositoryServiceImpl extends BaseRepositoryService implements RepositoryService {
+public class RepositoryServiceImpl extends BaseRepositoryService implements RepositoryService, GRuleBasePackageClazz {
     protected RefactorService refactorService;
     private PermissionService permissionService;
 

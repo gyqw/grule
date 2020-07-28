@@ -1,7 +1,6 @@
 package geex.grule.console;
 
 import com.bstek.urule.Utils;
-import geex.grule.console.controller.RequestContext;
 import org.springframework.context.ApplicationContext;
 
 import java.util.Collection;
@@ -14,7 +13,7 @@ import java.util.Collection;
 public class EnvironmentUtils {
     private static EnvironmentProvider environmentProvider;
 
-    public static User getLoginUser(RequestContext context) {
+    public static User getLoginUser() {
         if (environmentProvider == null) {
             initEnvironmentProvider();
         }

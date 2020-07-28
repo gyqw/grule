@@ -21,12 +21,11 @@ public class DefaultHtmlFileDebugWriter implements DebugWriter {
             msg.append(item.toHtml());
         }
         String fullPath = path + "/urule-debug.html";
-        StringBuilder sb = new StringBuilder();
-        sb.append("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>URule调试日志信息</title><body style='font-size:12px'>");
-        sb.append(msg.toString());
-        sb.append("</body></html>");
         FileOutputStream out = new FileOutputStream(new File(fullPath));
-        IOUtils.write(sb.toString(), out);
+        String sb = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>URule调试日志信息</title><body style='font-size:12px'>" +
+                msg.toString() +
+                "</body></html>";
+        IOUtils.write(sb, out);
         out.flush();
         out.close();
     }

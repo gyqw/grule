@@ -11,7 +11,6 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import javax.jcr.Repository;
 import javax.jcr.*;
@@ -30,9 +29,9 @@ import java.util.List;
 /**
  * @author Jacky.gao
  * @author fred
- * 2017年12月15日
+ * @since 2017年12月15日
  */
-public abstract class BaseRepositoryService implements RepositoryReader, ApplicationContextAware {
+public abstract class BaseRepositoryService implements RepositoryReader {
     public static final String RES_PACKGE_FILE = "___res__package__file__";
     public static final String PACKAGE_CONFIG_FILE = "___package_config__file__";
     public static final String CLIENT_CONFIG_FILE = "___client_config__file__";
@@ -251,7 +250,6 @@ public abstract class BaseRepositoryService implements RepositoryReader, Applica
         this.repositoryBuilder = repositoryBuilder;
     }
 
-    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         try {
             repository = repositoryBuilder.getRepository();

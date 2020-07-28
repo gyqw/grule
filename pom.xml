@@ -9,10 +9,12 @@
     <version>1.0.0</version>
 
     <modules>
+        <module>urule-parent</module>
+        <module>grule-parent</module>
+
         <module>grule-console</module>
         <module>urule-console</module>
         <module>urule-core</module>
-        <module>urule-parent</module>
 
         <module>urule-springboot</module>
         <module>grule-springboot</module>

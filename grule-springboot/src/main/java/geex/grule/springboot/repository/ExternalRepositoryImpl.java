@@ -2,14 +2,14 @@ package geex.grule.springboot.repository;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.bstek.urule.console.repository.ExternalRepository;
+import geex.grule.console.repository.ExternalRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 
 /**
  * @author fred
- * 2019-09-25 4:43 PM
+ * @since 2019-09-25 4:43 PM
  */
 @Repository
 public class ExternalRepositoryImpl implements ExternalRepository {

@@ -1,9 +1,8 @@
 package geex.grule.springboot.config;
 
-import com.bstek.urule.console.DefaultUser;
-import com.bstek.urule.console.EnvironmentProvider;
-import com.bstek.urule.console.User;
-import com.bstek.urule.console.servlet.RequestContext;
+import geex.grule.console.DefaultUser;
+import geex.grule.console.EnvironmentProvider;
+import geex.grule.console.User;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -11,12 +10,12 @@ import java.util.List;
 
 /**
  * @author fred
- * 2019-11-19 11:27 AM
+ * @since 2019-11-19 11:27 AM
  */
 @Component
 public class EnvironmentProviderImpl implements EnvironmentProvider {
     @Override
-    public User getLoginUser(RequestContext context) {
+    public User getLoginUser() {
         DefaultUser user = new DefaultUser();
         user.setUsername("user1");
         user.setCompanyId("bstek");

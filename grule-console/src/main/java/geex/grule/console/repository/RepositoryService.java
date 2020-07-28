@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author Jacky.gao
  * @author fred
- * 2015年3月24日
+ * @since 2015年3月24日
  */
 public interface RepositoryService extends RepositoryReader {
     public static final String BEAN_ID = "urule.repositoryService";

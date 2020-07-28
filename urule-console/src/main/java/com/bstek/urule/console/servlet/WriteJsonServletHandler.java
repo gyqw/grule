@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 
 /**
  * @author Jacky.gao
- * 2016年5月23日
+ * @since 2016年5月23日
  */
 public abstract class WriteJsonServletHandler extends BaseServletHandler {
     protected void writeObjectToJson(HttpServletResponse resp, Object obj) throws ServletException, IOException {

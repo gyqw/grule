@@ -9,12 +9,14 @@ import com.bstek.urule.model.rule.lhs.*;
 import com.bstek.urule.model.table.Condition;
 import com.bstek.urule.model.table.Joint;
 import com.bstek.urule.model.table.JointType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 /**
  * @author fred
- * 2018-11-05 6:53 PM
+ * @since 2018-11-05 6:53 PM
  */
 public class CrosstabRulesBuilder {
     public CrosstabRulesBuilder() {

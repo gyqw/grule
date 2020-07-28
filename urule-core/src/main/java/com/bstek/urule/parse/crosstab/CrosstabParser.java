@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  * @author fred
- * 2018-11-05 6:49 PM
+ * @since 2018-11-05 6:49 PM
  */
 public class CrosstabParser implements Parser<CrosstabDefinition> {
     private CrossRowParser crossRowParser;

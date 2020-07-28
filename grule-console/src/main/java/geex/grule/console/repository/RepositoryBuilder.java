@@ -1,5 +1,6 @@
 package geex.grule.console.repository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jackrabbit.oak.InitialContent;
 import org.apache.jackrabbit.oak.Oak;
 import org.apache.jackrabbit.oak.api.ContentRepository;
@@ -15,8 +16,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 
-import java.util.logging.Logger;
-
 import static org.apache.jackrabbit.oak.plugins.document.mongo.MongoDocumentNodeStoreBuilder.newMongoDocumentNodeStoreBuilder;
 
 /**
@@ -24,9 +23,9 @@ import static org.apache.jackrabbit.oak.plugins.document.mongo.MongoDocumentNode
  * @author fred
  * @since 2016年5月24日
  */
+@Slf4j
 @Component
 public class RepositoryBuilder implements InitializingBean {
-    private Logger log = Logger.getLogger(RepositoryBuilder.class.getName());
 
     private RepositoryImpl repository;
     private Element workspaceTemplate;
@@ -62,7 +61,7 @@ public class RepositoryBuilder implements InitializingBean {
         initDefaultRepository();
     }
 
-    // TODO: 3/24/20 destory
+    // TODO: 2020-3-24 destory
     public void destroy() {
         System.out.println("Shutdown repository...");
         repository.shutdown();

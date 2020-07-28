@@ -2,8 +2,6 @@ package geex.grule.console.repository.refactor;
 
 import geex.grule.console.EnvironmentUtils;
 import geex.grule.console.User;
-import geex.grule.console.controller.RequestContext;
-import geex.grule.console.controller.RequestHolder;
 import geex.grule.console.repository.Repository;
 import geex.grule.console.repository.RepositoryService;
 import geex.grule.console.repository.model.FileType;
@@ -30,7 +28,7 @@ public class RefactorServiceImpl implements RefactorService {
     @Override
     public void refactorFile(String oldPath, String newPath, Repository repo) throws Exception {
         String resPackagePath = oldPath.substring(1) + "/" + "___res__package__file__";
-        User user = EnvironmentUtils.getLoginUser(new RequestContext(RequestHolder.getRequest(), RequestHolder.getResponse()));
+        User user = EnvironmentUtils.getLoginUser();
         RepositoryFile rootFile = repo.getRootFile();
         List<RepositoryFile> children = rootFile.getChildren();
         if (oldPath.contains("___temp_mount_project_node_for_import__")) {
@@ -65,7 +63,7 @@ public class RefactorServiceImpl implements RefactorService {
     @Override
     public void refactorFile(String oldPath, String newPath) throws Exception {
         String project = this.repositoryService.getProject(oldPath);
-        User user = EnvironmentUtils.getLoginUser(new RequestContext(RequestHolder.getRequest(), RequestHolder.getResponse()));
+        User user = EnvironmentUtils.getLoginUser();
         FileType[] types = new FileType[]{FileType.DecisionTable, FileType.Crosstab, FileType.DecisionTree, FileType.RuleFlow, FileType.Ruleset, FileType.UL, FileType.Scorecard, FileType.ComplexScorecard, FileType.ScriptDecisionTable};
         Repository repo = this.repositoryService.loadRepository(project, user, false, types, (String) null);
         RepositoryFile rootFile = repo.getRootFile();
@@ -130,7 +128,7 @@ public class RefactorServiceImpl implements RefactorService {
     @Override
     public void refactorItem(String path, Item item) throws Exception {
         String project = this.repositoryService.getProject(path);
-        User user = EnvironmentUtils.getLoginUser(new RequestContext(RequestHolder.getRequest(), RequestHolder.getResponse()));
+        User user = EnvironmentUtils.getLoginUser();
         FileType[] types = new FileType[]{FileType.DecisionTable, FileType.Crosstab, FileType.DecisionTree, FileType.RuleFlow, FileType.Ruleset, FileType.UL, FileType.Scorecard, FileType.ComplexScorecard, FileType.ScriptDecisionTable};
         Repository repo = this.repositoryService.loadRepository(project, user, false, types, (String) null);
         RepositoryFile rootFile = repo.getRootFile();

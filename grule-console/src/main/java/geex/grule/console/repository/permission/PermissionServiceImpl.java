@@ -3,7 +3,6 @@ package geex.grule.console.repository.permission;
 import com.bstek.urule.exception.RuleException;
 import geex.grule.console.EnvironmentUtils;
 import geex.grule.console.User;
-import geex.grule.console.controller.RequestHolder;
 import geex.grule.console.model.ProjectConfig;
 import geex.grule.console.model.UserPermission;
 import geex.grule.console.repository.RepositoryService;
@@ -200,12 +199,12 @@ public class PermissionServiceImpl implements PermissionStore, PermissionService
 
     @Override
     public boolean isAdmin() {
-        User user = EnvironmentUtils.getLoginUser(RequestHolder.newRequestContext());
+        User user = EnvironmentUtils.getLoginUser();
         return user.isAdmin();
     }
 
     private ProjectConfig loadProjectPermission(String project) {
-        User user = EnvironmentUtils.getLoginUser(RequestHolder.newRequestContext());
+        User user = EnvironmentUtils.getLoginUser();
         String companyId = user.getCompanyId();
         try {
             List<UserPermission> permissions = repositoryService.loadResourceSecurityConfigs(companyId);

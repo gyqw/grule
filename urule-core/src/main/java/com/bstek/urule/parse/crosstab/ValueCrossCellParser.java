@@ -9,7 +9,7 @@ import java.util.Iterator;
 
 /**
  * @author fred
- * 2018-11-05 6:51 PM
+ * @since 2018-11-05 6:51 PM
  */
 public class ValueCrossCellParser extends CrossCellParser implements Parser<ValueCrossCell> {
     private ValueParser valueParser;

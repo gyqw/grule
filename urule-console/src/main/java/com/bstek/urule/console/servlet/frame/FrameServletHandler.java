@@ -46,7 +46,7 @@ import java.util.Map;
  * 2016年6月3日
  */
 public class FrameServletHandler extends RenderPageServletHandler {
-    private Logger logger = LoggerFactory.getLogger(FrameServletHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(FrameServletHandler.class);
 
     private RepositoryService repositoryService;
     private String welcomePage;

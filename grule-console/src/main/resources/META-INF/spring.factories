@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-geex.grule.console.configuration.GruleConsoleAutoConfiguration
+geex.grule.console.config.GruleConsoleAutoConfiguration

@@ -8,9 +8,7 @@
     <bean id="urule.core.propertyPlaceholderConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
-        <property name="location">
-            <value>classpath:urule-core-context.properties</value>
-        </property>
+        <property name="location" value="classpath:urule-core-context.properties"/>
     </bean>
 
     <bean id="urule.crosstableDeserializer" class="com.bstek.urule.parse.deserializer.CrosstableDeserializer">
@@ -43,7 +41,7 @@
     </bean>
 
     <bean id="urule.defaultHtmlFileDebugWriter" class="com.bstek.urule.debug.DefaultHtmlFileDebugWriter">
-        <property name="path" value="${urule.defaultHtmlFileDebugPath}"/>
+        <property name="path" value="${urule.defaultHtmlFileDebugPath:urule}"/>
     </bean>
 
     <bean id="urule.crosstabRulesBuilder" class="com.bstek.urule.builder.table.CrosstabRulesBuilder"/>
@@ -69,68 +67,67 @@
     <bean id="urule.activeAgendaFunctionDescriptor"
           class="com.bstek.urule.model.function.ActiveAgendaFunctionDescriptor"/>
     <bean id="urule.sinFunctionDescriptor" class="com.bstek.urule.model.function.impl.SinFunctionDescriptor">
-        <property name="disabled" value="${urule.sinFunctionDisabled}"/>
+        <property name="disabled" value="${urule.sinFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.cosFunctionDescriptor" class="com.bstek.urule.model.function.impl.CosFunctionDescriptor">
-        <property name="disabled" value="${urule.cosFunctionDisabled}"/>
+        <property name="disabled" value="${urule.cosFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.tanFunctionDescriptor" class="com.bstek.urule.model.function.impl.TanFunctionDescriptor">
-        <property name="disabled" value="${urule.tanFunctionDisabled}"/>
+        <property name="disabled" value="${urule.tanFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.lnFunctionDescriptor" class="com.bstek.urule.model.function.impl.LnFunctionDescriptor">
-        <property name="disabled" value="${urule.lnFunctionDisabled}"/>
+        <property name="disabled" value="${urule.lnFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.expFunctionDescriptor" class="com.bstek.urule.model.function.impl.ExpFunctionDescriptor">
-        <property name="disabled" value="${urule.expFunctionDisabled}"/>
+        <property name="disabled" value="${urule.expFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.updateFactFunctionDescriptor"
           class="com.bstek.urule.model.function.impl.UpdateFactFunctionDescriptor">
-        <property name="disabled" value="${urule.updateFactFunctionDisabled}"/>
+        <property name="disabled" value="${urule.updateFactFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.updateParameterFunctionDescriptor"
           class="com.bstek.urule.model.function.impl.UpdateParameterFunctionDescriptor"/>
     <bean id="urule.trimFunctionDescriptor" class="com.bstek.urule.model.function.impl.TrimFunctionDescriptor">
-        <property name="disabled" value="${urule.trimFunctionDisabled}"/>
+        <property name="disabled" value="${urule.trimFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.stringLengthFunctionDescriptor"
           class="com.bstek.urule.model.function.impl.StringLengthFunctionDescriptor">
-        <property name="disabled" value="${urule.stringLengthFunctionDisabled}"/>
+        <property name="disabled" value="${urule.stringLengthFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.absFunctionDescriptor" class="com.bstek.urule.model.function.impl.AbsFunctionDescriptor">
-        <property name="disabled" value="${urule.absFunctionDisabled}"/>
+        <property name="disabled" value="${urule.absFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.avgFunctionDescriptor" class="com.bstek.urule.model.function.impl.AvgFunctionDescriptor">
-        <property name="disabled" value="${urule.avgFunctionDisabled}"/>
+        <property name="disabled" value="${urule.avgFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.minValueFunctionDescriptor" class="com.bstek.urule.model.function.impl.MinValueFunctionDescriptor">
-        <property name="disabled" value="${urule.minValueFunctionDisabled}"/>
+        <property name="disabled" value="${urule.minValueFunctionDisabled:false}"/>
     </bean>
 
     <bean id="urule.maxValueFunctionDescriptor" class="com.bstek.urule.model.function.impl.MaxValueFunctionDescriptor">
-        <property name="disabled" value="${urule.maxValueFunctionDisabled}"/>
+        <property name="disabled" value="${urule.maxValueFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.maxFunctionDescriptor" class="com.bstek.urule.model.function.impl.MaxFunctionDescriptor">
-        <property name="disabled" value="${urule.maxFunctionDisabled}"/>
+        <property name="disabled" value="${urule.maxFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.minFunctionDescriptor" class="com.bstek.urule.model.function.impl.MinFunctionDescriptor">
-        <property name="disabled" value="${urule.minFunctionDisabled}"/>
+        <property name="disabled" value="${urule.minFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.sumFunctionDescriptor" class="com.bstek.urule.model.function.impl.SumFunctionDescriptor">
-        <property name="disabled" value="${urule.sumFunctionDisabled}"/>
+        <property name="disabled" value="${urule.sumFunctionDisabled:false}"/>
     </bean>
     <bean id="urule.CountFunctionDescriptor" class="com.bstek.urule.model.function.impl.CountFunctionDescriptor">
-        <property name="disabled" value="${urule.countFunctionDisabled}"/>
+        <property name="disabled" value="${urule.countFunctionDisabled:false}"/>
     </bean>
 
     <bean id="urule.remoteService" class="com.bstek.urule.runtime.service.RemoteServiceImpl">
-        <property name="resporityServerUrl" value="${urule.resporityServerUrl}"/>
+        <property name="resporityServerUrl" value="${urule.resporityServerUrl:}"/>
     </bean>
 
     <bean id="urule.configure" class="com.bstek.urule.Configure">
-        <property name="dateFormat" value="${urule.dateFormat}"/>
-        <property name="tempStorePath" value="${urule.tempStorePath}"/>
+        <property name="dateFormat" value="${urule.dateFormat:}"/>
+        <property name="tempStorePath" value="${urule.tempStorePath:}"/>
     </bean>
-
 
     <bean id="urule.actionContextBuilder" class="com.bstek.urule.dsl.builder.ActionContextBuilder"/>
 
@@ -148,7 +145,7 @@
 
     <bean id="urule.knowledgeService" class="com.bstek.urule.runtime.service.KnowledgeServiceImpl">
         <property name="remoteService" ref="urule.remoteService"/>
-        <property name="knowledgeUpdateCycle" value="${urule.knowledgeUpdateCycle}"/>
+        <property name="knowledgeUpdateCycle" value="${urule.knowledgeUpdateCycle:0}"/>
     </bean>
 
     <bean id="urule.dateAction" class="com.bstek.urule.runtime.builtinaction.DateAction"/>
@@ -165,8 +162,8 @@
     <bean id="urule.valueCompute" class="com.bstek.urule.runtime.rete.ValueCompute"/>
 
     <bean id="urule.utils" class="com.bstek.urule.Utils">
-        <property name="debug" value="${urule.debug}"/>
-        <property name="debugToFile" value="${urule.debugToFile}"/>
+        <property name="debug" value="${urule.debug:true}"/>
+        <property name="debugToFile" value="${urule.debugToFile:false}"/>
     </bean>
 
     <bean id="urule.flowResourceBuilder" class="com.bstek.urule.builder.resource.FlowResourceBuilder">
