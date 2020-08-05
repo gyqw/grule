@@ -44,6 +44,8 @@ public interface RepositoryService extends RepositoryReader {
 
     void deleteFile(String path, User user) throws Exception;
 
+    void deleteFileVersionHistory(String path, User user) throws Exception;
+
     void lockPath(String path, User user) throws Exception;
 
     void unlockPath(String path, User user) throws Exception;

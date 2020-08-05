@@ -54,7 +54,7 @@ import static com.bstek.urule.console.repository.BaseRepositoryService.RES_PACKG
 /**
  * @author Jacky.gao
  * @author fred
- * 2016年7月25日
+ * @since 2016年7月25日
  */
 public class CommonServletHandler extends RenderPageServletHandler {
     private Logger logger = LoggerFactory.getLogger(CommonServletHandler.class);

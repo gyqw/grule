@@ -30,6 +30,7 @@ import javax.jcr.lock.Lock;
 import javax.jcr.nodetype.NodeType;
 import javax.jcr.version.Version;
 import javax.jcr.version.VersionHistory;
+import javax.jcr.version.VersionIterator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -790,6 +791,18 @@ public class RepositoryServiceImpl extends BaseRepositoryService implements Repo
         }
         fileNode.remove();
         session.save();
+    }
+
+    @Override
+    public void deleteFileVersionHistory(String path, User user) throws Exception {
+        VersionHistory vh = versionManager.getVersionHistory(path);
+        for (VersionIterator vit = vh.getAllVersions(); vit.hasNext(); ) {
+            Version v = vit.nextVersion();
+            String vname = v.getName();
+            if (!"jcr:rootVersion".equals(vname)) {
+                vh.removeVersion(vname);
+            }
+        }
     }
 
     @Override

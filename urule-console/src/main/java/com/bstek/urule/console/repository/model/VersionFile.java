@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * @author Jacky.gao
  * @author fred
- * 2015年3月25日
+ * @since 2015年3月25日
  */
 public class VersionFile {
     private String path;
