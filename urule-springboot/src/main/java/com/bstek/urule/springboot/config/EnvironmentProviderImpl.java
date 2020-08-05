@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @author fred
- * 2019-11-19 11:27 AM
+ * @since 2019-11-19 11:27 AM
  */
 @Component
 public class EnvironmentProviderImpl implements EnvironmentProvider {
@@ -32,6 +32,5 @@ public class EnvironmentProviderImpl implements EnvironmentProvider {
         List<User> users = new ArrayList<>();
         users.add(user1);
         return users;
-
     }
 }

@@ -1,4 +1,4 @@
-# 2.3.6-SNAPSHOT (2020-03-23)
+# 2.3.7-SNAPSHOT (2020-07-28)
 
 ###  改进的功能：
 *  jackrabbit -> jackrabbit oak

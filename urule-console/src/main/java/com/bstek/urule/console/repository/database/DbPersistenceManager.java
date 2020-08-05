@@ -34,7 +34,7 @@ import java.util.Map;
 
 /**
  * @author Jacky.gao
- * 2017年12月7日
+ * @since 2017年12月7日
  */
 public class DbPersistenceManager extends AbstractBundlePersistenceManager implements DatabaseAware {
 
@@ -291,7 +291,7 @@ public class DbPersistenceManager extends AbstractBundlePersistenceManager imple
      * Returns the configured database type name.
      *
      * @return the database type name.
-     * @deprecated This method is deprecated; {@link getDatabaseType} should be used instead.
+     * @deprecated This method is deprecated; getDatabaseType should be used instead.
      */
     public String getSchema() {
         return databaseType;
@@ -312,7 +312,7 @@ public class DbPersistenceManager extends AbstractBundlePersistenceManager imple
      * objects.
      *
      * @param databaseType database type name
-     * @deprecated This method is deprecated; {@link setDatabaseType} should be used instead.
+     * @deprecated This method is deprecated; setDatabaseType should be used instead.
      */
     public void setSchema(String databaseType) {
         this.databaseType = databaseType;
@@ -571,8 +571,7 @@ public class DbPersistenceManager extends AbstractBundlePersistenceManager imple
     }
 
     private DataSource getDataSource() throws Exception {
-        setDatabaseType(RepositoryBuilder.databaseType);
-        return RepositoryBuilder.datasource;
+        return RepositoryBuilder.getDatasourceByName(this.dataSourceName);
     }
 
     /**

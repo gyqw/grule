@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 
 /**
  * @author fred
- * 2019-12-27 3:50 PM
+ * @since 2019-12-27 3:50 PM
  */
 @Service
 public class ExternalProcessServiceImpl implements ExternalProcessService {
-    private Logger logger = LoggerFactory.getLogger(ExternalProcessServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(ExternalProcessServiceImpl.class);
 
     @Override
     public String start(String project, String version, String explain) throws Exception {

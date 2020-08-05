@@ -4,7 +4,9 @@
 <Repository>
     <FileSystem class="com.bstek.urule.console.repository.database.system.MysqlFileSystem">
         <param name="schemaObjectPrefix" value="repo_"/>
+        <param name="dataSourceName" value="${dataSourceName}"/>
     </FileSystem>
+
     <Security appName="Jackrabbit">
         <AccessManager class="org.apache.jackrabbit.core.security.simple.SimpleAccessManager"/>
         <LoginModule class="org.apache.jackrabbit.core.security.simple.SimpleLoginModule">
@@ -12,30 +14,44 @@
             <param name="adminId" value="admin"/>
         </LoginModule>
     </Security>
+
     <DataStore class="com.bstek.urule.console.repository.database.DatabaseDataStore">
         <param name="schemaObjectPrefix" value="repo_ds_"/>
+        <param name="databaseType" value="mysql"/>
+        <param name="dataSourceName" value="${dataSourceName}"/>
     </DataStore>
+
     <Workspaces rootPath="${rep.home}/workspaces" defaultWorkspace="default"/>
+
     <Workspace name="default">
         <FileSystem class="com.bstek.urule.console.repository.database.system.MysqlFileSystem">
             <param name="schemaObjectPrefix" value="repo_${wsp.name}_"/>
+            <param name="dataSourceName" value="${dataSourceName}"/>
         </FileSystem>
         <PersistenceManager class="com.bstek.urule.console.repository.database.manager.MySqlPersistenceManager">
             <param name="schemaObjectPrefix" value="repo_pm_${wsp.name}_"/>
+            <param name="databaseType" value="mysql"/>
+            <param name="dataSourceName" value="${dataSourceName}"/>
         </PersistenceManager>
     </Workspace>
+
     <Versioning rootPath="${rep.home}/version">
         <FileSystem class="com.bstek.urule.console.repository.database.system.MysqlFileSystem">
             <param name="schemaObjectPrefix" value="repo_fsver_"/>
+            <param name="dataSourceName" value="${dataSourceName}"/>
         </FileSystem>
         <PersistenceManager class="com.bstek.urule.console.repository.database.manager.MySqlPersistenceManager">
             <param name="schemaObjectPrefix" value="repo_ver_"/>
+            <param name="databaseType" value="mysql"/>
+            <param name="dataSourceName" value="${dataSourceName}"/>
         </PersistenceManager>
     </Versioning>
 
     <Cluster syncDelay="5000">
         <Journal class="com.bstek.urule.console.repository.database.journal.DatabaseJournal">
             <param name="schemaObjectPrefix" value="journal_"/>
+            <param name="databaseType" value="mysql"/>
+            <param name="dataSourceName" value="${dataSourceName}"/>
         </Journal>
     </Cluster>
 </Repository>

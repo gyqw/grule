@@ -17,7 +17,7 @@ import java.util.NoSuchElementException;
 
 /**
  * @author Jacky.gao
- * 2017年12月7日
+ * @since 2017年12月7日
  */
 public class DatabaseRecordIterator implements RecordIterator {
 

@@ -1,9 +1,8 @@
 package com.bstek.urule.console.repository.database;
 
+import com.bstek.urule.console.repository.RepositoryBuilder;
 import org.apache.jackrabbit.core.fs.FileSystemException;
 import org.apache.jackrabbit.core.fs.db.DbFileSystem;
-
-import com.bstek.urule.console.repository.RepositoryBuilder;
 
 /**
  * @author Jacky.gao
@@ -17,7 +16,7 @@ public abstract class BaseDbFileSystem extends DbFileSystem {
         }
         try {
             setSchema(databaseType());
-            conHelper = createConnectionHelper(RepositoryBuilder.datasource);
+            conHelper = createConnectionHelper(RepositoryBuilder.getDatasourceByName(this.dataSourceName));
 
             // make sure schemaObjectPrefix consists of legal name characters only
             schemaObjectPrefix = conHelper.prepareDbIdentifier(schemaObjectPrefix);

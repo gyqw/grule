@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * @author Jacky.gao
  * @author fred
- * 2017年12月15日
+ * @since 2017年12月15日
  */
 public abstract class BaseRepositoryService implements RepositoryReader, ApplicationContextAware {
     public static final String RES_PACKGE_FILE = "___res__package__file__";

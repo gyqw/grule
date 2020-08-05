@@ -27,6 +27,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.context.WebApplicationContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 
 import javax.jcr.RepositoryException;
 import javax.servlet.ServletContext;
@@ -35,12 +36,15 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
  * @author Jacky.gao
- * 2016年5月24日
+ * @since 2016年5月24日
  */
 public class RepositoryBuilder implements InitializingBean, ApplicationContextAware {
     private String repoHomeDir;
@@ -49,9 +53,10 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
     private String repositoryXml;
     private ApplicationContext applicationContext;
     private String repositoryDatasourceName;
-    public static String databaseType;
-    public static DataSource datasource;
-    private Logger log = Logger.getLogger(RepositoryBuilder.class.getName());
+    private String databaseType;
+    private DataSource datasource;
+    private static Map<String, DataSource> dataSourceMap = new HashMap<>();
+    private final Logger log = Logger.getLogger(RepositoryBuilder.class.getName());
 
     public RepositoryImpl getRepository() {
         return repository;
@@ -149,13 +154,20 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
                 } else {
                     tempRepoHomeDir += "/urule-temp-repo-home/";
                 }
+                tempRepoHomeDir += UUID.randomUUID().toString().replace("-", "") + "/";
                 File tempDir = new File(tempRepoHomeDir);
                 clearTempDir(tempDir);
             } else {
                 tempRepoHomeDir = "";
             }
-            RepositoryConfig repositoryConfig = RepositoryConfig.create(inputStream, tempRepoHomeDir);
+
+            Properties properties = new Properties(System.getProperties());
+            properties.setProperty("rep.home", tempRepoHomeDir);
+            properties.setProperty("dataSourceName", this.repositoryDatasourceName);
+            RepositoryConfig repositoryConfig = RepositoryConfig.create(new InputSource(inputStream), properties);
             repository = RepositoryImpl.create(repositoryConfig);
+        } catch (Exception e) {
+            log.finer("initRepositoryByXml error: " + e.getMessage());
         } finally {
             if (inputStream != null) {
                 inputStream.close();
@@ -238,7 +250,10 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
 
     public void afterPropertiesSet() throws Exception {
         if (StringUtils.isNotBlank(repositoryDatasourceName)) {
-            RepositoryBuilder.datasource = (DataSource) this.applicationContext.getBean(repositoryDatasourceName);
+            this.datasource = (DataSource) this.applicationContext.getBean(repositoryDatasourceName);
+            if (RepositoryBuilder.dataSourceMap.get(this.repositoryDatasourceName) == null) {
+                RepositoryBuilder.dataSourceMap.put(this.repositoryDatasourceName, this.datasource);
+            }
         }
         if (repository != null) {
             repository.shutdown();
@@ -248,8 +263,8 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
         }
         if (StringUtils.isNotBlank(repositoryXml)) {
             initRepositoryByXml(repositoryXml);
-        } else if (RepositoryBuilder.datasource != null) {
-            if (RepositoryBuilder.databaseType == null) {
+        } else if (this.datasource != null) {
+            if (this.databaseType == null) {
                 throw new RuleException("You need config \"urule.repository.databasetype\" property when use spring datasource!");
             }
             initRepositoryFromSpringDatasource();
@@ -262,8 +277,8 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
     }
 
     private void initRepositoryFromSpringDatasource() throws Exception {
-        System.out.println("Init repository from spring datasource [" + repositoryDatasourceName + "] with database type [" + RepositoryBuilder.databaseType + "]...");
-        String xml = "classpath:com/bstek/urule/console/repository/database/configs/" + RepositoryBuilder.databaseType + ".xml";
+        log.info("Init repository from spring datasource [" + repositoryDatasourceName + "] with database type [" + this.databaseType + "]...");
+        String xml = "classpath:com/bstek/urule/console/repository/database/configs/" + this.databaseType + ".xml";
         initRepositoryByXml(xml);
     }
 
@@ -271,22 +286,25 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
         this.repoHomeDir = repoHomeDir;
     }
 
-
     public void setRepositoryXml(String repositoryXml) {
         this.repositoryXml = repositoryXml;
     }
 
     public void setDatabaseType(String databaseType) {
-        RepositoryBuilder.databaseType = databaseType;
+        this.databaseType = databaseType;
     }
 
     public void setRepositoryDatasourceName(String repositoryDatasourceName) {
         this.repositoryDatasourceName = repositoryDatasourceName;
     }
 
+    public static DataSource getDatasourceByName(String name) {
+        return RepositoryBuilder.dataSourceMap.get(name);
+    }
+
     public void destroy() {
-        System.out.println("Shutdown repository...");
+        log.info("Shutdown repository...");
         repository.shutdown();
-        System.out.println("Shutdown repository completed...");
+        log.info("Shutdown repository completed...");
     }
 }

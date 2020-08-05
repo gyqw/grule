@@ -1,34 +1,18 @@
 package com.bstek.urule.console.repository.database.journal;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Calendar;
-
-import javax.sql.DataSource;
-
+import com.bstek.urule.console.repository.RepositoryBuilder;
 import org.apache.commons.io.IOUtils;
-import org.apache.jackrabbit.core.journal.AbstractJournal;
-import org.apache.jackrabbit.core.journal.AppendRecord;
-import org.apache.jackrabbit.core.journal.FileRevision;
-import org.apache.jackrabbit.core.journal.InstanceRevision;
-import org.apache.jackrabbit.core.journal.JournalException;
-import org.apache.jackrabbit.core.journal.RecordIterator;
-import org.apache.jackrabbit.core.util.db.CheckSchemaOperation;
-import org.apache.jackrabbit.core.util.db.ConnectionFactory;
-import org.apache.jackrabbit.core.util.db.ConnectionHelper;
-import org.apache.jackrabbit.core.util.db.DatabaseAware;
-import org.apache.jackrabbit.core.util.db.DbUtility;
-import org.apache.jackrabbit.core.util.db.StreamWrapper;
+import org.apache.jackrabbit.core.journal.*;
+import org.apache.jackrabbit.core.util.db.*;
 import org.apache.jackrabbit.spi.commons.namespace.NamespaceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bstek.urule.console.repository.RepositoryBuilder;
+import javax.sql.DataSource;
+import java.io.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Calendar;
 
 /**
  * @author Jacky.gao
@@ -238,12 +222,13 @@ public class DatabaseJournal extends AbstractJournal implements DatabaseAware {
     }
 
     private DataSource getDataSource() throws Exception {
-        /*if (getDataSourceName() == null || "".equals(getDataSourceName())) {
-            return connectionFactory.getDataSource(getDriver(), getUrl(), getUser(), getPassword());
-        } else {
-            return connectionFactory.getDataSource(dataSourceName);
-        }*/
-        return RepositoryBuilder.datasource;
+//        if (getDataSourceName() == null || "".equals(getDataSourceName())) {
+//            return connectionFactory.getDataSource(getDriver(), getUrl(), getUser(), getPassword());
+//        } else {
+//            return connectionFactory.getDataSource(dataSourceName);
+//        }
+
+        return RepositoryBuilder.getDatasourceByName(this.dataSourceName);
     }
 
     /**
@@ -282,7 +267,7 @@ public class DatabaseJournal extends AbstractJournal implements DatabaseAware {
      * @throws JournalException if initialization fails
      */
     protected void init() throws JournalException {
-        databaseType = RepositoryBuilder.databaseType;
+//        databaseType = RepositoryBuilder.databaseType;
     }
 
     /**

@@ -6,14 +6,12 @@ import com.bstek.urule.runtime.KnowledgeSession;
 import com.bstek.urule.runtime.KnowledgeSessionFactory;
 import com.bstek.urule.runtime.response.RuleExecutionResponse;
 import com.bstek.urule.runtime.service.KnowledgeService;
-import com.bstek.urule.springboot.model.DataParam;
 import com.bstek.urule.springboot.model.ItemModel;
 import com.bstek.urule.springboot.model.OrderModel;
 import com.bstek.urule.springboot.model.OutputModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,7 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author fred 2019-09-25 10:10 AM
+ * @author fred
+ * @since 2019-09-25 10:10 AM
  */
 @RestController
 @RequestMapping("/api")
@@ -58,14 +57,5 @@ public class ApiController {
         } catch (Exception e) {
             logger.error("test error", e);
         }
-    }
-
-    @PostMapping("/param/dynamic")
-    public void dynamicParam() {
-
-    }
-
-    private void mapToVariableCategories(List<DataParam> paramList) {
-
     }
 }
