@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author Jacky.gao
  * @author fred
- * 2017年12月15日
+ * @since 2017年12月15日
  */
 public interface RepositoryReader {
     public static final String BEAN_ID = RepositoryService.BEAN_ID;

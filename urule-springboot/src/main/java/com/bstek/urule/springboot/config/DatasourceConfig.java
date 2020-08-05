@@ -30,4 +30,14 @@ public class DatasourceConfig {
         basicDataSource.setPassword("robin");
         return basicDataSource;
     }
+
+//    @Bean
+//    public BasicDataSource remoteDataSource() {
+//        BasicDataSource basicDataSource = new BasicDataSource();
+//        basicDataSource.setDriverClassName("com.mysql.jdbc.Driver");
+//        basicDataSource.setUrl("jdbc:mysql://192.168.100.61:8066/urule?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false");
+//        basicDataSource.setUsername("suhui");
+//        basicDataSource.setPassword("suhui666");
+//        return basicDataSource;
+//    }
 }

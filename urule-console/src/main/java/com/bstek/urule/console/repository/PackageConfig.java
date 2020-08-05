@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * @author fred
- * 2019-12-27 5:31 PM
+ * @since 2019-12-27 5:31 PM
  */
 public class PackageConfig {
     private String version;

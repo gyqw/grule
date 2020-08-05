@@ -1,7 +1,5 @@
 package com.bstek.urule.console.servlet.respackage;
 
-import static com.bstek.urule.console.repository.BaseRepositoryService.RES_PACKGE_FILE;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bstek.urule.Configure;
@@ -35,30 +33,6 @@ import com.bstek.urule.runtime.response.ExecutionResponse;
 import com.bstek.urule.runtime.response.ExecutionResponseImpl;
 import com.bstek.urule.runtime.response.FlowExecutionResponse;
 import com.bstek.urule.runtime.response.NodeExecutionResponse;
-import java.awt.Color;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -70,27 +44,35 @@ import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
+import org.apache.poi.xssf.usermodel.*;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
+import java.io.*;
+import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.*;
+
+import static com.bstek.urule.console.repository.BaseRepositoryService.RES_PACKGE_FILE;
+
 /**
  * @author Jacky.gao
- * @author fred 2016年6月3日
+ * @author fred
+ * @since 2016年6月3日
  */
 public class PackageServletHandler extends RenderPageServletHandler {
-
-    private Logger logger = LoggerFactory.getLogger(PackageServletHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(PackageServletHandler.class);
 
     public static final String KB_KEY = "_kb";
     public static final String VCS_KEY = "_vcs";
@@ -104,18 +86,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String method = retriveMethod(req);
-        if (method != null) {
-            invokeMethod(method, req, resp);
-        } else {
-            VelocityContext context = new VelocityContext();
-            context.put("contextPath", req.getContextPath());
-            resp.setContentType("text/html");
-            resp.setCharacterEncoding("utf-8");
-            Template template = ve.getTemplate("html/package-editor.html", "utf-8");
-            PrintWriter writer = resp.getWriter();
-            template.merge(context, writer);
-            writer.close();
-        }
+        invokeMethod(method, req, resp);
     }
 
     public void loadPackages(HttpServletRequest req, HttpServletResponse resp) throws Exception {
@@ -138,7 +109,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
     @SuppressWarnings("unchecked")
     public void exportExcelTemplate(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         List<VariableCategory> variableCategories = (List<VariableCategory>) httpSessionKnowledgeCache
-            .get(req, VCS_KEY);
+                .get(req, VCS_KEY);
         if (variableCategories == null) {
             KnowledgeBase knowledgeBase = buildKnowledgeBase(req);
             variableCategories = knowledgeBase.getResourceLibrary().getVariableCategories();
@@ -164,7 +135,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
     @SuppressWarnings("unchecked")
     public void exportExcelData(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         List<VariableCategory> variableCategories = (List<VariableCategory>) httpSessionKnowledgeCache
-            .get(req, VCS_KEY);
+                .get(req, VCS_KEY);
 
         if (variableCategories == null) {
             KnowledgeBase knowledgeBase = buildKnowledgeBase(req);
@@ -180,7 +151,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
         String projectName = req.getParameter("projectName");
         String packageName = req.getParameter("packageName");
         JSONArray data = applicationContext.getBean(ExternalRepository.class)
-            .findDataByDate(startDate, endDate, projectName, packageName);
+                .findDataByDate(startDate, endDate, projectName, packageName);
 
         SXSSFWorkbook wb = new SXSSFWorkbook();
         XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
@@ -261,7 +232,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
     }
 
     private void buildSheet(SXSSFWorkbook wb, VariableCategory vc, XSSFCellStyle style,
-        List<Map<String, Object>> data) {
+                            List<Map<String, Object>> data) {
         String name = vc.getName();
         Sheet sheet = wb.createSheet(name);
         int rowNum = 0;
@@ -480,11 +451,11 @@ public class PackageServletHandler extends RenderPageServletHandler {
             boolean result = pushKnowledgePackage(packageId, content, config.getClient());
             if (result) {
                 sb.append("<span class=\"text-info\" style='line-height:30px'>推送到客户端：" + config.getName() + "：" + config
-                    .getClient() + " 成功</span>");
+                        .getClient() + " 成功</span>");
             } else {
                 sb.append(
-                    "<span class=\"text-danger\" style='line-height:30px'>推送到客户端：" + config.getName() + "：" + config
-                        .getClient() + " 失败</span>");
+                        "<span class=\"text-danger\" style='line-height:30px'>推送到客户端：" + config.getName() + "：" + config
+                                .getClient() + " 失败</span>");
             }
             i++;
         }
@@ -501,7 +472,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
             }
             String clientUrl = client + KnowledgePackageReceiverServlet.URL;
             content = "packageId=" + URLEncoder.encode(packageId, "utf-8") + "&content=" + URLEncoder
-                .encode(content, "utf-8");
+                    .encode(content, "utf-8");
             URL url = new URL(clientUrl);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -659,10 +630,10 @@ public class PackageServletHandler extends RenderPageServletHandler {
             String flowId = req.getParameter("flowId");
 
             Map<Integer, Map<String, Map<String, Object>>> data =
-                (Map<Integer, Map<String, Map<String, Object>>>) httpSessionKnowledgeCache.get(req, IMPORT_EXCEL_DATA);
+                    (Map<Integer, Map<String, Map<String, Object>>>) httpSessionKnowledgeCache.get(req, IMPORT_EXCEL_DATA);
             if (data == null) {
                 throw new RuleException(
-                    "Import excel data for test has expired, please import the excel and try again.");
+                        "Import excel data for test has expired, please import the excel and try again.");
             }
 
             // 获取项目变量
@@ -739,7 +710,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
     }
 
     private void doSingleBatchTest(KnowledgePackage knowledgePackage, String flowId, Map<String, Object> row,
-        Map<String, Integer> flowMap) {
+                                   Map<String, Integer> flowMap) {
         long start = System.currentTimeMillis();
 
         // 获取session
@@ -790,7 +761,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
     }
 
     private SXSSFWorkbook buildExcel(List<VariableCategory> vcs, List<Map<String, Object>> resultList,
-        Map<String, Integer> flowMap) {
+                                     Map<String, Integer> flowMap) {
         SXSSFWorkbook wb = new SXSSFWorkbook();
 
         XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
@@ -1079,7 +1050,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
     }
 
     public void setHttpSessionKnowledgeCache(
-        HttpSessionKnowledgeCache httpSessionKnowledgeCache) {
+            HttpSessionKnowledgeCache httpSessionKnowledgeCache) {
         this.httpSessionKnowledgeCache = httpSessionKnowledgeCache;
     }
 

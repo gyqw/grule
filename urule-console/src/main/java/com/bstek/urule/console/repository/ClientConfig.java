@@ -2,7 +2,7 @@ package com.bstek.urule.console.repository;
 
 /**
  * @author Jacky.gao
- * 2016年8月11日
+ * @since 2016年8月11日
  */
 public class ClientConfig {
     private String name;

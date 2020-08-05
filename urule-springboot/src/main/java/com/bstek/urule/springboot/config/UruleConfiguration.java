@@ -7,7 +7,6 @@ import com.bstek.urule.console.servlet.URuleServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,8 +20,9 @@ class UruleConfiguration {
     }
 
     @Bean(destroyMethod = "destroy")
-    public RepositoryBuilder geexRepositoryBuilder(ApplicationContext applicationContext) {
+    public RepositoryBuilder geexRepositoryBuilder() {
         RepositoryBuilder repositoryBuilder = new RepositoryBuilder();
+        repositoryBuilder.setRepositoryXml("classpath:remote-urule.xml");
         repositoryBuilder.setRepositoryDatasourceName("remoteDataSource");
         repositoryBuilder.setDatabaseType("mysql");
         return repositoryBuilder;

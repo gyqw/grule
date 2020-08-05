@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * @author Jacky.gao
- * 2017年8月20日
+ * @since 2017年8月20日
  */
 public class HttpSessionKnowledgeCache {
     private Map<String, SessionObject> sessionMap = new HashMap<String, SessionObject>();

@@ -15,6 +15,7 @@ import java.util.List;
  */
 @Component
 public class EnvironmentProviderImpl implements EnvironmentProvider {
+
     @Override
     public User getLoginUser(RequestContext context) {
         DefaultUser user = new DefaultUser();

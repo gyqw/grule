@@ -167,7 +167,7 @@ public class RepositoryBuilder implements InitializingBean, ApplicationContextAw
             RepositoryConfig repositoryConfig = RepositoryConfig.create(new InputSource(inputStream), properties);
             repository = RepositoryImpl.create(repositoryConfig);
         } catch (Exception e) {
-            log.finer("initRepositoryByXml error: " + e.getMessage());
+            log.info("initRepositoryByXml error: " + e.getMessage());
         } finally {
             if (inputStream != null) {
                 inputStream.close();

@@ -1,4 +1,4 @@
-package com.bstek.urule.springboot.service;
+package com.bstek.urule.springboot.service.impl;
 
 import com.bstek.urule.console.ExternalProcessService;
 import org.slf4j.Logger;

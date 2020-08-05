@@ -679,7 +679,7 @@ public class DatabaseJournal extends AbstractJournal implements DatabaseAware {
                 }
 
                 // Insert the given revision in the database
-                if (!exists) {
+                if (!exists && isSchemaCheckEnabled()) {
                     conHelper.exec(insertLocalRevisionStmtSQL, revision, getId());
                 }
 
@@ -711,7 +711,9 @@ public class DatabaseJournal extends AbstractJournal implements DatabaseAware {
 
             // Update the cached value and the table with local revisions.
             try {
-                conHelper.exec(updateLocalRevisionStmtSQL, localRevision, getId());
+                if (isSchemaCheckEnabled()) {
+                    conHelper.exec(updateLocalRevisionStmtSQL, localRevision, getId());
+                }
                 this.localRevision = localRevision;
             } catch (SQLException e) {
                 log.warn("Failed to update local revision.", e);

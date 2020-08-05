@@ -9,10 +9,12 @@ import com.bstek.urule.runtime.service.KnowledgeService;
 import com.bstek.urule.springboot.model.ItemModel;
 import com.bstek.urule.springboot.model.OrderModel;
 import com.bstek.urule.springboot.model.OutputModel;
+import com.bstek.urule.springboot.service.ProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -23,10 +25,20 @@ import java.util.List;
  * @since 2019-09-25 10:10 AM
  */
 @RestController
-@RequestMapping("/api")
-public class ApiController {
+@RequestMapping("/project")
+public class ProjectController {
+    private final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
-    private final Logger logger = LoggerFactory.getLogger(ApiController.class);
+    private final ProjectService projectService;
+
+    public ProjectController(ProjectService projectService) {
+        this.projectService = projectService;
+    }
+
+    @GetMapping("/sync")
+    public void sync(@RequestParam("project") String project) {
+        this.projectService.syncProject(project);
+    }
 
     @GetMapping("/test")
     public void test() {
