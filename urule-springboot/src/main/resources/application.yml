@@ -1,0 +1,29 @@
+urule:
+  datasource:
+    uruleDataSource:
+      url: jdbc:mysql://127.0.0.1:3306/urule?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
+      driver: com.mysql.jdbc.Driver
+      username: root
+      password: 123
+
+---
+spring:
+  profiles: dev
+urule:
+  datasource:
+    remoteDataSource:
+      url: jdbc:mysql://192.168.112.17:3306/urule?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
+      driver: com.mysql.jdbc.Driver
+      username: robin
+      password: robin
+
+---
+spring:
+  profiles: riskdept
+urule:
+  datasource:
+    remoteDataSource:
+      url: jdbc:mysql://192.168.100.61:8066/urule?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
+      driver: com.mysql.jdbc.Driver
+      username: suhui
+      password: suhui666
