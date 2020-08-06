@@ -5,5 +5,5 @@ package com.bstek.urule.springboot.service;
  * @since 2020/08/05 2:06 PM
  */
 public interface ProjectService {
-    void syncProject(String projectName);
+    String syncProject(String projectName);
 }

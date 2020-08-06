@@ -36,8 +36,8 @@ public class ProjectController {
     }
 
     @GetMapping("/sync")
-    public void sync(@RequestParam("project") String project) {
-        this.projectService.syncProject(project);
+    public String sync(@RequestParam("project") String project) {
+        return this.projectService.syncProject(project);
     }
 
     @GetMapping("/test")

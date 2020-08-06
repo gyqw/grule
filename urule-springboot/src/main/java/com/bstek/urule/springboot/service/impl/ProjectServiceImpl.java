@@ -35,7 +35,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void syncProject(String projectName) {
+    public String syncProject(String projectName) {
         if (!projectName.startsWith("/")) {
             projectName = "/" + projectName;
         }
@@ -57,9 +57,11 @@ public class ProjectServiceImpl implements ProjectService {
                 this.repositoryService.importXml(inputStream, true);
             } catch (Exception e) {
                 log.error("syncProject ByteArrayInputStream error", e);
+                return e.getMessage();
             }
         } catch (Exception e) {
             log.error("syncProject ByteArrayOutputStream error", e);
+            return e.getMessage();
         }
 
         // 同步版本
@@ -70,7 +72,10 @@ public class ProjectServiceImpl implements ProjectService {
             iterateRepositoryFile(repository.getRootFile(), user);
         } catch (Exception e) {
             log.error("syncProject error", e);
+            return e.getMessage();
         }
+
+        return "success";
     }
 
     private void iterateRepositoryFile(RepositoryFile repositoryFile, User user) {
