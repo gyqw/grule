@@ -1,3 +1,6 @@
+logging:
+  file: /var/log/tomcat/urule-springboot.log
+
 ---
 spring:
   profiles: dev

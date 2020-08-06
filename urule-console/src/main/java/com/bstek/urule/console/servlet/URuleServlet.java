@@ -68,6 +68,7 @@ public class URuleServlet extends HttpServlet {
         } catch (Exception ex) {
             Throwable e = getCause(ex);
             resp.setCharacterEncoding("UTF-8");
+            resp.setContentType("text/html;charset=UTF-8");
             PrintWriter pw = resp.getWriter();
             if (e instanceof NoPermissionException) {
                 resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

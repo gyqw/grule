@@ -810,7 +810,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
     private void buildObject(Object obj, Map<String, Object> map, List<Variable> variables) {
         for (String name : map.keySet()) {
-            name = name.replaceAll("-", "\\.");
+//            name = name.replaceAll("-", "\\.");
             if (name.contains(".")) {
                 instanceChildObject(obj, name);
             }
